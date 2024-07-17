@@ -22,8 +22,9 @@ if __name__ == '__main__':
 	model = ChameleonForCausalLM.from_pretrained(model_id, device_map="auto")
 
 	image = Image.open(args.image)
-	system_prompt = "The dog in the photo named Teddy. "
-	prompt = system_prompt + args.prompt
+	# system_prompt = "What is the breed of the dog in this photo?"
+	# prompt = system_prompt + args.prompt
+	prompt = args.prompt
 	print(prompt)
 	inputs = processor(prompt, image, return_tensors="pt").to(model.device)
 

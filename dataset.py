@@ -5,6 +5,7 @@ import json
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
+from transformers import ChameleonProcessor
 
 class PersonalizedDataset(Dataset):
     def __init__(
@@ -17,8 +18,7 @@ class PersonalizedDataset(Dataset):
         center_crop=False,
         device="cuda",
         config=None,
-        image_processor=None,
-        # json_path = '.',
+        model_id=None,
         flip_p=0.5,
         train_lm_head=False,
         extreme_negative=False,
@@ -27,10 +27,9 @@ class PersonalizedDataset(Dataset):
         text_only=False,
     ):
         self.data_root = data_root
-        # self.tokenizer = tokenizer
         self.device = device
         self.config = config
-        self.image_processor = image_processor
+        self.processor = ChameleonProcessor.from_pretrained(model_id)
         self.center_crop = center_crop
         self.flip_p = flip_p
         self.sks_name = sks_name
@@ -88,27 +87,43 @@ class PersonalizedDataset(Dataset):
         #     )
         #     img = img[(h - crop) // 2 : (h + crop) // 2, (w - crop) // 2 : (w + crop) // 2]
         image_path = self.images_path[i]
-        images = [Image.open(image_path).convert("RGB")]
+        image = Image.open(image_path).convert("RGB")
 
         # --- Maybe flip the image...
-        images = [self.flip_transform(image) for image in images]
-        image_sizes = [x.size for x in images]
-        images_tensor = process_images(
-            images,
-            self.image_processor,
-            self.config
-        )
-        example["images"] = images_tensor
-        example['query'] = self.questions[i]#.replace('<sks>', f'<{self.sks_name}>')
-        example['answer'] = self.answers[i]#.replace('<sks>', f'<{self.sks_name}>')
-        # print(example['query'])
-        # print(example['answer'])
-        example['has_image'] = self.has_image[i]
-        example['image_sizes'] = image_sizes
+        image = self.flip_transform(image)
+        # breakpoint()
+        # image_sizes = [x.size for x in images]
+        # breakpoint()
+        # image = Image.open(image_path).convert("RGB")
+        # prompt = self.questions[i]
+        # inputs = self.processor(prompt, image, return_tensors="pt")
+        # images_tensor = process_images(
+        #     images,
+        #     self.image_processor,
+        #     self.config
+        # )
+        # example["images"] = images_tensor
+        # example['query'] = self.questions[i]#.replace('<sks>', f'<{self.sks_name}>')
+        # example['answer'] = self.answers[i]#.replace('<sks>', f'<{self.sks_name}>')
+        # example['image'] = images[0]
+        example = self.processor(self.questions[i] + self.answers[i], image, return_tensors="pt")
+        # breakpoint()
+        example['query'] = self.questions[i]
+        example['answer'] = self.answers[i]
+        example['image_path'] = image_path
         return example
 
 if __name__ == "__main__":
-	print('Hi Shibe')
-	train_dataset = PersonalizedDataset(data_root="./example_training_data/", sks_name='mam')
-	print('Dataset loaded!')
+	# print('Hi Shibe')
+	# train_dataset = PersonalizedDataset(data_root="./example_training_data/", sks_name='mam')
+	# print('Dataset loaded! -- But be careful, it is not yet processed!')
+
+	model_id = './chameleon-hf/chameleon-7b'
+	chemeleon_processor = ChameleonProcessor.from_pretrained(model_id)
+
+	train_dataset = PersonalizedDataset(
+		data_root="./example_training_data/",
+		sks_name='mam',
+		model_id=model_id
+		)
 	print(train_dataset[0])
