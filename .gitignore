@@ -1,0 +1,11 @@
+/data
+
+__pycache__/
+*.pyc
+
+/outputs
+
+/viewer
+sftp-config.json
+
+/transformers

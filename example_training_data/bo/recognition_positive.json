@@ -1,0 +1,282 @@
+{
+    "./yollava-data/train/bo/3.png":
+    [
+        {
+            "Human": "Hey, can you tell me if you see <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is in the photo."
+        },
+        {
+            "Human": "Hey AI, can you see if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is in the photo."
+        },
+        {
+            "Human": "Hey AI, can you recognize if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if you see <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        }
+    ],
+    "./yollava-data/train/bo/1.png":
+    [
+        {
+            "Human": "Hey, can you tell me if you see <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you see if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you see if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you recognize if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is definitely in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        }
+    ],
+    "./yollava-data/train/bo/6.png":
+    [
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you see if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can see <bo> in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey, can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if you see <bo> in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you check if this photo has <bo> in it?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can see <bo> in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        }
+    ],
+    "./yollava-data/train/bo/4.png":
+    [
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if you see <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey, can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey, can you check if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you see if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey, can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is definitely in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey, can you check this photo and tell me if you recognize <bo> in it?",
+            "AI": "Yes, I can confirm that <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        },
+        {
+            "Human": "Hey AI, can you tell me if you recognize <bo> in this photo?",
+            "AI": "Yes, I can see <bo> in the photo you've provided."
+        },
+        {
+            "Human": "Can you tell me if <bo> is in this photo?",
+            "AI": "Yes, <bo> is indeed in the photo."
+        }
+    ]
+}

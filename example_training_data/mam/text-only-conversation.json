@@ -1,0 +1,217 @@
+{
+    "./yollava-data/train/mam/3.png":
+    [
+        {
+            "Human": "Does <mam> wear glasses or any accessories?",
+            "AI": "<mam> is not wearing any glasses or accessories in the photo."
+        },
+        {
+            "Human": "What is <mam> height?",
+            "AI": "<mam> appears to be a medium-sized cat, with a height that could be described as average for a domestic cat. However, without a specific reference point or a scale in the photo, it's difficult to provide an exact height measurement."
+        },
+        {
+            "Human": "What is <mam> overall build or physique?",
+            "AI": "<mam> appears to be a well-proportioned cat with a healthy and muscular build."
+        },
+        {
+            "Human": "What is <mam> hair color?",
+            "AI": "<mam> has a gray and white coat."
+        },
+        {
+            "Human": "How would you describe <mam> hairstyle?",
+            "AI": "<mam> has a long-haired hairstyle."
+        },
+        {
+            "Human": "What type of clothing is <mam> wearing?",
+            "AI": "<mam> is not wearing any clothing. The image shows a cat sitting on a rug."
+        },
+        {
+            "Human": "What is <mam> skin tone?",
+            "AI": "<mam> appears to have a light-colored fur, which could be described as a cream or light gray tone."
+        },
+        {
+            "Human": "What is <mam> general expression or demeanor?",
+            "AI": "<mam> appears to have a calm and attentive demeanor. The cat is sitting upright with its ears perked up, which can indicate curiosity or alertness. The eyes are wide open, which might suggest that <mam> is focused on something in its environment. The overall posture and expression give the impression of a curious and attentive feline."
+        },
+        {
+            "Human": "What color are <mam> eyes?",
+            "AI": "<mam> has yellow eyes."
+        },
+        {
+            "Human": "Does <mam> have any distinctive facial features?",
+            "AI": "Yes, <mam> has distinctive facial features. He has a prominent ruff around his neck and a very expressive face with large, round eyes that are wide open."
+        }
+    ],
+    "./yollava-data/train/mam/1.png":
+    [
+        {
+            "Human": "Does <mam> wear glasses or any accessories?",
+            "AI": "<mam> is not wearing any glasses or accessories in the photo."
+        },
+        {
+            "Human": "What is <mam> height?",
+            "AI": "<mam> is a medium-sized cat, and based on the photo, it appears to be of average height for a domestic cat. However, without a reference object or a scale, it's difficult to provide an exact height measurement."
+        },
+        {
+            "Human": "What is <mam> overall build or physique?",
+            "AI": "<mam> appears to be a well-groomed, medium-sized cat with a sleek and muscular build. The cat has a short, dense coat with a mix of gray and white colors, and its ears are perked up, suggesting alertness. The cat's eyes are open and focused, and it seems to be sitting upright on a surface, possibly a table or a countertop."
+        },
+        {
+            "Human": "What is <mam> hair color?",
+            "AI": "<mam> has a gray and white coat."
+        },
+        {
+            "Human": "How would you describe <mam> hairstyle?",
+            "AI": "<mam> has a short, neat hairstyle."
+        },
+        {
+            "Human": "What type of clothing is <mam> wearing?",
+            "AI": "<mam> is not wearing any clothing. The image shows a cat sitting on a surface."
+        },
+        {
+            "Human": "What is <mam> skin tone?",
+            "AI": "<mam> has a light gray skin tone."
+        },
+        {
+            "Human": "What is <mam> general expression or demeanor?",
+            "AI": "<mam> appears to have a calm and attentive demeanor. The cat is sitting upright with its ears perked forward, which can indicate curiosity or alertness. The eyes are open and focused, suggesting that <mam> is engaged with its surroundings or the person taking the photo. The overall expression seems relaxed yet attentive, which is typical for cats when they are in a comfortable and familiar environment."
+        },
+        {
+            "Human": "What color are <mam> eyes?",
+            "AI": "<mam> has green eyes."
+        },
+        {
+            "Human": "Does <mam> have any distinctive facial features?",
+            "AI": "Yes, <mam> has distinctive facial features. He has a prominent nose and striking green eyes."
+        }
+    ],
+    "./yollava-data/train/mam/6.png":
+    [
+        {
+            "Human": "Does <mam> wear glasses or any accessories?",
+            "AI": "<mam> is not wearing any glasses or accessories in the photo."
+        },
+        {
+            "Human": "What is <mam> height?",
+            "AI": "<mam> appears to be a medium-sized cat, standing on its hind legs. It's difficult to accurately determine the height of a cat from a photo, but it seems to be of a typical height for a domestic cat when standing on its hind legs."
+        },
+        {
+            "Human": "What is <mam> overall build or physique?",
+            "AI": "<mam> appears to be a well-proportioned cat with a muscular build, suggesting that it is likely in good health and physically active."
+        },
+        {
+            "Human": "What is <mam> hair color?",
+            "AI": "<mam> has gray hair."
+        },
+        {
+            "Human": "How would you describe <mam> hairstyle?",
+            "AI": "<mam> has a short, fluffy hairstyle with a noticeable ruff around the neck, which is typical of the breed."
+        },
+        {
+            "Human": "What type of clothing is <mam> wearing?",
+            "AI": "<mam> is not wearing any clothing."
+        },
+        {
+            "Human": "What is <mam> skin tone?",
+            "AI": "<mam> appears to have a light-colored fur, which could be described as a light gray or a pale cream color."
+        },
+        {
+            "Human": "What is <mam> general expression or demeanor?",
+            "AI": "<mam> appears to have a curious and attentive expression, with wide eyes and a slightly raised posture, as if it's interested in something or someone in the room."
+        },
+        {
+            "Human": "What color are <mam> eyes?",
+            "AI": "<mam> has green eyes."
+        },
+        {
+            "Human": "Does <mam> have any distinctive facial features?",
+            "AI": "Yes, <mam> has distinctive facial features. The cat in the photo has large, wide eyes and a prominent, alert expression."
+        }
+    ],
+    "./yollava-data/train/mam/4.png":
+    [
+        {
+            "Human": "Does <mam> wear glasses or any accessories?",
+            "AI": "<mam> is not wearing any glasses or accessories in the photo."
+        },
+        {
+            "Human": "What is <mam> height?",
+            "AI": "<mam> appears to be a small to medium-sized cat, likely a kitten or a young adult cat. The exact height cannot be determined from the image, but it seems to be a typical size for a domestic cat."
+        },
+        {
+            "Human": "What is <mam> overall build or physique?",
+            "AI": "<mam> appears to be a well-proportioned cat with a medium to large build. The cat has a muscular body, with a noticeable chest and stomach area, suggesting it is in good physical condition. The cat's legs are also well-defined, indicating a strong and healthy physique."
+        },
+        {
+            "Human": "What is <mam> hair color?",
+            "AI": "<mam> has a gray and white coat."
+        },
+        {
+            "Human": "How would you describe <mam> hairstyle?",
+            "AI": "<mam> has a short, fluffy hairstyle with a bit of length on the ears and around the face, giving it a cute and well-groomed appearance."
+        },
+        {
+            "Human": "What type of clothing is <mam> wearing?",
+            "AI": "<mam> is not wearing any clothing."
+        },
+        {
+            "Human": "What is <mam> skin tone?",
+            "AI": "<mam> appears to have a light-colored fur, which could be described as a cream or light tan tone."
+        },
+        {
+            "Human": "What is <mam> general expression or demeanor?",
+            "AI": "<mam> appears to have a curious and attentive expression, with wide eyes and a slightly raised posture, as if he is interested in something or someone in the room."
+        },
+        {
+            "Human": "What color are <mam> eyes?",
+            "AI": "<mam> has yellow eyes."
+        },
+        {
+            "Human": "Does <mam> have any distinctive facial features?",
+            "AI": "Yes, <mam> has distinctive facial features. He has a prominent nose and striking eyes that are a mix of colors, which is quite unusual for cats."
+        }
+    ],
+    "./yollava-data/train/mam/9.png":
+    [
+        {
+            "Human": "Does <mam> wear glasses or any accessories?",
+            "AI": "<mam> is a cat, and cats do not wear glasses or accessories."
+        },
+        {
+            "Human": "What is <mam> height?",
+            "AI": "<mam> is a cat, and cats are generally smaller than humans. The cat in the photo appears to be a standard domestic cat size, which is typically around 10 to 12 inches in height at the shoulder. However, without a specific reference point or a way to measure the cat's height, it's difficult to provide an exact measurement."
+        },
+        {
+            "Human": "What is <mam> overall build or physique?",
+            "AI": "<mam> appears to be a well-proportioned cat with a sleek and muscular build."
+        },
+        {
+            "Human": "What is <mam> hair color?",
+            "AI": "<mam> has gray hair."
+        },
+        {
+            "Human": "How would you describe <mam> hairstyle?",
+            "AI": "<mam> has a short, sleek hairstyle."
+        },
+        {
+            "Human": "What type of clothing is <mam> wearing?",
+            "AI": "<mam> is not wearing any clothing. The image shows a cat lying on a countertop."
+        },
+        {
+            "Human": "What is <mam> skin tone?",
+            "AI": "<mam> has a light-colored skin tone."
+        },
+        {
+            "Human": "What is <mam> general expression or demeanor?",
+            "AI": "<mam> appears to have a relaxed and content demeanor. The cat is lying down comfortably on a countertop, with its head slightly raised, which could indicate curiosity or attentiveness to its surroundings. The cat's eyes are open, and its fur looks well-groomed, suggesting that it is in a calm and safe environment."
+        },
+        {
+            "Human": "What color are <mam> eyes?",
+            "AI": "<mam> has yellow eyes."
+        },
+        {
+            "Human": "Does <mam> have any distinctive facial features?",
+            "AI": "Yes, <mam> has distinctive facial features. One of the most noticeable is the yellow eyes, which are often associated with certain breeds of cats. Additionally, <mam> appears to have a somewhat unusual fur pattern, which could be a characteristic of a specific breed or a unique individual variation."
+        }
+    ]
+}
