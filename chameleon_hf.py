@@ -1,11 +1,10 @@
+import argparse
+
 import requests
 import torch
-
 from PIL import Image
-from transformers import ChameleonForCausalLM
-from transformers import ChameleonProcessor
+from transformers import ChameleonForConditionalGeneration, ChameleonProcessor
 
-import argparse
 
 def get_args():
 	parser = argparse.ArgumentParser(description='Chameleon')
@@ -17,19 +16,14 @@ def get_args():
 if __name__ == '__main__':
 	args = get_args()
 	model_id = args.model_id
+	image = Image.open(args.image)
 
 	processor = ChameleonProcessor.from_pretrained(model_id)
-	model = ChameleonForCausalLM.from_pretrained(model_id, device_map="auto")
+	model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto") 
+	prompt = "What color is the belt in this image?<image>"
 
-	image = Image.open(args.image)
-	# system_prompt = "What is the breed of the dog in this photo?"
-	# prompt = system_prompt + args.prompt
-	prompt = args.prompt
-	print(prompt)
 	inputs = processor(prompt, image, return_tensors="pt").to(model.device)
 
-	# output = model.generate(**inputs, max_new_tokens=50)
-	print('Generating...')
-	output = model.generate(**inputs, max_new_tokens=2000)
+	# autoregressively complete prompt
+	output = model.generate(**inputs, max_new_tokens=50)
 	print(processor.decode(output[0], skip_special_tokens=True))
-	# breakpoint()

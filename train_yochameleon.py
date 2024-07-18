@@ -1,16 +1,17 @@
+import argparse
+import os
+# from transformers import ChameleonForCausalLM
+import shutil
+
 import requests
 import torch
-
-import argparse
-
-from PIL import Image
 from dataset import PersonalizedDataset
+from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
-from torchvision import datasets
-from torchvision import transforms
+from torchvision import datasets, transforms
 from tqdm import tqdm
-from transformers import ChameleonForCausalLM
-from transformers import ChameleonProcessor
+from transformers import ChameleonForConditionalGeneration, ChameleonProcessor
+
 
 def get_args():
     parser = argparse.ArgumentParser(description='Chameleon')
@@ -25,13 +26,22 @@ def get_args():
 
     # hyperparameters
     parser.add_argument('--epoch', type=int, default=10, help='Number of epochs')
+    # parser.add_argument('--exp_', type=int, default=10, help='Number of epochs')
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = get_args()
+    log_dir = f'./runs/{args.sks_name}'
+    
+    if os.path.exists(log_dir):
+        # Delete the directory and its contents
+        shutil.rmtree(log_dir)
+    writer = SummaryWriter(f'./runs/{args.sks_name}')
+
     model_id = args.model_id
     processor = ChameleonProcessor.from_pretrained(model_id)
-    model = ChameleonForCausalLM.from_pretrained(model_id, device_map="auto")
+    # model = ChameleonForCausalLM.from_pretrained(model_id, device_map="auto")
+    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
     print(f'Loaded {model_id}!')
 
     # --- Add personalized tokens
@@ -78,23 +88,24 @@ if __name__ == '__main__':
                 print(names, "requires_grad")
         for step, batch in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
-            # model(batch['input_ids'][0], batch['pixel_values'][0], batch['attention_mask'])
-            breakpoint()
-            # model(batch['input_ids'][0])
-            # model(batch['input_ids'][0]).loss
-
-            # --- Prepare the inputs
-            # query = batch['query']
-            # answer = batch['answer']
-            # image = batch['image']
-            # has_image = batch['has_image']
-            # image_sizes = batch['image_sizes']
-            # image = image.unsqueeze(0)
-            # image = image.to('cuda')
-
-            # # --- Prepare the prompt
-            # prompt = query[0] + ' ' + sks_prompt
-            # inputs = processor(prompt, image, return_tensors="pt")
-            # inputs = {k: v.to('cuda') for k, v in inputs.items()}
-
-            # --- Forward pass
+            # TODO: move to batch implementation
+            # breakpoint()
+            output = model(input_ids = batch['input_ids'][0],
+                attention_mask = batch['attention_mask'][0],
+                pixel_values = batch['pixel_values'][0],
+                labels = batch['input_ids'][0])
+            loss = output.loss
+            loss.backward()
+            # print(loss)
+            optimizer.step()
+            index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
+            index_no_updates[personalized_token_ids] = False
+            with torch.no_grad():
+                model.get_input_embeddings().weight[
+                    index_no_updates
+                ] = orig_embeds_params[index_no_updates]
+                model.lm_head.weight[index_no_updates] = orig_lm_params[index_no_updates]
+            writer.add_scalar('Loss/Loss', loss, epoch*len(train_dataloader)+step)
+            
+            writer.add_scalar('Norm/Vocab-Not-Update-Norm', model.get_input_embeddings().weight[index_no_updates].norm(), epoch*len(train_dataloader)+step)
+            writer.add_scalar('Norm/Vocab', model.get_input_embeddings().weight.norm(), epoch*len(train_dataloader)+step)

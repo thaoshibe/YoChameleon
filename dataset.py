@@ -1,11 +1,11 @@
-import os
-
 import json
+import os
 
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 from transformers import ChameleonProcessor
+
 
 class PersonalizedDataset(Dataset):
     def __init__(
@@ -75,7 +75,7 @@ class PersonalizedDataset(Dataset):
 
     def __getitem__(self, i):
         example = {}
-        # --- Center crop 
+        # --- Center crop -- Not sure?
         # if self.center_crop:
         #     crop = min(img.shape[0], img.shape[1])
         #     (
@@ -89,41 +89,33 @@ class PersonalizedDataset(Dataset):
         image_path = self.images_path[i]
         image = Image.open(image_path).convert("RGB")
 
-        # --- Maybe flip the image...
-        image = self.flip_transform(image)
-        # breakpoint()
-        # image_sizes = [x.size for x in images]
-        # breakpoint()
-        # image = Image.open(image_path).convert("RGB")
-        # prompt = self.questions[i]
-        # inputs = self.processor(prompt, image, return_tensors="pt")
-        # images_tensor = process_images(
-        #     images,
-        #     self.image_processor,
-        #     self.config
-        # )
-        # example["images"] = images_tensor
-        # example['query'] = self.questions[i]#.replace('<sks>', f'<{self.sks_name}>')
-        # example['answer'] = self.answers[i]#.replace('<sks>', f'<{self.sks_name}>')
-        # example['image'] = images[0]
-        example = self.processor(self.questions[i] + self.answers[i], image, return_tensors="pt")
-        # breakpoint()
-        example['query'] = self.questions[i]
-        example['answer'] = self.answers[i]
+        # --- Maybe flip the image... (? TODO)
+        # image = self.flip_transform(image)
+        question = self.questions[i].replace(f'<{self.sks_name}>', '<reserved16300>')
+        answer = self.answers[i].replace(f'<{self.sks_name}>', '<reserved16300>')
+
+        prompt = f'{question} <image>. {answer}'
+        question = f'{question} <image>.'
+        index_question = len(self.processor(question)['input_ids'][0])
+        example = self.processor(prompt, image, return_tensors="pt")
+        # print(question, answer, prompt)
+        example['attention_mask'][:, :index_question] = 0
+        example['query'] = question
+        example['answer'] = answer
         example['image_path'] = image_path
         return example
 
 if __name__ == "__main__":
-	# print('Hi Shibe')
-	# train_dataset = PersonalizedDataset(data_root="./example_training_data/", sks_name='mam')
-	# print('Dataset loaded! -- But be careful, it is not yet processed!')
+    # print('Hi Shibe')
+    # train_dataset = PersonalizedDataset(data_root="./example_training_data/", sks_name='mam')
+    # print('Dataset loaded! -- But be careful, it is not yet processed!')
 
-	model_id = './chameleon-hf/chameleon-7b'
-	chemeleon_processor = ChameleonProcessor.from_pretrained(model_id)
+    model_id = './chameleon-hf/chameleon-7b'
+    chemeleon_processor = ChameleonProcessor.from_pretrained(model_id)
 
-	train_dataset = PersonalizedDataset(
-		data_root="./example_training_data/",
-		sks_name='mam',
-		model_id=model_id
-		)
-	print(train_dataset[0])
+    train_dataset = PersonalizedDataset(
+        data_root="./example_training_data/",
+        sks_name='mam',
+        model_id=model_id
+        )
+    print(train_dataset[0])
