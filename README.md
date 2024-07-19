@@ -29,7 +29,11 @@ pip install -e .
 ### TODO 📝
 
 - [ ] YoLLaVA + Chameleon
-	+ [ ] Add new token
-	+ [ ] Dataloader
-	+ [ ] Training part
-	+ [ ] Run dummi code
+	+ [x] Add new token
+	+ [x] Dataloader
+	+ [x] Training part
+	+ [x] Run dummi code
+	+ [x] Check loss -- Mask out question/prompt
+
+- [ ] Note
+	+ [ ] Currently all Q/A has images

@@ -25,6 +25,7 @@ class PersonalizedDataset(Dataset):
         recog_only=False,
         random_image=False,
         text_only=False,
+        personalized_prompt = False,
     ):
         self.data_root = data_root
         self.device = device
@@ -37,6 +38,7 @@ class PersonalizedDataset(Dataset):
         self.images_path = []
         self.answers = []
         self.has_image = []
+        self.personalized_prompt = personalized_prompt
         # --- Load data from json files
 
         conversation_types = ['recognition_positive', 'recognition_negative-laion', 'recognition_negative-cc12m', 'text-only-conversation']
@@ -94,12 +96,15 @@ class PersonalizedDataset(Dataset):
         question = self.questions[i].replace(f'<{self.sks_name}>', '<reserved16300>')
         answer = self.answers[i].replace(f'<{self.sks_name}>', '<reserved16300>')
 
-        prompt = f'{question} <image>. {answer}'
-        question = f'{question} <image>.'
+        prompt = f'{self.personalized_prompt} {question} <image>. {answer}'
+        question = f'{self.personalized_prompt} {question} <image>.'
         index_question = len(self.processor(question)['input_ids'][0])
         example = self.processor(prompt, image, return_tensors="pt")
         # print(question, answer, prompt)
-        example['attention_mask'][:, :index_question] = 0
+        # -- compute loss on answer only
+        example['labels'] = example['input_ids'].clone()
+        example['labels'][:, :index_question]=-100
+
         example['query'] = question
         example['answer'] = answer
         example['image_path'] = image_path

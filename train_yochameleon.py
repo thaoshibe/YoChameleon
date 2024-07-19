@@ -5,12 +5,15 @@ import shutil
 
 import requests
 import torch
-from dataset import PersonalizedDataset
+
 from PIL import Image
+from dataset import PersonalizedDataset
 from torch.utils.tensorboard import SummaryWriter
-from torchvision import datasets, transforms
+from torchvision import datasets
+from torchvision import transforms
 from tqdm import tqdm
-from transformers import ChameleonForConditionalGeneration, ChameleonProcessor
+from transformers import ChameleonForConditionalGeneration
+from transformers import ChameleonProcessor
 
 
 def get_args():
@@ -26,7 +29,7 @@ def get_args():
 
     # hyperparameters
     parser.add_argument('--epoch', type=int, default=10, help='Number of epochs')
-    # parser.add_argument('--exp_', type=int, default=10, help='Number of epochs')
+    parser.add_argument('--savedir', type=str, default='./ckpt/', help='Directory to save the model')
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -37,6 +40,8 @@ if __name__ == '__main__':
         # Delete the directory and its contents
         shutil.rmtree(log_dir)
     writer = SummaryWriter(f'./runs/{args.sks_name}')
+    save_location = f'./{args.savedir}/{args.sks_name}'
+    os.makedirs(save_location, exist_ok=True)
 
     model_id = args.model_id
     processor = ChameleonProcessor.from_pretrained(model_id)
@@ -59,7 +64,8 @@ if __name__ == '__main__':
     train_dataset = PersonalizedDataset(
         data_root="./example_training_data/",
         sks_name='mam',
-        model_id=model_id
+        model_id=model_id,
+        personalized_prompt = sks_prompt,
         )
     
     train_dataloader = torch.utils.data.DataLoader(
@@ -81,6 +87,9 @@ if __name__ == '__main__':
     )
     model.model.requires_grad_(False)
     model.model.embed_tokens.weight.requires_grad_(True)
+    index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
+    index_no_updates[personalized_token_ids] = False
+
     # --- Start training
     for epoch in tqdm(range(0, args.epoch)):
         for names, p in model.named_parameters():
@@ -93,13 +102,11 @@ if __name__ == '__main__':
             output = model(input_ids = batch['input_ids'][0],
                 attention_mask = batch['attention_mask'][0],
                 pixel_values = batch['pixel_values'][0],
-                labels = batch['input_ids'][0])
+                labels = batch['labels'][0])
             loss = output.loss
             loss.backward()
             # print(loss)
             optimizer.step()
-            index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
-            index_no_updates[personalized_token_ids] = False
             with torch.no_grad():
                 model.get_input_embeddings().weight[
                     index_no_updates
@@ -109,3 +116,9 @@ if __name__ == '__main__':
             
             writer.add_scalar('Norm/Vocab-Not-Update-Norm', model.get_input_embeddings().weight[index_no_updates].norm(), epoch*len(train_dataloader)+step)
             writer.add_scalar('Norm/Vocab', model.get_input_embeddings().weight.norm(), epoch*len(train_dataloader)+step)
+        if epoch % 5 == 0:
+            print('Save model at: ', save_location)
+            save_path_token = os.path.join(save_location, f'{epoch}-token.pt')
+            save_path_lmhead = os.path.join(save_location, f'{epoch}-lmhead.pt')
+            torch.save(model.get_input_embeddings().weight.data[personalized_token_ids], save_path_token)
+            torch.save(model.lm_head.weight.data[personalized_token_ids], save_path_lmhead)
