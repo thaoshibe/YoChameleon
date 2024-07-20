@@ -96,8 +96,8 @@ class PersonalizedDataset(Dataset):
         question = self.questions[i].replace(f'<{self.sks_name}>', '<reserved16300>')
         answer = self.answers[i].replace(f'<{self.sks_name}>', '<reserved16300>')
 
-        prompt = f'{self.personalized_prompt} {question} <image>. {answer}'
-        question = f'{self.personalized_prompt} {question} <image>.'
+        prompt = f'{self.personalized_prompt} {question} <image> {answer}'
+        question = f'{self.personalized_prompt} {question} <image>'
         index_question = len(self.processor(question)['input_ids'][0])
         example = self.processor(prompt, image, return_tensors="pt")
         # print(question, answer, prompt)

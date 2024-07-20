@@ -19,16 +19,16 @@ from transformers import ChameleonProcessor
 def get_args():
     parser = argparse.ArgumentParser(description='Chameleon')
     # model related
-    parser.add_argument('--image', type=str, default='./chameleon/inference/examples/thao-bo.jpeg', help='Path to image')
-    parser.add_argument('--prompt', type=str, default="What is the color of the dog? <image>", help='Prompt')
-    parser.add_argument('--model_id', type=str, default='./chameleon-hf/chameleon-7b', help='Model ID')
+    # parser.add_argument('--image', type=str, default='./chameleon/inference/examples/thao-bo.jpeg', help='Path to image')
+    # parser.add_argument('--prompt', type=str, default="What is the color of the dog? <image>", help='Prompt')
+    parser.add_argument('--model_id', type=str, default='chameleon_ckpt/chameleon-7b', help='Model ID')
 
     # personalized token related
     parser.add_argument('--sks_name', type=str, default='sks', help='Name of the personalized token')
     parser.add_argument('--prefix_token', type=int, default=16, help='Number of prefix tokens')
 
     # hyperparameters
-    parser.add_argument('--epoch', type=int, default=10, help='Number of epochs')
+    parser.add_argument('--epoch', type=int, default=20, help='Number of epochs')
     parser.add_argument('--savedir', type=str, default='./ckpt/', help='Directory to save the model')
     return parser.parse_args()
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # --- Dataloader
     train_dataset = PersonalizedDataset(
         data_root="./example_training_data/",
-        sks_name='mam',
+        sks_name=args.sks_name,
         model_id=model_id,
         personalized_prompt = sks_prompt,
         )
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             
             writer.add_scalar('Norm/Vocab-Not-Update-Norm', model.get_input_embeddings().weight[index_no_updates].norm(), epoch*len(train_dataloader)+step)
             writer.add_scalar('Norm/Vocab', model.get_input_embeddings().weight.norm(), epoch*len(train_dataloader)+step)
-        if epoch % 5 == 0:
+        if epoch % 2 == 0:
             print('Save model at: ', save_location)
             save_path_token = os.path.join(save_location, f'{epoch}-token.pt')
             save_path_lmhead = os.path.join(save_location, f'{epoch}-lmhead.pt')

@@ -19,9 +19,9 @@ from transformers import ChameleonProcessor
 def get_args():
     parser = argparse.ArgumentParser(description='Chameleon')
     # model related
-    parser.add_argument('--image', type=str, default='./yollava-data/train/mam/0.png', help='Path to image')
+    parser.add_argument('--image', type=str, default='./yollava-data/train/bo/0.png', help='Path to image')
     parser.add_argument('--prompt', type=str, default="What is the color of the dog? <image>", help='Prompt')
-    parser.add_argument('--model_id', type=str, default='./chameleon-hf/chameleon-7b', help='Model ID')
+    parser.add_argument('--model_id', type=str, default='chameleon_ckpt/chameleon-7b', help='Model ID')
 
     # personalized token related
     parser.add_argument('--sks_name', type=str, default='sks', help='Name of the personalized token')
@@ -56,15 +56,19 @@ if __name__ == '__main__':
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
 
     # breakpoint()
-    model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(f'./ckpt/sks/5-token.pt').to(model.device)
-    model.lm_head.weight.data[personalized_token_ids] = torch.load(f'./ckpt/sks/5-lmhead.pt').to(model.lm_head.weight.data.device)
+    model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(f'./ckpt/{args.sks_name}/{args.epoch}-token.pt').to(model.device)
+    model.lm_head.weight.data[personalized_token_ids] = torch.load(f'./ckpt/{args.sks_name}/{args.epoch}-lmhead.pt').to(model.lm_head.weight.data.device)
 
     image = Image.open(args.image)
 
-    prompt = "What is the color of <reserved16300>?"
+    # prompt = f"{sks_prompt} Can you try to describe <reserved16300> in details?"
+    # inputs = processor(prompt, images=None, return_tensors="pt").to(model.device)
 
-    inputs = processor(prompt, images=None, return_tensors="pt").to(model.device)
-
+    prompt = f"{sks_prompt} What is the similarity between <reserved16300> and this dog? <image>."
+    # prompt = f'Is there any dog in this image? <image>'
+    inputs = processor(prompt, image, return_tensors="pt").to(model.device)
     # autoregressively complete prompt
-    output = model.generate(**inputs, max_new_tokens=50)
+    output = model.generate(**inputs, max_new_tokens=1000)
     print(processor.decode(output[0], skip_special_tokens=False))
+    print('-------------------------')
+    print(processor.decode(output[0], skip_special_tokens=True))

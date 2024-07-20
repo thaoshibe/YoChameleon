@@ -34,6 +34,9 @@ pip install -e .
 	+ [x] Training part
 	+ [x] Run dummi code
 	+ [x] Check loss -- Mask out question/prompt
+- [ ] Chameleon + Anole?
 
 - [ ] Note
 	+ [ ] Currently all Q/A has images
+	+ [ ] Generate corresponding answer for Chameleon is not ready yet
+	+ [ ] Right now code is syned between 2 GPU -- How to fit them into a single GPU?
