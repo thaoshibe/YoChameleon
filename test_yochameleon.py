@@ -63,12 +63,32 @@ if __name__ == '__main__':
 
     # prompt = f"{sks_prompt} Can you try to describe <reserved16300> in details?"
     # inputs = processor(prompt, images=None, return_tensors="pt").to(model.device)
+    # breakpoint()
+    # prompt = f"{sks_prompt} What is the similarity between <reserved16300> and this dog? <image>."
+    # inputs = processor(prompt, image, return_tensors="pt").to(model.device)
+    # output = model.generate(**inputs, max_new_tokens=1000)
+    # print(processor.decode(output[0], skip_special_tokens=False))
+    # print('-------------------------')
+    # print(processor.decode(output[0], skip_special_tokens=True))
+    # breakpoint()
+    for index in range(0,10):
+        try:
+            prompt = f"{sks_prompt} <reserved16300> is a dog. Can you generate a photo of <reserved16300>"
+            inputs = processor(prompt, image, return_tensors="pt").to(model.device)
+            generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True,)
+            response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
+            pixel_values = model.decode_image_tokens(response_ids[:, 1:-1].cpu())
+            images = processor.postprocess_pixel_values(pixel_values.detach().cpu().numpy())
+            images[0].save(f"{args.sks_name}_{index}.png")
+            print('Done')
+        except Exception as e:
+            print(e)
 
-    prompt = f"{sks_prompt} What is the similarity between <reserved16300> and this dog? <image>."
-    # prompt = f'Is there any dog in this image? <image>'
-    inputs = processor(prompt, image, return_tensors="pt").to(model.device)
-    # autoregressively complete prompt
-    output = model.generate(**inputs, max_new_tokens=1000)
-    print(processor.decode(output[0], skip_special_tokens=False))
-    print('-------------------------')
-    print(processor.decode(output[0], skip_special_tokens=True))
+
+
+
+
+
+
+
+

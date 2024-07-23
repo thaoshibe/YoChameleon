@@ -26,6 +26,19 @@ cd transformers
 pip install -e .
 ```
 
+### Training
+
+```
+# Chameleon + YoLLaVA
+python train_yochameleon.py --sks_name bo
+test_yochameleon.py --sks_name bo --epoch 10
+
+# Chameleon + Anole
+python train_anole.py --sks_name bo
+```
+
+
+
 ### TODO 📝
 
 - [ ] YoLLaVA + Chameleon
@@ -35,8 +48,20 @@ pip install -e .
 	+ [x] Run dummi code
 	+ [x] Check loss -- Mask out question/prompt
 - [ ] Chameleon + Anole?
+	+ [x] Test text generation ability
+	+ [x] Test image encoding
+	+ [x] Test image generation
+- [ ] YoLLaVA + Anole
+	+ [x] Test text generation ability
+	+ [x] Test image encoding
+	+ [x] Test image generation
+	+ [ ] Dataloader
+	+ [ ] Training part
+	+ [ ] Run dummi code
+	+ [ ] Check loss -- Compute loss on images?
 
 - [ ] Note
-	+ [ ] Currently all Q/A has images
-	+ [ ] Generate corresponding answer for Chameleon is not ready yet
+	+ [ ] ⚠️ Currently all Q/A has images -- IMPORTANT, need to fix soon
+	+ [x] Generate corresponding answer for Chameleon is not ready yet
 	+ [ ] Right now code is syned between 2 GPU -- How to fit them into a single GPU?
+	+ [ ] ⚠️ Check what's the logic of the generate mode in Chameleon inference code

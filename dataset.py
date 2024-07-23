@@ -1,11 +1,91 @@
 import json
 import os
 
+import glob
+
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 from transformers import ChameleonProcessor
 
+class PersonalizedDataset_Anole(Dataset):
+    def __init__(
+        self,
+        data_root,
+        sks_name,
+        # tokenizer,
+        set="train",
+        placeholder_token="<sks>",
+        center_crop=False,
+        device="cuda",
+        config=None,
+        model_id=None,
+        flip_p=0.5,
+        train_lm_head=False,
+        extreme_negative=False,
+        recog_only=False,
+        random_image=False,
+        text_only=False,
+        personalized_prompt = False,
+        repeat=10,
+    ):
+        self.data_root = data_root
+        self.device = device
+        self.config = config
+        self.processor = ChameleonProcessor.from_pretrained(model_id)
+        self.center_crop = center_crop
+        self.flip_p = flip_p
+        self.sks_name = sks_name
+        
+        self.personalized_prompt = personalized_prompt
+        self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
+        # --- Load data from json files
+        self.image_paths = glob.glob(os.path.join(self.data_root, self.sks_name, '*.png'))
+        self.image_paths = self.image_paths*repeat
+        self._length = len(self.image_paths)
+
+    def __len__(self):
+        return self._length
+
+    def __getitem__(self, i):
+        example = {}
+        # --- Center crop -- Not sure?
+        # if self.center_crop:
+        #     crop = min(img.shape[0], img.shape[1])
+        #     (
+        #         h,
+        #         w,
+        #     ) = (
+        #         img.shape[0],
+        #         img.shape[1],
+        #     )
+        #     img = img[(h - crop) // 2 : (h + crop) // 2, (w - crop) // 2 : (w + crop) // 2]
+        image_path = self.image_paths[i]
+        image = Image.open(image_path).convert("RGB")
+
+        # --- Maybe flip the image... (? TODO)
+        image = self.flip_transform(image)
+        # question = self.questions[i].replace(f'<{self.sks_name}>', '<reserved16300>')
+        # answer = self.answers[i].replace(f'<{self.sks_name}>', '<reserved16300>')
+        question = ''
+        answer = '<image>'
+        prompt = f'{self.personalized_prompt}{question}{answer}'
+
+        prompt_question = f'{self.personalized_prompt}{question}'
+        index_question = len(self.processor(prompt_question)['input_ids'][0])
+        example = self.processor(prompt, image, return_tensors="pt")
+        # print(question, answer, prompt)
+        # -- compute loss on image content
+        example['labels'] = example['input_ids'].clone()
+        example['labels'][:, :index_question]=-100
+        # doubt check this -- should we compute loss on the <eoss> token?
+        # example['labels'][:, -1:]=-100
+        example['labels'][:, -2:]=-100
+
+        example['query'] = question
+        example['answer'] = answer
+        example['image_path'] = image_path
+        return example
 
 class PersonalizedDataset(Dataset):
     def __init__(
@@ -111,16 +191,29 @@ class PersonalizedDataset(Dataset):
         return example
 
 if __name__ == "__main__":
+    # ---- TEST for Chameleon-text-conversation data
     # print('Hi Shibe')
     # train_dataset = PersonalizedDataset(data_root="./example_training_data/", sks_name='mam')
     # print('Dataset loaded! -- But be careful, it is not yet processed!')
 
-    model_id = './chameleon-hf/chameleon-7b'
+    # model_id = './chameleon-hf/chameleon-7b'
+    # chemeleon_processor = ChameleonProcessor.from_pretrained(model_id)
+
+    # train_dataset = PersonalizedDataset(
+    #     data_root="./example_training_data/",
+    #     sks_name='mam',
+    #     model_id=model_id
+    #     )
+    # print(train_dataset[0])
+
+    # ---- TEST for Anole data
+    model_id = 'leloy/Anole-7b-v0.1-hf'
     chemeleon_processor = ChameleonProcessor.from_pretrained(model_id)
 
-    train_dataset = PersonalizedDataset(
-        data_root="./example_training_data/",
+    train_dataset = PersonalizedDataset_Anole(
+        data_root="./yollava-data/train/",
         sks_name='mam',
-        model_id=model_id
+        model_id=model_id,
+        personalized_prompt="<sks> is a cat."
         )
     print(train_dataset[0])
