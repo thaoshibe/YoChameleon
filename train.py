@@ -7,7 +7,7 @@ import requests
 import torch
 
 from PIL import Image
-from dataset import PersonalizedDataset_Anole
+from dataset import PersonalizedDataset_Mixture
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets
 from torchvision import transforms
@@ -23,7 +23,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='YoAnole')
     # model related
     parser.add_argument('--model_id', type=str, default='leloy/Anole-7b-v0.1-hf', help='Model ID')
-    parser.add_argument('--data_root', type=str, default='./yollava-data/train/', help='Model ID')
+    parser.add_argument('--data_root', type=str, default='./example_training_data/', help='Model ID')
 
     # personalized token related
     parser.add_argument('--sks_name', type=str, default='sks', help='Name of the personalized token')
@@ -32,7 +32,7 @@ def get_args():
     # hyperparameters
     parser.add_argument('--epoch', type=int, default=20, help='Number of epochs')
     parser.add_argument('--savedir', type=str, default='./ckpt/', help='Directory to save the model')
-    parser.add_argument('--exp_name', type=str, default='anole', help='Name of experiement')
+    parser.add_argument('--exp_name', type=str, default='total', help='Name of experiement')
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     print(f'Personalized prompt: {sks_prompt}')
     
     # --- Dataloader
-    train_dataset = PersonalizedDataset_Anole(
+    train_dataset = PersonalizedDataset_Mixture(
         data_root=args.data_root,
         sks_name=args.sks_name,
         model_id=model_id,
@@ -102,14 +102,22 @@ if __name__ == '__main__':
         for step, batch in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
             # TODO: move to batch implementation
-            vqgan_ids = model.model.get_image_tokens(pixel_values=batch['pixel_values'][0]).to(batch['labels'].dtype)
-            mask = (batch['labels'] != -100)
-            batch['labels'][mask] = vqgan_ids.to(batch['labels'].device)
+            if batch['image_generation']:
+                vqgan_ids = model.model.get_image_tokens(pixel_values=batch['pixel_values'][0]).to(batch['labels'].dtype)
+                mask = (batch['labels'] != -100)
+                batch['labels'][mask] = vqgan_ids.to(batch['labels'].device)
 
-            output = model(input_ids = batch['input_ids'][0],
-                attention_mask = batch['attention_mask'][0],
-                pixel_values = batch['pixel_values'][0],
-                labels = batch['labels'][0])
+                output = model(input_ids = batch['input_ids'][0],
+                    attention_mask = batch['attention_mask'][0],
+                    pixel_values = batch['pixel_values'][0],
+                    labels = batch['labels'][0]
+                    )
+            else:
+                output = model(input_ids = batch['input_ids'][0],
+                    attention_mask = batch['attention_mask'][0],
+                    pixel_values = batch['pixel_values'][0],
+                    labels = batch['labels'][0]
+                    )
 
             loss = output.loss
             loss.backward()

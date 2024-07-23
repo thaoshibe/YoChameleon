@@ -22,7 +22,8 @@ def get_args():
     # parser.add_argument('--image', type=str, default='./chameleon/inference/examples/thao-bo.jpeg', help='Path to image')
     # parser.add_argument('--prompt', type=str, default="What is the color of the dog? <image>", help='Prompt')
     parser.add_argument('--model_id', type=str, default='chameleon_ckpt/chameleon-7b', help='Model ID')
-
+    parser.add_argument('--data_root', type=str, default="./example_training_data/", help='Data root')
+    
     # personalized token related
     parser.add_argument('--sks_name', type=str, default='sks', help='Name of the personalized token')
     parser.add_argument('--prefix_token', type=int, default=16, help='Number of prefix tokens')
@@ -62,7 +63,7 @@ if __name__ == '__main__':
 
     # --- Dataloader
     train_dataset = PersonalizedDataset(
-        data_root="./example_training_data/",
+        data_root=args.data_root,
         sks_name=args.sks_name,
         model_id=model_id,
         personalized_prompt = sks_prompt,

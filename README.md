@@ -33,8 +33,11 @@ pip install -e .
 python train_yochameleon.py --sks_name bo
 test_yochameleon.py --sks_name bo --epoch 10
 
-# Chameleon + Anole
+# Anole + YoLLaVA
 python train_anole.py --sks_name bo
+
+# Chameleon + Anole + YoLLaVA
+python train.py --sks_name bo
 ```
 
 
@@ -55,10 +58,18 @@ python train_anole.py --sks_name bo
 	+ [x] Test text generation ability
 	+ [x] Test image encoding
 	+ [x] Test image generation
-	+ [ ] Dataloader
-	+ [ ] Training part
-	+ [ ] Run dummi code
-	+ [ ] Check loss -- Compute loss on images?
+	+ [x] Dataloader
+	+ [x] Training part
+	+ [x] Run dummi code
+	+ [x] Check loss -- Compute loss on images?
+- [ ] YoLLaVA + Total
+	+ [x] Test text generation ability
+	+ [x] Test image encoding
+	+ [x] Test image generation
+	+ [x] Dataloader
+	+ [x] Training part
+	+ [x] Run dummi code
+	+ [x] Check loss -- Compute loss on images?
 
 - [ ] Note
 	+ [ ] ⚠️ Currently all Q/A has images -- IMPORTANT, need to fix soon
