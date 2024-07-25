@@ -61,30 +61,38 @@ if __name__ == '__main__':
 
     image = Image.open(args.image)
 
-    prompt = f"{sks_prompt} Can you try to describe <reserved16300> in details?"
+    prompt = f"{sks_prompt} Can you describe <reserved16300> in details?"
     inputs = processor(prompt, images=None, return_tensors="pt").to(model.device)
     # breakpoint()
     # prompt = f"{sks_prompt} What is the similarity between <reserved16300> and this dog? <image>."
     inputs = processor(prompt, image, return_tensors="pt").to(model.device)
-    output = model.generate(**inputs, max_new_tokens=20)
-    print(processor.decode(output[0], skip_special_tokens=False))
+    output = model.generate(**inputs, max_new_tokens=100)
+    result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
+    # print(processor.decode(output[0], skip_special_tokens=False))
+
     print('-------------------------')
+    os.makedirs(f"./generated_images/{args.exp_name}", exist_ok=True)
     print(processor.decode(output[0], skip_special_tokens=True))
-    # breakpoint()
-    # for index in range(0,10):
-    #     try:
-    #         prompt = f"{sks_prompt}"
-    #         # prompt = "<reserved16300>"
-    #         inputs = processor(prompt, image, return_tensors="pt").to(model.device)
-    #         generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True,)
-    #         breakpo
-    #         response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
-    #         pixel_values = model.decode_image_tokens(response_ids[:, 1:-1].cpu())
-    #         images = processor.postprocess_pixel_values(pixel_values.detach().cpu().numpy())
-    #         images[0].save(f"./generated_images/{args.sks_name}_{index}.png")
-    #         print('Done')
-    #     except Exception as e:
-    #         print(e)
+    with open(f'./generated_images/{args.exp_name}/output.txt', 'w') as file:
+        file.write(result_with_special_tokens + '\n')
+        file.write('-------------------------\n')
+        # file.write(result_without_special_tokens + '\n')
+
+    for index in range(0,10):
+        try:
+            prompt = f"{sks_prompt} Here is a photo of Donald Trump and <reserved16300>."
+            # prompt = "<reserved16300>"
+            inputs = processor(prompt, return_tensors="pt").to(model.device)
+            generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True,)
+            response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
+            pixel_values = model.decode_image_tokens(response_ids[:, 1:-1].cpu())
+            images = processor.postprocess_pixel_values(pixel_values.detach().cpu().numpy())
+
+            images[0].save(f"./generated_images/{args.exp_name}/{args.sks_name}_{index}.png")
+            print('Done')
+        except Exception as e:
+            print(e)
+        torch.cuda.empty_cache()
 
 
 
