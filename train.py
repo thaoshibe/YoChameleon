@@ -6,6 +6,10 @@ import shutil
 import requests
 import torch
 
+import os
+
+import torch
+
 from PIL import Image
 from dataset import PersonalizedDataset_Mixture
 from torch.utils.tensorboard import SummaryWriter
@@ -14,10 +18,6 @@ from torchvision import transforms
 from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
-
-# boi_token = 8197
-boi_token = 8710
-eoi_token = 8196
 
 def get_args():
     parser = argparse.ArgumentParser(description='YoAnole')
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     model_id = args.model_id
     processor = ChameleonProcessor.from_pretrained(model_id)
     # model = ChameleonForCausalLM.from_pretrained(model_id, device_map="auto")
-    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
+    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="cuda")
     print(f'Loaded {model_id}!')
 
     # --- Add personalized tokens
@@ -70,10 +70,11 @@ if __name__ == '__main__':
         model_id=model_id,
         personalized_prompt = sks_prompt,
         # output_type='image'
+        get_image_tokens = model.model.get_image_tokens,
         )
-    
+    # print(train_dataset[100])
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=1, shuffle=True, num_workers=1
+        train_dataset, batch_size=1, shuffle=True, num_workers=4
     )
 
     # --- Prepare for training
@@ -102,23 +103,29 @@ if __name__ == '__main__':
         for step, batch in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
             # TODO: move to batch implementation
-            if batch['image_generation']:
-                vqgan_ids = model.model.get_image_tokens(pixel_values=batch['pixel_values'][0]).to(batch['labels'].dtype)
-                mask = (batch['labels'] != -100)
-                batch['labels'][mask] = vqgan_ids.to(batch['labels'].device)
+            # breakpoint()
+            # if batch['image_generation']:
+            #     vqgan_ids = model.model.get_image_tokens(pixel_values=batch['pixel_values']).to(batch['labels'].dtype)
+            #     mask = (batch['labels'] != -100)
+            #     batch['labels'][mask] = vqgan_ids.to(batch['labels'].device)
 
-                output = model(input_ids = batch['input_ids'][0],
-                    attention_mask = batch['attention_mask'][0],
-                    pixel_values = batch['pixel_values'][0],
-                    labels = batch['labels'][0]
-                    )
-            else:
-                output = model(input_ids = batch['input_ids'][0],
-                    attention_mask = batch['attention_mask'][0],
-                    pixel_values = batch['pixel_values'][0],
-                    labels = batch['labels'][0]
-                    )
-
+            #     output = model(input_ids = batch['input_ids'],
+            #         attention_mask = batch['attention_mask'],
+            #         pixel_values = batch['pixel_values'],
+            #         labels = batch['labels']
+            #         )
+            # else:
+                # output = model(input_ids = batch['input_ids'],
+                #     attention_mask = batch['attention_mask'],
+                #     pixel_values = batch['pixel_values'],
+                #     labels = batch['labels']
+                #     )
+            # batch = {key: value.to(device) for key, value in batch.items()}
+            output = model(input_ids = batch['input_ids'].to(model.device),
+                attention_mask = batch['attention_mask'].to(model.device),
+                pixel_values = batch['pixel_values'].to(model.device),
+                labels = batch['labels'].to(model.device)
+                )
             loss = output.loss
             loss.backward()
             # print(loss)

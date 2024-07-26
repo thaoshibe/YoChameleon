@@ -10,6 +10,10 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from transformers import ChameleonProcessor
 
+START_OF_IMAGE_INDEX = 8197 # <racm3:break>
+END_OF_IMAGE_INDEX = 8196 # <eoss>
+PAD_INDEX = 1
+
 class PersonalizedDataset_Anole(Dataset):
     def __init__(
         self,
@@ -212,6 +216,7 @@ class PersonalizedDataset_Mixture(Dataset):
         random_image=False,
         text_only=False,
         personalized_prompt = False,
+        get_image_tokens = None,
     ):
         self.data_root = data_root
         self.device = device
@@ -226,6 +231,7 @@ class PersonalizedDataset_Mixture(Dataset):
         self.has_image = []
         self.require_image_generation = []
         self.personalized_prompt = personalized_prompt
+        self.get_image_tokens = get_image_tokens
         # --- Load data from json files
 
         conversation_types = ['recognition_positive', 'recognition_negative-laion', 'recognition_negative-cc12m', 'text-only-conversation']
@@ -287,12 +293,11 @@ class PersonalizedDataset_Mixture(Dataset):
         #     img = img[(h - crop) // 2 : (h + crop) // 2, (w - crop) // 2 : (w + crop) // 2]
         # breakpoint()
         image_generation = self.require_image_generation[i]
-        if image_generation:
-            image_path = self.images_path[i]
-            image = Image.open(image_path).convert("RGB")
+        image_path = self.images_path[i]
+        image = Image.open(image_path).convert("RGB")
+        image = self.flip_transform(image)
 
-            # --- Maybe flip the image... (? TODO)
-            image = self.flip_transform(image)
+        if image_generation:
             # question = self.questions[i].replace(f'<{self.sks_name}>', '<reserved16300>')
             # answer = self.answers[i].replace(f'<{self.sks_name}>', '<reserved16300>')
             question = ''
@@ -300,44 +305,47 @@ class PersonalizedDataset_Mixture(Dataset):
             prompt = f'{self.personalized_prompt}{question}{answer}'
 
             prompt_question = f'{self.personalized_prompt}{question}'
-            index_question = len(self.processor(prompt_question)['input_ids'][0])
-            example = self.processor(prompt, image, return_tensors="pt")
+            # index_answer = len(self.processor(answer)['input_ids'][0])
+            example = self.processor(prompt, image,
+                return_tensors="pt",
+                padding='max_length', max_length=2048)
             # print(question, answer, prompt)
             # -- compute loss on image content
+            # example['labels'] = example['input_ids'].clone()
+            vqgan_ids = self.get_image_tokens(pixel_values=example['pixel_values'])
+            for key in example:
+                example[key] = example[key][0]
+
             example['labels'] = example['input_ids'].clone()
-            example['labels'][:, :index_question]=-100
-            # doubt check this -- should we compute loss on the <eoss> token?
-            # example['labels'][:, -1:]=-100
-            example['labels'][:, -2:]=-100
+            soi_index = torch.nonzero(example['labels']==START_OF_IMAGE_INDEX).item()
+            eoi_index = torch.nonzero(example['labels']==END_OF_IMAGE_INDEX).item()
+            example['labels'][soi_index+1:eoi_index]= vqgan_ids
+            example['labels'][:soi_index+1]=-100
+            example['labels'][eoi_index:]=-100
 
-            example['query'] = prompt_question
-            example['answer'] = answer
-            example['image_path'] = image_path
-            example['has_image'] = self.has_image[i]
-            example['image_generation'] = image_generation
         else:
-            image_path = self.images_path[i]
-            image = Image.open(image_path).convert("RGB")
-
-            # --- Maybe flip the image... (? TODO)
-            # image = self.flip_transform(image)
             question = self.questions[i].replace(f'<{self.sks_name}>', '<reserved16300>')
             answer = self.answers[i].replace(f'<{self.sks_name}>', '<reserved16300>')
 
-            prompt = f'{self.personalized_prompt} {question} <image> {answer}'
-            question = f'{self.personalized_prompt} {question} <image>'
-            index_question = len(self.processor(question)['input_ids'][0])
-            example = self.processor(prompt, image, return_tensors="pt")
-            # print(question, answer, prompt)
+            prompt = f'{self.personalized_prompt} {question}<image><reserved08706>{answer}'
+            # question = f'{self.personalized_prompt} {question} <image>'
+            index_answer = len(self.processor(answer)['input_ids'][0])
+            
+            example = self.processor(prompt,
+                image,
+                return_tensors="pt",
+                padding='max_length', max_length=2048)
+
+            for key in example:
+                example[key] = example[key][0]
             # -- compute loss on answer only
             example['labels'] = example['input_ids'].clone()
-            example['labels'][:, :index_question]=-100
-
-            example['query'] = question
-            example['answer'] = answer
-            example['image_path'] = image_path
-            example['has_image'] = self.has_image[i]
-            example['image_generation'] = image_generation
+            example['labels'][:-index_answer+1]=-100
+        example['query'] = question
+        example['answer'] = answer
+        example['image_path'] = image_path
+        example['has_image'] = self.has_image[i]
+        example['image_generation'] = image_generation
         return example
 
 if __name__ == "__main__":
@@ -378,4 +386,4 @@ if __name__ == "__main__":
         model_id=model_id,
         personalized_prompt="<sks> is a cat."
         )
-    print(train_dataset[0])
+    print(train_dataset[400])
