@@ -110,7 +110,7 @@ if __name__ == '__main__':
         )
     # print(train_dataset[100])
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, collate_fn=collate_fn
+        train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=1, collate_fn=collate_fn
     )
 
     # --- Prepare for training

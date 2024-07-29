@@ -73,15 +73,16 @@ class PersonalizedDataset(Dataset):
                 self.require_image_generation.extend([False]*len(answers))
             print(conversation_type, len(self.questions))
         print('Total: ', len(self.questions), len(self.answers), len(self.images_path), len(self.has_image))
-        # # Add data for image generation
-        # gt_images = [x for x in self.images_path if f'train/{self.sks_name}' in x]
-        # for image_path in gt_images:
-        #     self.questions.append('')
-        #     self.answers.append('<image>')
-        #     self.images_path.append(image_path)
-        #     self.has_image.extend([False])
-        #     self.require_image_generation.extend([True])
-
+        # Add data for image generation
+        # self.images_path = glob.glob(os.path.join('./yollava-data/train/bo/*.png'))
+        gt_images = [x for x in self.images_path if f'train/{self.sks_name}' in x]
+        for image_path in gt_images:
+            self.questions.append('')
+            self.answers.append('<image>')
+            self.images_path.extend([image_path])
+            self.has_image.extend([False])
+            self.require_image_generation.extend([True])
+        # breakpoint()
         if set == "train":
             self._length = len(self.questions)
         else:
@@ -122,23 +123,10 @@ class PersonalizedDataset(Dataset):
             example['input'] = f'{self.personalized_prompt}{self.questions[i]}<image><reserved08706>{self.answers[i]}'
         else:
             example['input'] = f'{self.personalized_prompt}{self.questions[i]}<reserved08706>{self.answers[i]}'
-        if example['image_generation']:
-            example['input'] = f'{self.personalized_prompt}{self.questions[i]}<reserved08706><image>{self.answers[i]}'
+        # if example['image_generation']:
+        #     example['input'] = f'{self.personalized_prompt}{self.questions[i]}<reserved08706><image>{self.answers[i]}'
         return example
 
-# def collate_fn(batch):
-#     # unpack batch
-#     breakpoint()
-#     text = [_[0] for _ in batch]
-#     target = [_[1] for _ in batch]
-
-#     # get the input tokens
-#     input_tokens = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
-
-#     # get the target
-#     target = torch.tensor(target)
-
-#     return input_tokens, target
 def collate_fn(batch):
     images = [item['image'] for item in batch]
     inputs = [item['input'] for item in batch]
@@ -156,11 +144,11 @@ def collate_fn(batch):
     mask = torch.arange(seq_len).expand(batch_size, seq_len) < eot_indices.unsqueeze(1)
     # Apply the mask to the labels
     example['labels'][mask] = -100
-
-    eot_index = torch.nonzero(example['labels']==END_OF_TURN).item()
-    soi_index = torch.nonzero(example['labels']==START_OF_IMAGE_INDEX).item()
+    # breakpoint()
+    # eot_index = torch.nonzero(example['labels']==END_OF_TURN).item()
+    # soi_index = torch.nonzero(example['labels']==START_OF_IMAGE_INDEX).item()
     # input_ids = torch.stack(input_ids)
-    attention_mask = torch.stack(attention_mask)
+    # attention_mask = torch.stack(attention_mask)
 
     return example
 
@@ -172,13 +160,13 @@ if __name__ == "__main__":
 
     train_dataset = PersonalizedDataset(
         data_root="./example_training_data/",
-        sks_name='mam',
+        sks_name='bo',
         personalized_prompt="<sks> is a cat."
         )
-    print(train_dataset[400])
+    print(train_dataset[0])
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=3, shuffle=True, num_workers=0, collate_fn=collate_fn,
     )
     for i, batch in enumerate(train_dataloader):
-        print(len(batch['query']), i)
+        print(len(batch['labels']), i)
     print('Done one loop on dataset')
