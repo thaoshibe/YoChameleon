@@ -27,6 +27,7 @@ PAD_INDEX = 1
 def collate_fn(batch):
     inputs = [item['input'] for item in batch]
     images = [item['image'] for item in batch]
+    img_gen_bools = [item['image_generation'] for item in batch]
     # question = [f'{questions[i]}{answers[i]}' for i in range(len(questions))]
     example = processor(inputs, images, padding=True)
     example['labels'] = example['input_ids'].clone()
@@ -41,20 +42,7 @@ def collate_fn(batch):
 
     # Apply the mask to the labels
     example['labels'][mask] = -100
-
-    # If gen_image, then replace labels to image tokens
-
-    #     vqgan_ids = model.model.get_image_tokens(pixel_values=batch['pixel_values']).to(batch['labels'].dtype)
-    #     mask = (batch['labels'] != -100)
-    #     batch['labels'][mask] = vqgan_ids.to(batch['labels'].device)
-
-    # Move to device
-    # example = {key: value.to(model.device) for key, value in example.items()}
-    # eot_index = torch.nonzero(example['labels']==END_OF_TURN).item()
-    # soi_index = torch.nonzero(example['labels']==START_OF_IMAGE_INDEX).item()
-    # input_ids = torch.stack(input_ids)
-    # attention_mask = torch.stack(attention_mask)
-
+    example['img_gen_bools'] = img_gen_bools
     return example
 
 def get_args():
@@ -70,7 +58,7 @@ def get_args():
     # hyperparameters
     parser.add_argument('--epoch', type=int, default=20, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
-    parser.add_argument('--savedir', type=str, default='./ckpt/', help='Directory to save the model')
+    parser.add_argument('--savedir', type=str, default='./ckpt', help='Directory to save the model')
     parser.add_argument('--exp_name', type=str, default='total', help='Name of experiement')
     return parser.parse_args()
 
@@ -138,7 +126,12 @@ if __name__ == '__main__':
                 print(names, "requires_grad")
         for step, batch in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
-            
+            for i, img_gen in enumerate(batch['img_gen_bools']):
+                if img_gen:
+                    soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
+                    eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
+                    image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+                    batch['labels'][i, soi_index:eot_index] = image_tokens
             # Move tensors to device
             input_ids = batch['input_ids'].to(model.device)
             attention_mask = batch['attention_mask'].to(model.device)

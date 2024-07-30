@@ -12,6 +12,7 @@ from torch.utils.data import Dataset
 from torchvision import datasets
 from torchvision import transforms
 from torchvision import transforms
+from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
 
 START_OF_IMAGE_INDEX = 8197 # <racm3:break>
@@ -128,27 +129,30 @@ class PersonalizedDataset(Dataset):
         return example
 
 def collate_fn(batch):
-    images = [item['image'] for item in batch]
     inputs = [item['input'] for item in batch]
-
+    images = [item['image'] for item in batch]
+    img_gen_bools = [item['image_generation'] for item in batch]
     # question = [f'{questions[i]}{answers[i]}' for i in range(len(questions))]
-    example = chemeleon_processor(inputs, images, padding=True)
+    example = processor(inputs, images, padding=True)
     example['labels'] = example['input_ids'].clone()
 
     # Find the index of the first occurrence of END_OF_TURN in each sequence
     batch_size, seq_len = example['labels'].shape
     eot_mask = example['labels'] == END_OF_TURN
-    eot_indices = torch.argmax(eot_mask.int(), dim=1)+1
+    eot_indices = torch.argmax(eot_mask.int(), dim=1)
 
     # Create a mask for the positions to be replaced with -100
     mask = torch.arange(seq_len).expand(batch_size, seq_len) < eot_indices.unsqueeze(1)
+
     # Apply the mask to the labels
     example['labels'][mask] = -100
-    # breakpoint()
-    # eot_index = torch.nonzero(example['labels']==END_OF_TURN).item()
-    # soi_index = torch.nonzero(example['labels']==START_OF_IMAGE_INDEX).item()
-    # input_ids = torch.stack(input_ids)
-    # attention_mask = torch.stack(attention_mask)
+    for i, img_gen in enumerate(img_gen_bools):
+        if img_gen:
+            # breakpoint()
+            soi_index = torch.nonzero(example['labels'][i]==START_OF_IMAGE_INDEX).item()+1
+            eot_index = torch.nonzero(example['labels'][i]==END_OF_IMAGE_INDEX).item()
+            image_tokens = model.model.get_image_tokens(pixel_values=example['pixel_values'][None, i])[0]
+            example['labels'][i, soi_index:eot_index] = image_tokens
 
     return example
 
@@ -156,8 +160,9 @@ def collate_fn(batch):
 if __name__ == "__main__":
 
     model_id = 'leloy/Anole-7b-v0.1-hf'
-    chemeleon_processor = ChameleonProcessor.from_pretrained(model_id)
-
+    processor = ChameleonProcessor.from_pretrained(model_id)
+    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
+    print(f'Loaded {model_id}!')
     train_dataset = PersonalizedDataset(
         data_root="./example_training_data/",
         sks_name='bo',
