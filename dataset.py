@@ -11,7 +11,6 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import datasets
 from torchvision import transforms
-from torchvision import transforms
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
 
@@ -20,98 +19,7 @@ END_OF_IMAGE_INDEX = 8196 # <eoss>
 END_OF_TURN = 8710
 PAD_INDEX = 1
 
-class PersonalizedDataset_ImgGen_Only(Dataset):
-    def __init__(
-        self,
-        data_root,
-        sks_name,
-        set="train",
-        placeholder_token="<sks>",
-        center_crop=False,
-        device="cuda",
-        config=None,
-        flip_p=0.5,
-        personalized_prompt = False,
-        repeat=10,
-        # get_image_tokens = None,
-    ):
-        self.data_root = data_root
-        self.device = device
-        self.config = config
-        # self.processor = ChameleonProcessor.from_pretrained(model_id)
-        self.center_crop = center_crop
-        self.flip_p = flip_p
-        self.sks_name = sks_name
-        self.questions = []
-        self.images_path = []
-        self.answers = []
-        self.has_image = []
-        self.require_image_generation = []
-        self.personalized_prompt = personalized_prompt
-        gt_images = glob.glob(os.path.join(data_root, self.sks_name, '*.png'))
-
-        with open(f'./preprocess/{self.sks_name}.json') as f:
-            captions = json.load(f)
-
-        for image_path in gt_images:
-            
-            self.questions.append(captions[image_path])
-            self.answers.append('<image>')
-            self.images_path.extend([image_path])
-            self.has_image.extend([False])
-            self.require_image_generation.extend([True])
-
-        # repeat for more data
-        self.questions = self.questions*repeat
-        self.answers = self.answers*repeat
-        self.images_path = self.images_path*repeat
-        self.has_image = self.has_image*repeat
-        self.require_image_generation = self.require_image_generation*repeat
-
-        if set == "train":
-            self._length = len(self.questions)
-        else:
-            self._length = self.num_images
-        self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
-
-        # self.templates = my_query_templates
-
-    def __len__(self):
-        return self._length
-
-    def __getitem__(self, i):
-        example = {}
-        # --- Center crop -- Not sure?
-        # if self.center_crop:
-        #     crop = min(img.shape[0], img.shape[1])
-        #     (
-        #         h,
-        #         w,
-        #     ) = (
-        #         img.shape[0],
-        #         img.shape[1],
-        #     )
-        #     img = img[(h - crop) // 2 : (h + crop) // 2, (w - crop) // 2 : (w + crop) // 2]
-        # breakpoint()
-        # image_generation = self.require_image_generation[i]
-        image_path = self.images_path[i]
-        image = Image.open(image_path).convert("RGB")
-        image = self.flip_transform(image)
-
-        example['question'] = self.questions[i]
-        example['answer'] = self.answers[i]
-        example['has_image'] = self.has_image[i]
-        example['image_generation'] = self.require_image_generation[i]
-        example['image'] = image
-        # TODO: clean up this condition
-        if example['has_image']:
-            example['input'] = f'{self.personalized_prompt}{self.questions[i]}<image><reserved08706>{self.answers[i]}'
-        else:
-            example['input'] = f'{self.personalized_prompt}{self.questions[i]}<reserved08706>{self.answers[i]}'
-        # if example['image_generation']:
-        #     example['input'] = f'{self.personalized_prompt}{self.questions[i]}<reserved08706><image>{self.answers[i]}'
-        return example
-
+# END-OF-TURN token: <reserved08706>
 
 class PersonalizedDataset(Dataset):
     def __init__(
@@ -121,62 +29,36 @@ class PersonalizedDataset(Dataset):
         set="train",
         placeholder_token="<sks>",
         center_crop=False,
-        device="cuda",
-        config=None,
         flip_p=0.5,
         personalized_prompt = False,
+        repeat=10,
+        processor: ChameleonProcessor = None,
         # get_image_tokens = None,
     ):
         self.data_root = data_root
-        self.device = device
-        self.config = config
-        # self.processor = ChameleonProcessor.from_pretrained(model_id)
-        self.center_crop = center_crop
         self.flip_p = flip_p
         self.sks_name = sks_name
         self.questions = []
         self.images_path = []
         self.answers = []
-        self.has_image = []
-        self.require_image_generation = []
         self.personalized_prompt = personalized_prompt
-        # self.get_image_tokens = get_image_tokens
-        # --- Load data from json files
-        conversation_types = ['recognition_positive', 'recognition_negative-laion', 'recognition_negative-cc12m', 'text-only-conversation']
-        for conversation_type in conversation_types:
-            f = open(os.path.join(data_root, sks_name, f'{conversation_type}.json'))
-            data = json.load(f)
-            file_names = [x for x in data.keys()]
-            for file_name in file_names:
-                questions = []
-                answers = []
-                for conv in data[file_name]:
-                    questions.append(conv['Human'])
-                    answers.append(conv['AI'])
+        self.processor = processor
+        gt_images = glob.glob(os.path.join(data_root, self.sks_name, '*.png'))
 
-                self.questions.extend(questions)
-                self.answers.extend(answers)
-                
-                self.images_path.extend([file_name]*len(answers))
-                if conversation_type == 'text-only-conversation':
-                    self.has_image.extend([False]*len(answers))
-                    # self.require_image_generation.extend([False]*len(answers))
-                else:
-                    self.has_image.extend([True]*len(answers))
-                self.require_image_generation.extend([False]*len(answers))
-            print(conversation_type, len(self.questions))
-        print('Total: ', len(self.questions), len(self.answers), len(self.images_path), len(self.has_image))
-        # Add data for image generation
-        # self.images_path = glob.glob(os.path.join('./yollava-data/train/bo/*.png'))
-        # gt_images = [x for x in self.images_path if f'train/{self.sks_name}' in x]
-        gt_images = glob.glob(os.path.join('../images/', self.sks_name, '*.jpg'))
+        with open(f'./preprocess/{self.sks_name}.json') as f:
+            captions = json.load(f)
+
         for image_path in gt_images:
-            self.questions.append('')
+            self.questions.append(captions[image_path])
             self.answers.append('<image>')
             self.images_path.extend([image_path])
-            self.has_image.extend([False])
-            self.require_image_generation.extend([True])
-        # breakpoint()
+
+        # repeat for more data
+        if set == "train":
+            self.questions = self.questions*repeat
+            self.answers = self.answers*repeat
+            self.images_path = self.images_path*repeat
+
         if set == "train":
             self._length = len(self.questions)
         else:
@@ -190,82 +72,44 @@ class PersonalizedDataset(Dataset):
 
     def __getitem__(self, i):
         example = {}
-        # --- Center crop -- Not sure?
-        # if self.center_crop:
-        #     crop = min(img.shape[0], img.shape[1])
-        #     (
-        #         h,
-        #         w,
-        #     ) = (
-        #         img.shape[0],
-        #         img.shape[1],
-        #     )
-        #     img = img[(h - crop) // 2 : (h + crop) // 2, (w - crop) // 2 : (w + crop) // 2]
-        # breakpoint()
-        # image_generation = self.require_image_generation[i]
+
         image_path = self.images_path[i]
         image = Image.open(image_path).convert("RGB")
         image = self.flip_transform(image)
 
-        example['question'] = self.questions[i]
-        example['answer'] = self.answers[i]
-        example['has_image'] = self.has_image[i]
-        example['image_generation'] = self.require_image_generation[i]
-        example['image'] = image
-        # TODO: clean up this condition
-        if example['has_image']:
-            example['input'] = f'{self.personalized_prompt}{self.questions[i]}<image><reserved08706>{self.answers[i]}'
-        else:
-            example['input'] = f'{self.personalized_prompt}{self.questions[i]}<reserved08706>{self.answers[i]}'
-        # if example['image_generation']:
-        #     example['input'] = f'{self.personalized_prompt}{self.questions[i]}<reserved08706><image>{self.answers[i]}'
+        # example['question'] = self.questions[i]
+        # example['answer'] = self.answers[i]
+        # example['image'] = image
+        example = self.processor(
+            self.questions[i],
+            images=image,
+            padding="max_length",
+            max_length=4096,
+            )
+        # example['labels'] = example['labels'][0]
+        example['input_ids'] = example['input_ids'][0]
+        example['attention_mask'] = example['attention_mask'][0]
+        example['pixel_values'] = example['pixel_values'][0]
+        example['labels'] = example['input_ids'].clone()
         return example
-
-def collate_fn(batch):
-    inputs = [item['input'] for item in batch]
-    images = [item['image'] for item in batch]
-    img_gen_bools = [item['image_generation'] for item in batch]
-    # question = [f'{questions[i]}{answers[i]}' for i in range(len(questions))]
-    example = processor(inputs, images, padding=True)
-    example['labels'] = example['input_ids'].clone()
-
-    # Find the index of the first occurrence of END_OF_TURN in each sequence
-    batch_size, seq_len = example['labels'].shape
-    eot_mask = example['labels'] == END_OF_TURN
-    eot_indices = torch.argmax(eot_mask.int(), dim=1)
-
-    # Create a mask for the positions to be replaced with -100
-    mask = torch.arange(seq_len).expand(batch_size, seq_len) < eot_indices.unsqueeze(1)
-
-    # Apply the mask to the labels
-    example['labels'][mask] = -100
-    for i, img_gen in enumerate(img_gen_bools):
-        if img_gen:
-            # breakpoint()
-            soi_index = torch.nonzero(example['labels'][i]==START_OF_IMAGE_INDEX).item()+1
-            eot_index = torch.nonzero(example['labels'][i]==END_OF_IMAGE_INDEX).item()
-            image_tokens = model.model.get_image_tokens(pixel_values=example['pixel_values'][None, i])[0]
-            example['labels'][i, soi_index:eot_index] = image_tokens
-
-    return example
-
 
 if __name__ == "__main__":
 
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
-    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
+    
     print(f'Loaded {model_id}!')
-    # train_dataset = PersonalizedDataset(
-    train_dataset = PersonalizedDataset_ImgGen_Only(
+    train_dataset = PersonalizedDataset(
         data_root="./yollava-data/train/",
         sks_name='bo',
-        personalized_prompt="<sks> is a cat."
+        personalized_prompt="<sks> is a cat.",
+        processor=processor,
         )
     print(train_dataset[0])
+
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=3, shuffle=True, num_workers=0, collate_fn=collate_fn,
+        train_dataset, batch_size=3, shuffle=True, num_workers=0,
     )
     for i, batch in enumerate(train_dataloader):
-        print(len(batch['labels']), i)
+        print(len(batch['input_ids']), i)
     print('Done one loop on dataset')
