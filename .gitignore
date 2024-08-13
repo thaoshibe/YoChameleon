@@ -1,4 +1,7 @@
 /data
+.DS_Store
+*/*/.DS_Store
+chameleon/inference/.DS_Store
 
 __pycache__/
 *.pyc
