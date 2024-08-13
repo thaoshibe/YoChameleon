@@ -21,7 +21,7 @@ def get_args():
     # model related
     # parser.add_argument('--image', type=str, default='./chameleon/inference/examples/thao-bo.jpeg', help='Path to image')
     # parser.add_argument('--prompt', type=str, default="What is the color of the dog? <image>", help='Prompt')
-    parser.add_argument('--model_id', type=str, default='chameleon_ckpt/chameleon-7b', help='Model ID')
+    parser.add_argument('--model_id', type=str, default='facebook/chameleon-7b', help='Model ID')
     parser.add_argument('--data_root', type=str, default="./example_training_data/", help='Data root')
     
     # personalized token related

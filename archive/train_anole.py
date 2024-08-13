@@ -6,13 +6,8 @@ import shutil
 import requests
 import torch
 
-import os
-
-import torch
-
 from PIL import Image
-from dataset import PersonalizedDataset
-from dataset import PersonalizedDataset_ImgGen_Only
+from dataset import PersonalizedDataset_Anole
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets
 from torchvision import transforms
@@ -20,48 +15,24 @@ from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
 
-START_OF_IMAGE_INDEX = 8197 # <racm3:break>
-END_OF_IMAGE_INDEX = 8196 # <eoss>
-END_OF_TURN = 8710
-PAD_INDEX = 1
-
-def collate_fn(batch):
-    inputs = [item['input'] for item in batch]
-    images = [item['image'] for item in batch]
-    img_gen_bools = [item['image_generation'] for item in batch]
-    # question = [f'{questions[i]}{answers[i]}' for i in range(len(questions))]
-    example = processor(inputs, images, padding=True)
-    example['labels'] = example['input_ids'].clone()
-
-    # Find the index of the first occurrence of END_OF_TURN in each sequence
-    batch_size, seq_len = example['labels'].shape
-    eot_mask = example['labels'] == END_OF_TURN
-    eot_indices = torch.argmax(eot_mask.int(), dim=1)
-
-    # Create a mask for the positions to be replaced with -100
-    mask = torch.arange(seq_len).expand(batch_size, seq_len) < eot_indices.unsqueeze(1)
-
-    # Apply the mask to the labels
-    example['labels'][mask] = -100
-    example['img_gen_bools'] = img_gen_bools
-    return example
+# boi_token = 8197
+boi_token = 8710
+eoi_token = 8196
 
 def get_args():
     parser = argparse.ArgumentParser(description='YoAnole')
     # model related
     parser.add_argument('--model_id', type=str, default='leloy/Anole-7b-v0.1-hf', help='Model ID')
-    parser.add_argument('--data_root', type=str, default='./example_training_data/', help='Model ID')
+    parser.add_argument('--data_root', type=str, default='./yollava-data/train/', help='Model ID')
 
     # personalized token related
     parser.add_argument('--sks_name', type=str, default='sks', help='Name of the personalized token')
     parser.add_argument('--prefix_token', type=int, default=16, help='Number of prefix tokens')
 
     # hyperparameters
-    parser.add_argument('--epoch', type=int, default=50, help='Number of epochs')
-    parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
-    parser.add_argument('--savedir', type=str, default='./ckpt', help='Directory to save the model')
-    parser.add_argument('--exp_name', type=str, default='total', help='Name of experiement')
-    parser.add_argument('--image_gen_only', action='store_true', help='Image generation dataset only')
+    parser.add_argument('--epoch', type=int, default=20, help='Number of epochs')
+    parser.add_argument('--savedir', type=str, default='./ckpt/', help='Directory to save the model')
+    parser.add_argument('--exp_name', type=str, default='anole', help='Name of experiement')
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -93,21 +64,16 @@ if __name__ == '__main__':
     print(f'Personalized prompt: {sks_prompt}')
     
     # --- Dataloader
-    if args.image_gen_only:
-        train_dataset = PersonalizedDataset_ImgGen_Only(
-            data_root=args.data_root,
-            sks_name=args.sks_name,
-            personalized_prompt = sks_prompt,
-            )
-    else:
-        train_dataset = PersonalizedDataset(
-            data_root=args.data_root,
-            sks_name=args.sks_name,
-            personalized_prompt = sks_prompt,
-            )
-    # print(train_dataset[100])
+    train_dataset = PersonalizedDataset_Anole(
+        data_root=args.data_root,
+        sks_name=args.sks_name,
+        model_id=model_id,
+        personalized_prompt = sks_prompt,
+        # output_type='image'
+        )
+    
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=1, collate_fn=collate_fn
+        train_dataset, batch_size=1, shuffle=True, num_workers=1
     )
 
     # --- Prepare for training
@@ -135,25 +101,16 @@ if __name__ == '__main__':
                 print(names, "requires_grad")
         for step, batch in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
-            for i, img_gen in enumerate(batch['img_gen_bools']):
-                if img_gen:
-                    soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
-                    eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
-                    image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
-                    batch['labels'][i, soi_index:eot_index] = image_tokens
-                    # breakpoint()
-            # Move tensors to device
-            input_ids = batch['input_ids'].to(model.device)
-            attention_mask = batch['attention_mask'].to(model.device)
-            pixel_values = batch['pixel_values'].to(model.device)
-            labels = batch['labels'].to(model.device)
-            # Forward pass
-            output = model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                pixel_values=pixel_values,
-                labels=labels
-            )
+            # TODO: move to batch implementation
+            vqgan_ids = model.model.get_image_tokens(pixel_values=batch['pixel_values'][0]).to(batch['labels'].dtype)
+            mask = (batch['labels'] != -100)
+            batch['labels'][mask] = vqgan_ids.to(batch['labels'].device)
+
+            output = model(input_ids = batch['input_ids'][0],
+                attention_mask = batch['attention_mask'][0],
+                pixel_values = batch['pixel_values'][0],
+                labels = batch['labels'][0])
+
             loss = output.loss
             loss.backward()
             # print(loss)

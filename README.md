@@ -13,16 +13,10 @@ tar -cjvf data.tar.bz2 data
 ### Prerequisites
 
 ```
-# Download pretrained models? -- This one is for code with TRANSFORMERS
-mdkir chameleon-hf
-cd chameleon-hf
-git clone git@hf.co:facebook/chameleon-30b
-git clone git@hf.co:facebook/chameleon-7b
-
-# Instrall transformers with chameleon
-cd ..
-git clone -b chameleon https://github.com/huggingface/transformers.git
+git clone https://github.com/huggingface/transformers.git
 cd transformers
+git fetch origin pull/32013/head:pr-32013
+git checkout pr-32013
 pip install -e .
 ```
 
@@ -41,38 +35,24 @@ python train.py --sks_name bo
 ```
 
 
-
 ### TODO 📝
 
-- [ ] YoLLaVA + Chameleon
-	+ [x] Add new token
-	+ [x] Dataloader
-	+ [x] Training part
-	+ [x] Run dummi code
-	+ [x] Check loss -- Mask out question/prompt
-- [ ] Chameleon + Anole?
-	+ [x] Test text generation ability
-	+ [x] Test image encoding
-	+ [x] Test image generation
-- [ ] YoLLaVA + Anole
-	+ [x] Test text generation ability
-	+ [x] Test image encoding
-	+ [x] Test image generation
-	+ [x] Dataloader
-	+ [x] Training part
-	+ [x] Run dummi code
-	+ [x] Check loss -- Compute loss on images?
-- [ ] YoLLaVA + Total
-	+ [x] Test text generation ability
-	+ [x] Test image encoding
-	+ [x] Test image generation
-	+ [x] Dataloader
-	+ [x] Training part
-	+ [x] Run dummi code
-	+ [x] Check loss -- Compute loss on images?
+- [ ] Clean code first -- So that we can easily add more data augmentation
+	+ [ ] Write dataloader from file? (json file)
+	+ [ ] Write config file? -- Maybe not necessary
+	+ [ ] Check data format: `personalized prompt -- caption -- <image>`
+- [ ] Data Augmentation
+	+ [ ] Captioning
+		+ [ ] Write code for detail caption for each image
+	+ [ ] Image augmentation
+		+ [ ] Normal image augmentation
+		+ [ ] Part-segmentation
+	+ [ ] Compute loss on subject only?
 
-- [ ] Note
-	+ [ ] ⚠️ Currently all Q/A has images -- IMPORTANT, need to fix soon
-	+ [x] Generate corresponding answer for Chameleon is not ready yet
-	+ [ ] Right now code is syned between 2 GPU -- How to fit them into a single GPU?
-	+ [ ] ⚠️ Check what's the logic of the generate mode in Chameleon inference code
+In general, we have these version:
+- [ ] v0: 500 imgs
+- [ ] v1: data augmentation only
+- [ ] v2: detail image captioning
+- [ ] v3: part-segementation
+- [ ] v4: compute loss on image segmentation
+- [ ] v5: all?
