@@ -15,6 +15,11 @@ from utils import Config
 from utils import collate_fn
 from utils import setup
 
+START_OF_IMAGE_INDEX = 8197 # <racm3:break>
+END_OF_IMAGE_INDEX = 8196 # <eoss>
+END_OF_TURN = 8710
+PAD_INDEX = 1
+
 def get_args():
     parser = argparse.ArgumentParser(description='Your Chameleon model')
     # model related
@@ -43,13 +48,16 @@ if __name__ == '__main__':
     print(f'Personalized tokens will be: {personalized_tokens}')
     print(f'Personalized token ids will be: {personalized_token_ids}')
     print(f'Personalized prompt: {sks_prompt}')
-    
+    # breakpoint()
+
     # --- Dataloader
     train_dataset = PersonalizedDataset(
             data_root=config.data_root,
+            json_file=config.json_file,
             sks_name=config.sks_name,
             personalized_prompt = sks_prompt,
             processor=processor,
+            # get_image_tokens=model.model.get_image_tokens,
             )
 
     train_dataloader = torch.utils.data.DataLoader(
@@ -62,7 +70,6 @@ if __name__ == '__main__':
     orig_embeds_params = model.get_input_embeddings().weight.data.clone()
     orig_lm_params = model.lm_head.weight.data.clone()
     trainable_params = [model.get_input_embeddings().weight, model.lm_head.weight]
-
     optimizer = torch.optim.AdamW(
         trainable_params, # for optimize the embeddings and the head
         lr=1e-3,
@@ -80,14 +87,14 @@ if __name__ == '__main__':
         for names, p in model.named_parameters():
             if p.requires_grad:
                 print(names, "requires_grad")
-        for step, batch in enumerate(tqdm(train_dataloader)):
+        for step, batch in enumerate(train_dataloader):
             optimizer.zero_grad()
-            # for i, img_gen in enumerate(batch['img_gen_bools']):
-            #     if img_gen:
-            #         soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
-            #         eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
-            #         image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
-            #         batch['labels'][i, soi_index:eot_index] = image_tokens
+            # breakpoint()
+            for i, label in enumerate(batch['labels']):
+                soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
+                eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
+                image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+                batch['labels'][i, soi_index:eot_index] = image_tokens
 
             # Move tensors to device
             # input_ids = batch['input_ids'].to(model.device)
@@ -95,6 +102,16 @@ if __name__ == '__main__':
             # pixel_values = batch['pixel_values'].to(model.device)
             # labels = batch['labels'].to(model.device)
             batch = {k: v.to(model.device) for k, v in batch.items()}
+            
+            # boi_indices = (cur_labels == START_OF_IMAGE_INDEX).nonzero()
+            # if there is any BEGIN-OF-IMAGE token in the current conversation
+            # if len(boi_indices) > 0:
+            #     for boi_idx in boi_indices:
+            #         soi_index = boi_idx.item()+1
+            #         eot_index = (cur_labels == END_OF_IMAGE_INDEX).nonzero().item()
+            #         cur_labels[soi_index:eot_index] = image_tokens
+            # labels[start_idx:end_idx+1] = cur_labels
+
             # Forward pass
             output = model(
                 input_ids=batch['input_ids'],
@@ -105,6 +122,7 @@ if __name__ == '__main__':
             loss = output.loss
             loss.backward()
             # print(loss)
+            print(loss)
             optimizer.step()
             with torch.no_grad():
                 model.get_input_embeddings().weight[

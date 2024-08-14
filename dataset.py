@@ -27,83 +27,79 @@ class PersonalizedDataset(Dataset):
         data_root,
         sks_name,
         set="train",
+        json_file=None,
         placeholder_token="<sks>",
         center_crop=False,
-        flip_p=0.5,
         personalized_prompt = False,
         repeat=10,
         processor: ChameleonProcessor = None,
+        # get_image_tokens: ChameleonForConditionalGeneration = None,
         # get_image_tokens = None,
     ):
         self.data_root = data_root
-        self.flip_p = flip_p
         self.sks_name = sks_name
         self.questions = []
         self.images_path = []
         self.answers = []
         self.personalized_prompt = personalized_prompt
         self.processor = processor
-        gt_images = glob.glob(os.path.join(data_root, self.sks_name, '*.png'))
-
-        with open(f'./preprocess/{self.sks_name}.json') as f:
-            captions = json.load(f)
-
-        for image_path in gt_images:
-            self.questions.append(captions[image_path])
-            self.answers.append('<image>')
-            self.images_path.extend([image_path])
-
-        # repeat for more data
-        if set == "train":
-            self.questions = self.questions*repeat
-            self.answers = self.answers*repeat
-            self.images_path = self.images_path*repeat
-
-        if set == "train":
-            self._length = len(self.questions)
-        else:
-            self._length = self.num_images
-        self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
+        # self.get_image_tokens = get_image_tokens
+        with open(json_file) as f:
+            data = json.load(f)
+        self.data = data
+        self.flip_transform = transforms.RandomHorizontalFlip()
 
         # self.templates = my_query_templates
 
     def __len__(self):
-        return self._length
+        return len(self.data)
 
     def __getitem__(self, i):
-        example = {}
+        image_paths = [os.path.join(self.data_root, self.sks_name, item) for item in self.data[i]['image']]
+        images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
+        images = [self.flip_transform(image) for image in images]
 
-        image_path = self.images_path[i]
-        image = Image.open(image_path).convert("RGB")
-        image = self.flip_transform(image)
+        conv = self.data[i]['conversations']
+        chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
+        conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
+        full_text = f'{self.personalized_prompt}\n{conversations}'
 
-        # example['question'] = self.questions[i]
-        # example['answer'] = self.answers[i]
-        # example['image'] = image
+        
         example = self.processor(
-            self.questions[i],
-            images=image,
+            full_text,
+            images=images,
             padding="max_length",
-            max_length=4096,
+            max_length=2048,
             )
-        # example['labels'] = example['labels'][0]
         example['input_ids'] = example['input_ids'][0]
         example['attention_mask'] = example['attention_mask'][0]
         example['pixel_values'] = example['pixel_values'][0]
-        example['labels'] = example['input_ids'].clone()
+
+        clone_inputs = example['input_ids'].clone()
+        eot_indices = (clone_inputs == END_OF_TURN).nonzero()[:]
+        
+        # Initialize a mask with the same shape as the tensor, filled with -100 (mask out question)
+        labels = torch.full(clone_inputs.shape, -100)
+        
+        for start_idx, end_idx in zip(eot_indices[0::2]+1, eot_indices[1::2]):
+            # cur_labels = clone_inputs[start_idx:end_idx+1]
+            labels[start_idx:end_idx+1] = clone_inputs[start_idx:end_idx+1]
+        example['labels'] = labels
         return example
 
 if __name__ == "__main__":
 
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
-    
+    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
     print(f'Loaded {model_id}!')
     train_dataset = PersonalizedDataset(
-        data_root="./yollava-data/train/",
+        data_root="./yollava-data/",
+        json_file='./example_training_data/v1/bo.json',
         sks_name='bo',
-        personalized_prompt="<sks> is a cat.",
+        personalized_prompt="<bo> is a cat.",
         processor=processor,
+        # get_image_tokens=model.model.get_image_tokens,
         )
     print(train_dataset[0])
 

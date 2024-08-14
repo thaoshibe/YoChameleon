@@ -1,0 +1,12 @@
+model_id: 'leloy/Anole-7b-v0.1-hf'
+data_root: './yollava-data/train/'
+json_file: './example_training_data/v1/bo.json'
+
+sks_name: 'bo'
+prefix_token: 16
+
+epoch: 100
+batch_size: 3
+savedir: './ckpt'
+exp_name: 'basic'
+save_every: 5

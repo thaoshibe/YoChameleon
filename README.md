@@ -34,6 +34,13 @@ python train_anole.py --sks_name bo
 python train.py --sks_name bo
 ```
 
+### Create training json
+
+```
+# this will create llava-like json file
+cd preprocess
+python create_img_gen.py --image_folder /mnt/localssd/code/YoChameleon/yollava-data/train --output_dir /mnt/localssd/code/YoChameleon/example_training_data/v1 --sks_name mam 
+```
 
 ### TODO 📝
 
@@ -51,7 +58,7 @@ python train.py --sks_name bo
 
 In general, we have these version:
 - [ ] v0: 500 imgs
-- [ ] v1: data augmentation only
+- [ ] v1: data augmentation only -- folder `./example_training_data/v1/`
 - [ ] v2: detail image captioning
 - [ ] v3: part-segementation
 - [ ] v4: compute loss on image segmentation
