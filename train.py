@@ -94,10 +94,11 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             for i, item in enumerate(batch['labels']):
                 # if img_gen:
-                soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
-                eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
-                image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
-                batch['labels'][i, soi_index:eot_index] = image_tokens
+                if len(torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX)) != 0:
+                    soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
+                    eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
+                    image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+                    batch['labels'][i, soi_index:eot_index] = image_tokens
             batch = {k: v.to(model.device) for k, v in batch.items()}
             # Forward pass
 
