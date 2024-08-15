@@ -1,0 +1,12 @@
+model_id: 'leloy/Anole-7b-v0.1-hf'
+data_root: '/mnt/localssd/code/data/minimam/augmented'
+json_file: './example_training_data/v2/mam.json'
+
+sks_name: 'mam'
+prefix_token: 16
+
+epoch: 11
+batch_size: 3
+savedir: './ckpt'
+exp_name: 'v2'
+save_every: 5

@@ -14,14 +14,14 @@ from torchvision import transforms
 from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
-
+from transformers.image_transforms import to_pil_image
 
 def get_args():
     parser = argparse.ArgumentParser(description='Chameleon')
     # model related
     parser.add_argument('--image', type=str, default='./yollava-data/train/mam/3.png', help='Path to image')
     parser.add_argument('--prompt', type=str, default="What is the color of the dog?<image>", help='Prompt')
-    parser.add_argument('--model_id', type=str, default='chameleon_ckpt/chameleon-7b', help='Model ID')
+    parser.add_argument('--model_id', type=str, default='leloy/Anole-7b-v0.1-hf', help='Model ID')
     parser.add_argument('--exp_name', type=str, default='anole', help='Number of epochs')
     # personalized token related
     parser.add_argument('--sks_name', type=str, default='sks', help='Name of the personalized token')
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     image = Image.open(args.image)
 
-    prompt = f"{sks_prompt} What is <reserved16300>? Answer in details."
+    prompt = f"{sks_prompt} Can you describe <reserved16300>? Answer in details."
     # prompt = f"{sks_prompt} Is <reserved16300> in this photo?"
     inputs = processor(prompt, images=None, return_tensors="pt").to(model.device)
     # breakpoint()
@@ -80,21 +80,26 @@ if __name__ == '__main__':
         # file.write(result_without_special_tokens + '\n')
 
     for index in range(0,10):
-        try:
-            prompt_short = 'A photo of <reserved16300> in a sunflower field'
-            prompt = f"{sks_prompt} {prompt_short}"
-            # prompt = "<reserved16300>"
-            inputs = processor(prompt, return_tensors="pt").to(model.device)
-            generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True,)
-            response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
-            pixel_values = model.decode_image_tokens(response_ids[:, 1:-1].cpu())
-            images = processor.postprocess_pixel_values(pixel_values.detach().cpu().numpy())
+        prompt_short = 'A photo of <reserved16300> in a sunflower field.'
+        prompt = f"{sks_prompt} {prompt_short}"
+        # prompt = 'A photo of a cat'
+        print(prompt)
+        # prompt = "<reserved16300>"
+        inputs = processor(prompt, return_tensors="pt").to(model.device)
+        generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only",
+            max_new_tokens=1026,
+            do_sample=True,)
+        response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
+        pixel_values = model.decode_image_tokens(response_ids[:, 1:-1].cpu())
+        pixel_values = processor.postprocess_pixel_values(pixel_values)
+        image = to_pil_image(pixel_values[0].detach().cpu())
+        image.save('test.png')
 
-            images[0].save(f"./generated_images/{args.exp_name}/epoch_{args.epoch}_{args.sks_name}_{index}_{prompt_short}.png")
-            print('Done')
-        except Exception as e:
-            print(e)
-        torch.cuda.empty_cache()
+        image.save(f"./generated_images/{args.exp_name}/epoch_{args.epoch}_{args.sks_name}_{index}_{prompt_short}.png")
+        print('Done')
+        # except Exception as e:
+        #     print(e)
+        # torch.cuda.empty_cache()
 
 
 

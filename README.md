@@ -39,7 +39,13 @@ python train.py --sks_name bo
 ```
 # this will create llava-like json file
 cd preprocess
-python create_img_gen.py --image_folder /mnt/localssd/code/YoChameleon/yollava-data/train --output_dir /mnt/localssd/code/YoChameleon/example_training_data/v1 --sks_name mam 
+python create_img_gen.py --image_folder /mnt/localssd/code/YoChameleon/yollava-data/train --output_dir /mnt/localssd/code/YoChameleon/example_training_data/v1 --sks_name mam
+```
+
+### Create augmented training photos
+
+```
+python data_augmentation.py --image_folder /mnt/localssd/code/data/minimam --output_folder /mnt/localssd/code/data/minimam/augmented --num_augmented_images 500
 ```
 
 ### TODO 📝

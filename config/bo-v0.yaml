@@ -1,0 +1,12 @@
+model_id: 'leloy/Anole-7b-v0.1-hf'
+data_root: '/mnt/localssd/code/data/'
+json_file: './example_training_data/v0/bo.json'
+
+sks_name: 'bo'
+prefix_token: 16
+
+epoch: 11
+batch_size: 3
+savedir: './ckpt'
+exp_name: 'v0'
+save_every: 5

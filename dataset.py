@@ -8,11 +8,17 @@ import numpy as np
 import torch
 
 from PIL import Image
+
 from torch.utils.data import Dataset
 from torchvision import datasets
 from torchvision import transforms
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
+from transformers import ChameleonVQVAE
+from transformers import ChameleonVQVAEConfig
+from transformers.image_transforms import to_pil_image
+# from utils import ChameleonImageVocabularyMapping
+from utils import ChameleonVQVAEPreprocessor
 
 START_OF_IMAGE_INDEX = 8197 # <racm3:break>
 END_OF_IMAGE_INDEX = 8196 # <eoss>
@@ -33,6 +39,7 @@ class PersonalizedDataset(Dataset):
         personalized_prompt = False,
         repeat=10,
         processor: ChameleonProcessor = None,
+        vqvae: ChameleonVQVAE = None
         # get_image_tokens: ChameleonForConditionalGeneration = None,
         # get_image_tokens = None,
     ):
@@ -43,6 +50,7 @@ class PersonalizedDataset(Dataset):
         self.answers = []
         self.personalized_prompt = personalized_prompt
         self.processor = processor
+        self.vqvae = vqvae
         # self.get_image_tokens = get_image_tokens
         with open(json_file) as f:
             data = json.load(f)
@@ -80,10 +88,24 @@ class PersonalizedDataset(Dataset):
         
         # Initialize a mask with the same shape as the tensor, filled with -100 (mask out question)
         labels = torch.full(clone_inputs.shape, -100)
-        
         for start_idx, end_idx in zip(eot_indices[0::2]+1, eot_indices[1::2]):
-            # cur_labels = clone_inputs[start_idx:end_idx+1]
-            labels[start_idx:end_idx+1] = clone_inputs[start_idx:end_idx+1]
+            cur_labels = clone_inputs[start_idx:end_idx+1] 
+            # check if there is any image token in the current conversation
+            # check = torch.nonzero(cur_labels==START_OF_IMAGE_INDEX).shape[0]
+            # if check > 0:
+            #     soi_index = torch.nonzero(cur_labels==START_OF_IMAGE_INDEX).item()+1
+            #     eot_index = torch.nonzero(cur_labels==END_OF_IMAGE_INDEX).item()
+            #     #----
+            #     image_tokens = self.vqvae.get_image_tokens(pixel_values=example['pixel_values'][None])[0]
+            #     breakpoint()
+            #     pixel_values = self.vqvae.decode(image_tokens[None])
+            #     images = self.processor.postprocess_pixel_values(pixel_values)
+            #     image = to_pil_image(images[0].detach().cpu())
+            #     image.save("test.png")
+
+            #     cur_labels[soi_index:eot_index] = image_tokens
+            # replace <image> to real vq-vae tokens
+            labels[start_idx:end_idx+1] = cur_labels
         example['labels'] = labels
         return example
 
@@ -92,17 +114,23 @@ if __name__ == "__main__":
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
     model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
+    pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(model_id)
     print(f'Loaded {model_id}!')
     train_dataset = PersonalizedDataset(
-        data_root="./yollava-data/",
+        data_root="./yollava-data/train/",
         json_file='./example_training_data/v1/bo.json',
         sks_name='bo',
         personalized_prompt="<bo> is a cat.",
         processor=processor,
-        # get_image_tokens=model.model.get_image_tokens,
+        vqvae=pretrained_vqvae,
         )
     print(train_dataset[0])
-
+    #-- test labels
+    labels = train_dataset[0]['labels']
+    pixel_values = model.decode_image_tokens(labels[1022:-2][None])
+    images = processor.postprocess_pixel_values(pixel_values)
+    image = to_pil_image(images[0].detach().cpu())
+    # image.save("test.png")
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=3, shuffle=True, num_workers=0,
     )

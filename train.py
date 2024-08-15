@@ -11,6 +11,7 @@ from torchvision import datasets
 from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
+from utils import ChameleonVQVAEPreprocessor
 from utils import Config
 from utils import collate_fn
 from utils import setup
@@ -35,6 +36,7 @@ if __name__ == '__main__':
     writer, save_location = setup(config)
 
     processor = ChameleonProcessor.from_pretrained(config.model_id)
+    pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(config.model_id)
     model = ChameleonForConditionalGeneration.from_pretrained(config.model_id, device_map="auto")
     print(f'Loaded {config.model_id}!')
 
@@ -57,7 +59,7 @@ if __name__ == '__main__':
             sks_name=config.sks_name,
             personalized_prompt = sks_prompt,
             processor=processor,
-            # get_image_tokens=model.model.get_image_tokens,
+            vqvae=pretrained_vqvae,
             )
 
     train_dataloader = torch.utils.data.DataLoader(
@@ -84,35 +86,21 @@ if __name__ == '__main__':
 
     # --- Start training
     for epoch in tqdm(range(0, config.epoch)):
-        for names, p in model.named_parameters():
-            if p.requires_grad:
-                print(names, "requires_grad")
+        # -- Check if train the correct parameters
+        # for names, p in model.named_parameters():
+        #     if p.requires_grad:
+        #         print(names, "requires_grad")
         for step, batch in enumerate(train_dataloader):
             optimizer.zero_grad()
-            # breakpoint()
-            for i, label in enumerate(batch['labels']):
+            for i, item in enumerate(batch['labels']):
+                # if img_gen:
                 soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
                 eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
                 image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
                 batch['labels'][i, soi_index:eot_index] = image_tokens
-
-            # Move tensors to device
-            # input_ids = batch['input_ids'].to(model.device)
-            # attention_mask = batch['attention_mask'].to(model.device)
-            # pixel_values = batch['pixel_values'].to(model.device)
-            # labels = batch['labels'].to(model.device)
             batch = {k: v.to(model.device) for k, v in batch.items()}
-            
-            # boi_indices = (cur_labels == START_OF_IMAGE_INDEX).nonzero()
-            # if there is any BEGIN-OF-IMAGE token in the current conversation
-            # if len(boi_indices) > 0:
-            #     for boi_idx in boi_indices:
-            #         soi_index = boi_idx.item()+1
-            #         eot_index = (cur_labels == END_OF_IMAGE_INDEX).nonzero().item()
-            #         cur_labels[soi_index:eot_index] = image_tokens
-            # labels[start_idx:end_idx+1] = cur_labels
-
             # Forward pass
+
             output = model(
                 input_ids=batch['input_ids'],
                 pixel_values=batch['pixel_values'],
@@ -122,7 +110,6 @@ if __name__ == '__main__':
             loss = output.loss
             loss.backward()
             # print(loss)
-            print(loss)
             optimizer.step()
             with torch.no_grad():
                 model.get_input_embeddings().weight[
