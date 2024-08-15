@@ -36,7 +36,7 @@ if __name__ == '__main__':
     writer, save_location = setup(config)
 
     processor = ChameleonProcessor.from_pretrained(config.model_id)
-    pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(config.model_id)
+    # pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(config.model_id)
     model = ChameleonForConditionalGeneration.from_pretrained(config.model_id, device_map="auto")
     print(f'Loaded {config.model_id}!')
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
             sks_name=config.sks_name,
             personalized_prompt = sks_prompt,
             processor=processor,
-            vqvae=pretrained_vqvae,
+            # vqvae=pretrained_vqvae,
             )
 
     train_dataloader = torch.utils.data.DataLoader(
