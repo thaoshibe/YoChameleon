@@ -80,7 +80,7 @@ def main():
     parser = argparse.ArgumentParser(description="Process images with SAM model and generate multiple inpainted images.")
     parser.add_argument("--image_folder", type=str, help="Path to the folder containing images.")
     parser.add_argument("--output_folder", type=str, help="Path to the folder where output images will be saved.")
-    parser.add_argument("--num_inpaintings_per_image", type=int, default=120, help="Number of inpainting images to generate per image.")
+    parser.add_argument("--num_inpaintings_per_image", type=int, default=100, help="Number of inpainting images to generate per image.")
 
     args = parser.parse_args()
 

@@ -52,8 +52,12 @@ class PersonalizedDataset(Dataset):
         self.processor = processor
         self.vqvae = vqvae
         # self.get_image_tokens = get_image_tokens
-        with open(json_file) as f:
-            data = json.load(f)
+        # load json_files:
+        data = []
+        for file in json_file:
+            with open(file) as f:
+                info = json.load(f)
+                data.extend(info)
         self.data = data
         self.flip_transform = transforms.RandomHorizontalFlip()
 
@@ -63,7 +67,10 @@ class PersonalizedDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, i):
-        image_paths = [os.path.join(self.data_root, self.sks_name, item) for item in self.data[i]['image']]
+        # image_paths = [os.path.join(self.data_root, self.sks_name, item) for item in self.data[i]['image']]
+        # image_paths = [os.path.join(self.data_root, item) for item in self.data[i]['image']]
+        image_paths = self.data[i]['image']
+        # print(image_paths)
         images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         images = [self.flip_transform(image) for image in images]
 
@@ -71,8 +78,7 @@ class PersonalizedDataset(Dataset):
         chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
         conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
         full_text = f'{self.personalized_prompt}\n{conversations}'
-
-        
+        full_text = full_text.replace("<sks>", "<reserved16300>")
         example = self.processor(
             full_text,
             images=images,
@@ -117,12 +123,15 @@ if __name__ == "__main__":
     pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(model_id)
     print(f'Loaded {model_id}!')
     train_dataset = PersonalizedDataset(
-        data_root="./yollava-data/train/",
-        json_file='./example_training_data/v1/bo.json',
+        data_root="/mnt/localssd/code/data/minibo/",
+        json_file=[
+            '/mnt/localssd/code/data/minibo/text-conversation.json',
+            '/mnt/localssd/code/data/minibo/recognition.json'
+            ],
         sks_name='bo',
         personalized_prompt="<bo> is a cat.",
         processor=processor,
-        vqvae=pretrained_vqvae,
+        # vqvae=pretrained_vqvae,
         )
     print(train_dataset[0])
     #-- test labels

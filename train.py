@@ -71,29 +71,44 @@ if __name__ == '__main__':
     token_embeds = model.get_input_embeddings().weight.data # this should have shape: torch.Size([65536, 8192]) which is #vocab x token-embed
     orig_embeds_params = model.get_input_embeddings().weight.data.clone()
     orig_lm_params = model.lm_head.weight.data.clone()
-    trainable_params = [model.get_input_embeddings().weight, model.lm_head.weight]
-    optimizer = torch.optim.AdamW(
-        trainable_params, # for optimize the embeddings and the head
-        lr=1e-3,
-        betas=(0.9, 0.999),
-        weight_decay=1e-2,
-        eps=1e-08,
-    )
-    model.model.requires_grad_(False)
-    model.model.embed_tokens.weight.requires_grad_(True)
-    index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
-    index_no_updates[personalized_token_ids] = False
+    if config.whole_model:
+        trainable_params = model.model.parameters()
+        optimizer = torch.optim.AdamW(
+            trainable_params, # for optimize the embeddings and the head
+            lr=2e-5,
+            betas=(0.9, 0.95),
+            weight_decay=0.001,
+            eps=1e-08,
+        )
+    else:
+        trainable_params = [model.get_input_embeddings().weight, model.lm_head.weight]
+        optimizer = torch.optim.AdamW(
+            trainable_params, # for optimize the embeddings and the head
+            lr=1e-3,
+            betas=(0.9, 0.999),
+            weight_decay=1e-2,
+            eps=1e-08,
+        )
+    if config.whole_model =='True':
+        model.model.requires_grad_(True)
+        model.model.embed_tokens.weight.requires_grad_(True)
+        index_no_updates = torch.zeros((len(processor.tokenizer),), dtype=torch.bool)
+    else:
+        model.model.requires_grad_(False)
+        model.model.embed_tokens.weight.requires_grad_(True)
+        index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
+        index_no_updates[personalized_token_ids] = False
 
     # --- Start training
     for epoch in tqdm(range(0, config.epoch)):
         # -- Check if train the correct parameters
-        # for names, p in model.named_parameters():
-        #     if p.requires_grad:
-        #         print(names, "requires_grad")
-        for step, batch in enumerate(train_dataloader):
+        for names, p in model.named_parameters():
+            if p.requires_grad:
+                print(names, "requires_grad")
+        for step, batch in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
+            # check if in labels, there is any start-of-image-tokens
             for i, item in enumerate(batch['labels']):
-                # if img_gen:
                 if len(torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX)) != 0:
                     soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
                     eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
@@ -112,11 +127,12 @@ if __name__ == '__main__':
             loss.backward()
             # print(loss)
             optimizer.step()
-            with torch.no_grad():
-                model.get_input_embeddings().weight[
-                    index_no_updates
-                ] = orig_embeds_params[index_no_updates]
-                model.lm_head.weight[index_no_updates] = orig_lm_params[index_no_updates]
+            if config.whole_model =='False':
+                with torch.no_grad():
+                    model.get_input_embeddings().weight[
+                        index_no_updates
+                    ] = orig_embeds_params[index_no_updates]
+                    model.lm_head.weight[index_no_updates] = orig_lm_params[index_no_updates]
             writer.add_scalar('Loss/Loss', loss, epoch*len(train_dataloader)+step)
             
             # writer.add_scalar('Norm/Vocab-Not-Update-Norm', model.get_input_embeddings().weight[index_no_updates].norm(), epoch*len(train_dataloader)+step)
@@ -127,4 +143,7 @@ if __name__ == '__main__':
             save_path_token = os.path.join(save_location, f'{epoch}-token.pt')
             save_path_lmhead = os.path.join(save_location, f'{epoch}-lmhead.pt')
             torch.save(model.get_input_embeddings().weight.data[personalized_token_ids], save_path_token)
-            torch.save(model.lm_head.weight.data[personalized_token_ids], save_path_lmhead)
+            if config.whole_model =='True':
+                torch.save(model.model.state_dict(), os.path.join(save_location, f'{epoch}-model.pt'))
+            else:
+                torch.save(model.lm_head.weight.data[personalized_token_ids], save_path_lmhead)
