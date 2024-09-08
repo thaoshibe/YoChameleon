@@ -19,9 +19,9 @@ python gpt4o-api.py --input_image_folder /mnt/localssd/code/data/minibo/inpainte
 
 ```
 
-### Image Captioning
+### Compare two images based on reference image
 
-
-
--- Change to folder?
+```
+python gpt4o-two-images.py --reference_folder /mnt/localssd/code/data/minibo/ --target_folder /mnt/localssd/code/YoChameleon/example_training_data/bo/laion --output_file /mnt/localssd/code/data/minibo/laion_based_on_reference.json
+```
 

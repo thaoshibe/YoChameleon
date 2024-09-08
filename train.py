@@ -98,6 +98,7 @@ if __name__ == '__main__':
         model.model.embed_tokens.weight.requires_grad_(True)
         index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
         index_no_updates[personalized_token_ids] = False
+        model.model.resize_token_embeddings(len(processor.tokenizer))
 
     # --- Start training
     for epoch in tqdm(range(0, config.epoch)):

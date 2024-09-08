@@ -12,6 +12,6 @@ prefix_token: 16
 epoch: 150
 batch_size: 2
 savedir: './ckpt'
-exp_name: 'bo-v1'
+exp_name: 'bo-neg-recon'
 save_every: 2
 whole_model: "False"
