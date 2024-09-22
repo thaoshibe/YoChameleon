@@ -1,5 +1,0 @@
-In this game, players work in pairs. One player, the describer, is given a reference image, while the other, the drawer, must recreate a hidden target image.
-The describer provides clues by comparing similarities and differences between the reference and target, without directly describing the reference.
-The describer must refer to the reference as "Charlie" and cannot directly state Charlie’s attributes. Describers can write a caption of up to 80 words, extra words will be ignored. The goal is for the drawer to recreate the target as accurately as possible.
-
-Now you are the describer, the first image is reference, the second image is target. Remember that do not describe Charlie directly. Start the description as: "A photo of an subject like Charlie..."
