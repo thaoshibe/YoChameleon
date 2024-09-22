@@ -1,0 +1,4 @@
+You are seeing an image of a subject named Charlie.
+Answer the question about Charlie without mention the image.
+{question}
+{image_path}
