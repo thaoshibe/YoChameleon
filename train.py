@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     processor = ChameleonProcessor.from_pretrained(config.model_id)
     # pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(config.model_id)
-    model = ChameleonForConditionalGeneration.from_pretrained(config.model_id, device_map="auto")
+    model = ChameleonForConditionalGeneration.from_pretrained(config.model_id, device_map="auto")#, torch_dtype=torch.float16)
     print(f'Loaded {config.model_id}!')
 
     # --- Add personalized tokens
@@ -109,10 +109,12 @@ if __name__ == '__main__':
         for step, batch in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
             # check if in labels, there is any start-of-image-tokens
+            batch['pixel_values'] = batch['pixel_values'].to(model.dtype)
             for i, item in enumerate(batch['labels']):
                 if len(torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX)) != 0:
                     soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
                     eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
+                    # current_img = batch['pixel_values'][None, i].to(model.dtype)
                     image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
                     batch['labels'][i, soi_index:eot_index] = image_tokens
             batch = {k: v.to(model.device) for k, v in batch.items()}

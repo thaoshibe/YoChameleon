@@ -77,7 +77,9 @@ class PersonalizedDataset(Dataset):
         conv = self.data[i]['conversations']
         chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
         conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
-        full_text = f'{self.personalized_prompt}\n{conversations}'
+        # full_text = f'{self.personalized_prompt}\n{conversations}'
+        full_text = f'{conversations}'
+        # print(full_text)
         full_text = full_text.replace("<sks>", "<reserved16300>")
         example = self.processor(
             full_text,

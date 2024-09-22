@@ -18,17 +18,75 @@
 # CUDA_VISIBLE_DEVICES=3,4 python test.py --sks_name bo --exp_name bo-inpaint-sdxl --epoch 5 & \
 # CUDA_VISIBLE_DEVICES=3,4 python test.py --sks_name bo --exp_name v5-qa --epoch 10 & \
 # CUDA_VISIBLE_DEVICES=3,4 python test.py --sks_name bo --exp_name v5-qa --epoch 20
-python test.py --sks_name bo --exp_name yollava --epoch 5 --prompt "A photo of <reserved16300>"
-python test.py --sks_name bo --exp_name bo-v2 --epoch 5 --prompt "A photo of <reserved16300>"
-python test.py --sks_name bo --exp_name bo-v3 --epoch 5 --prompt "A photo of <reserved16300>"
-python test.py --sks_name bo --exp_name bo-v4 --epoch 5 --prompt "A photo of <reserved16300>"
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>"
+# python test.py --sks_name bo --exp_name bo-v2 --epoch 5 --prompt "A photo of <reserved16300>"
+# python test.py --sks_name bo --exp_name bo-v3 --epoch 5 --prompt "A photo of <reserved16300>"
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 5 --prompt "A photo of <reserved16300>"
 
-python test.py --sks_name bo --exp_name yollava --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
-python test.py --sks_name bo --exp_name bo-v2 --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
-python test.py --sks_name bo --exp_name bo-v3 --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
-python test.py --sks_name bo --exp_name bo-v4 --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
+# python test.py --sks_name bo --exp_name yollava --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
+# python test.py --sks_name bo --exp_name bo-v2 --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
+# python test.py --sks_name bo --exp_name bo-v3 --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 5 --prompt "A photo of <reserved16300> in a sunflower field"
 
-python test.py --sks_name bo --exp_name yollava --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
-python test.py --sks_name bo --exp_name bo-v2 --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
-python test.py --sks_name bo --exp_name bo-v3 --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
-python test.py --sks_name bo --exp_name bo-v4 --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
+# python test.py --sks_name bo --exp_name yollava --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
+# python test.py --sks_name bo --exp_name bo-v2 --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
+# python test.py --sks_name bo --exp_name bo-v3 --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 5 --prompt "A photo of <reserved16300> in a winter village"
+
+#!/bin/bash
+
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 30 --prompt "A photo of <reserved16300>" --token_len 2
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 3
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 4
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 5
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 6
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 7
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 30 --prompt "A photo of <reserved16300>" --token_len 8
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 9
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 10
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 11
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 30 --prompt "A photo of <reserved16300>" --token_len 12
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 13
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 14
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 15
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300>" --token_len 16
+# python test.py --sks_name thao --exp_name thao-v1 --epoch 30 --prompt "A photo of <reserved16300>" --token_len 17
+
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 2
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 3
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 4
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 5
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 6
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 7
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 8
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 9
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 10
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 11
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 12
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 13
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 14
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 15
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 16
+python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 17
+
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 10 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is <reserved16301><reserved16302>" &
+
+# python test.py --sks_name bo --exp_name bo-v4 --epoch 20 --prompt "A photo of <reserved16300> is" &
+
+# Wait for all parallel processes to complete
+# wait

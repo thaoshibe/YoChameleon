@@ -24,6 +24,7 @@ def get_args():
     parser.add_argument('--exp_name', type=str, default='anole', help='Number of epochs')
     parser.add_argument('--sks_name', type=str, default='sks', help='Name of the personalized token')
     parser.add_argument('--prefix_token', type=int, default=16, help='Number of prefix tokens')
+    parser.add_argument('--token_len', type=int, default=16, help='Number of used tokens')
 
     # hyperparameters
     parser.add_argument('--epoch', type=int, default=10, help='Number of epochs')
@@ -38,24 +39,26 @@ if __name__ == '__main__':
 
     model_id = args.model_id
     processor = ChameleonProcessor.from_pretrained(model_id)
-    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
+    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")#, torch_dtype=torch.float16)
     print(f'Loaded {model_id}!')
 
     # --- Add personalized tokens
     prefix_tokens = [f'<reserved{16301+i}>' for i in range(args.prefix_token)]
     personalized_tokens = [f'<reserved16300>']
     personalized_tokens.extend(prefix_tokens)
-    sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}."
+    sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:args.token_len])}."
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
-    
+    model.model.resize_token_embeddings(len(processor.tokenizer))
     try:
-        model.lm_head.weight.data[personalized_token_ids] = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt').to(model.lm_head.weight.data.device)
+        lm_head = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt').to(model.lm_head.weight.data.device)
+        lm_head = lm_head.to(model.dtype)
+        model.lm_head.weight.data[personalized_token_ids] = lm_head
     except:
         state_dict = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt')
         model.model.load_state_dict(state_dict)
         
     # image = Image.open(args.image)
-    model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-token.pt').to(model.device)
+    model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-token.pt').to(model.device).to(model.dtype)
     prompt = f"{sks_prompt}\nCan you describe <reserved16300>? Answer in details."
     # prompt = f"{sks_prompt} Is <reserved16300> in this photo?"
     inputs = processor(prompt, images=None, return_tensors="pt").to(model.device)
@@ -71,15 +74,13 @@ if __name__ == '__main__':
         file.write('-------------------------\n')
         # file.write(result_without_special_tokens + '\n')
 
-    for index in range(0,10):
+    for index in range(0, 10):
         # prompt_short = 'A photo of <reserved16300> in a sunflower field'
         prompt_short = args.prompt
-        prompt = f"{sks_prompt} {prompt_short}"
-        # prompt = 'A photo of a cat'
-        print(prompt)
-        # prompt = "<reserved16300>"
+        prompt = f"{sks_prompt}\n{prompt_short}"
         inputs = processor(prompt, return_tensors="pt").to(model.device)
-        generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only",
+        generate_ids = model.generate(**inputs,
+            multimodal_generation_mode="image-only",
             max_new_tokens=1026,
             do_sample=True,)
         response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
@@ -87,8 +88,8 @@ if __name__ == '__main__':
         pixel_values = processor.postprocess_pixel_values(pixel_values)
         image = to_pil_image(pixel_values[0].detach().cpu())
         image.save('test.png')
-
-        image.save(f"./generated_images/{args.exp_name}/epoch_{args.epoch}_{args.sks_name}_{index}_{prompt_short}.png")
+        prompt_short = prompt_short.replace('<reserved16300>', 'bo')
+        image.save(f"./generated_images/{args.exp_name}/epoch_{args.epoch}_{args.sks_name}_{prompt_short}_{args.token_len}_{index}.png")
         print('Done')
         # except Exception as e:
         #     print(e)
