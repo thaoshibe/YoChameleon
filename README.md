@@ -47,25 +47,3 @@ python create_img_gen.py --image_folder /mnt/localssd/code/YoChameleon/yollava-d
 ```
 python data_augmentation.py --image_folder /mnt/localssd/code/data/minimam --output_folder /mnt/localssd/code/data/minimam/augmented --num_augmented_images 500
 ```
-
-### TODO 📝
-
-- [ ] Clean code first -- So that we can easily add more data augmentation
-	+ [ ] Write dataloader from file? (json file)
-	+ [ ] Write config file? -- Maybe not necessary
-	+ [ ] Check data format: `personalized prompt -- caption -- <image>`
-- [ ] Data Augmentation
-	+ [ ] Captioning
-		+ [ ] Write code for detail caption for each image
-	+ [ ] Image augmentation
-		+ [ ] Normal image augmentation
-		+ [ ] Part-segmentation
-	+ [ ] Compute loss on subject only?
-
-In general, we have these version:
-- [ ] v0: 500 imgs
-- [ ] v1: data augmentation only -- folder `./example_training_data/v1/`
-- [ ] v2: detail image captioning
-- [ ] v3: part-segementation
-- [ ] v4: compute loss on image segmentation
-- [ ] v5: all?
