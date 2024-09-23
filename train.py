@@ -71,6 +71,8 @@ if __name__ == '__main__':
     token_embeds = model.get_input_embeddings().weight.data # this should have shape: torch.Size([65536, 8192]) which is #vocab x token-embed
     orig_embeds_params = model.get_input_embeddings().weight.data.clone()
     orig_lm_params = model.lm_head.weight.data.clone()
+    
+
     if config.whole_model:
         trainable_params = model.model.parameters()
         optimizer = torch.optim.AdamW(
@@ -89,7 +91,17 @@ if __name__ == '__main__':
             weight_decay=1e-2,
             eps=1e-08,
         )
-    if config.whole_model =='True':
+    if config.resume:
+        start_epoch = config.resume_epoch
+        try:
+            lm_head = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config.resume_epoch}-lmhead.pt', map_location='cuda').to(model.lm_head.weight.data.device)
+            lm_head = lm_head.to(model.dtype)
+            model.lm_head.weight.data[personalized_token_ids] = lm_head
+        except:
+            state_dict = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config.resume_epoch}-model.pt')
+            model.model.load_state_dict(state_dict)
+
+    if config.whole_model:
         model.model.requires_grad_(True)
         model.model.embed_tokens.weight.requires_grad_(True)
         index_no_updates = torch.zeros((len(processor.tokenizer),), dtype=torch.bool)
@@ -101,7 +113,7 @@ if __name__ == '__main__':
         model.model.resize_token_embeddings(len(processor.tokenizer))
 
     # --- Start training
-    for epoch in tqdm(range(0, config.epoch)):
+    for epoch in tqdm(range(start_epoch, config.epoch)):
         # -- Check if train the correct parameters
         for names, p in model.named_parameters():
             if p.requires_grad:

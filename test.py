@@ -68,9 +68,9 @@ if __name__ == '__main__':
     print(processor.decode(output[0], skip_special_tokens=False))
 
     print('-------------------------')
-    os.makedirs(f"./generated_images/{args.exp_name}", exist_ok=True)
+    os.makedirs(f"/sensei-fs/users/thaon/generated_images/{args.exp_name}", exist_ok=True)
     print(processor.decode(output[0], skip_special_tokens=True))
-    with open(f'./generated_images/{args.exp_name}/output.txt', 'w') as file:
+    with open(f'/sensei-fs/users/thaon/generated_images/{args.exp_name}/output.txt', 'w') as file:
         file.write(result_with_special_tokens + '\n')
         file.write('-------------------------\n')
         # file.write(result_without_special_tokens + '\n')
@@ -90,8 +90,8 @@ if __name__ == '__main__':
         image = to_pil_image(pixel_values[0].detach().cpu())
         image.save('test.png')
         prompt_short = prompt_short.replace('<reserved16300>', f'{args.sks_name}')
-        os.makedirs(f"./generated_images/{args.exp_name}/{args.epoch}/{args.token_len-1}", exist_ok=True)
-        image.save(f"./generated_images/{args.exp_name}/{args.epoch}/{args.token_len-1}/{prompt_short}_{index}.png")
+        os.makedirs(f"/sensei-fs/users/thaon/generated_images/{args.exp_name}/{args.epoch}/{args.token_len-1}", exist_ok=True)
+        image.save(f"/sensei-fs/users/thaon/generated_images/{args.exp_name}/{args.epoch}/{args.token_len-1}/{prompt_short}_{index}.png")
         print('Done')
         # except Exception as e:
         #     print(e)

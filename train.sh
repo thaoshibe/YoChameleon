@@ -50,6 +50,6 @@ python create_training_data/retrieve_negative/create_conversation_by_ranking.py 
 
 CUDA_VISIBLE_DEVICES=4,5,6,7 python train.py --config config/${NAME}-v1.yaml
 
-
-
+# Create training data with 64 tokens
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ --save_folder /mnt/localssd/code/data/yollava-data/train/thao/negative_example --limit 500 --token_length 64 --spacing 4
 
