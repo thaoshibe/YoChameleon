@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
     model_id = args.model_id
     processor = ChameleonProcessor.from_pretrained(model_id)
-    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")#, torch_dtype=torch.float16)
+    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="cuda")#, torch_dtype=torch.float16)
     print(f'Loaded {model_id}!')
 
     # --- Add personalized tokens
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
     model.model.resize_token_embeddings(len(processor.tokenizer))
     try:
-        lm_head = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt').to(model.lm_head.weight.data.device)
+        lm_head = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt', map_location='cuda').to(model.lm_head.weight.data.device)
         lm_head = lm_head.to(model.dtype)
 
         model.lm_head.weight.data[personalized_token_ids] = lm_head
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             max_new_tokens=1026,
             do_sample=True,)
         response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
-        pixel_values = model.decode_image_tokens(response_ids[:, 1:-1].cpu())
+        pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])
         pixel_values = processor.postprocess_pixel_values(pixel_values)
         image = to_pil_image(pixel_values[0].detach().cpu())
         image.save('test.png')
