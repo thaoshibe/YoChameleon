@@ -89,10 +89,10 @@ def retrieve_multiple_images(image_paths, output_folder = 'piat_retrieved', limi
         )
         cv2.imwrite(save_location, npyImage)
         print(f"Saved {save_location}")
-    index = image_paths[0].split('/')[-2]#.split('.')[0]
-    with open(f"{output_folder}/{index}.json", 'w') as f:
+    # index = image_paths[0].split('/')[-2]#.split('.')[0]
+    with open(f"{output_folder}/scores.json", 'w') as f:
         json.dump(data_dict, f)
-    print(f"Saved {index}.json")
+    # print(f"Saved {index}.json")
     return data_dict
 
 def get_args():

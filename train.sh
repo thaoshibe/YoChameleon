@@ -32,7 +32,7 @@
 
 #----------------------------------------------
 
-INPUT_FOLDER="/mnt/localssd/code/data/yollava-data/train/thao"
+INPUT_FOLDER="/mnt/localssd/code/data/yollava-data/train/yuheng"
 SAVE_FOLDER="${INPUT_FOLDER}/negative_example"
 # SAVE_FOLDER='./test'
 LIMIT=500
@@ -46,6 +46,8 @@ python create_training_data/retrieve_negative/create_conversation_by_ranking.py 
     --input_folder $INPUT_FOLDER \
     --save_folder $SAVE_FOLDER \
     --limit $LIMIT
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 python train.py --config config/yuheng-v1.yaml
 
 
 
