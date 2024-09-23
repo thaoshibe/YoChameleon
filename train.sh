@@ -1,9 +1,4 @@
-# CUDA_VISIBLE_DEVICES=2,3 python train.py --sks_name mam --batch_size 4 --data_root ./yollava-data/train/ --exp_name bz4-caption-v1 --model_id leloy/Anole-7b-v0.1-hf --image_gen_only
-# CUDA_VISIBLE_DEVICES=0,1 python train.py --sks_name bo --batch_size 4 --data_root ./yollava-data/train/ --exp_name bz4-caption-v1 --model_id leloy/Anole-7b-v0.1-hf --image_gen_only
-# CUDA_VISIBLE_DEVICES=4,5 python train.py --sks_name bo --batch_size 4 --data_root ./yollava-data/train/ --exp_name bz4-caption-v2 --model_id leloy/Anole-7b-v0.1-hf --image_gen_only
-# CUDA_VISIBLE_DEVICES=6,7 python train.py --sks_name mam --batch_size 4 --data_root ./yollava-data/train/ --exp_name bz4-caption-v2 --model_id leloy/Anole-7b-v0.1-hf --image_gen_only
-
-
+# Train process with total dataset
 #--- Create inpainting data
 # python create_augmentation_mask.py \
 # 	--image_folder /mnt/localssd/code/data/minibo \
@@ -34,5 +29,24 @@
 # 	--output_file /mnt/localssd/code/data/minibo/text-conversation.json
 
 # python train.py --config ./config/bo-sdxl.yaml
+
+#----------------------------------------------
+
+INPUT_FOLDER="/mnt/localssd/code/data/yollava-data/train/thao"
+SAVE_FOLDER="${INPUT_FOLDER}/negative_example"
+# SAVE_FOLDER='./test'
+LIMIT=500
+
+# python create_training_data/retrieve_negative/load_similar_example.py \
+#     --input_folder $INPUT_FOLDER \
+#     --save_folder $SAVE_FOLDER \
+#     --limit $LIMIT
+
+python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+    --input_folder $INPUT_FOLDER \
+    --save_folder $SAVE_FOLDER \
+    --limit $LIMIT
+
+
 
 

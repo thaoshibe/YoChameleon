@@ -34,7 +34,7 @@ if __name__ == '__main__':
     
     #--- Set up basic stuffs
     writer, save_location = setup(config)
-
+    # breakpoint()
     processor = ChameleonProcessor.from_pretrained(config.model_id)
     # pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(config.model_id)
     model = ChameleonForConditionalGeneration.from_pretrained(config.model_id, device_map="auto")#, torch_dtype=torch.float16)

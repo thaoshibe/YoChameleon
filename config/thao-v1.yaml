@@ -1,0 +1,14 @@
+model_id: 'leloy/Anole-7b-v0.1-hf'
+data_root: '/mnt/localssd/code/data/minithao/'
+json_file:
+  - '/mnt/localssd/code/data/yollava-data/train/thao/conversations.json'
+
+sks_name: 'thao'
+prefix_token: 16
+
+epoch: 150
+batch_size: 8
+savedir: './ckpt'
+exp_name: 'thao-v1'
+save_every: 2
+whole_model: "False"
