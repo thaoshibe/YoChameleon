@@ -28,14 +28,14 @@ def get_args():
 
     # hyperparameters
     parser.add_argument('--epoch', type=int, default=10, help='Number of epochs')
-    parser.add_argument('--savedir', type=str, default='./ckpt/', help='Directory to save the model')
+    parser.add_argument('--savedir', type=str, default='/sensei-fs/users/thaon/ckpt', help='Directory to save the model')
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = get_args()
 
-    save_location = f'./{args.savedir}/{args.sks_name}'
-    os.makedirs(save_location, exist_ok=True)
+    # save_location = f'./{args.savedir}/{args.sks_name}'
+    # os.makedirs(save_location, exist_ok=True)
 
     model_id = args.model_id
     processor = ChameleonProcessor.from_pretrained(model_id)
@@ -50,15 +50,16 @@ if __name__ == '__main__':
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
     model.model.resize_token_embeddings(len(processor.tokenizer))
     try:
-        lm_head = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt').to(model.lm_head.weight.data.device)
+        lm_head = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt').to(model.lm_head.weight.data.device)
         lm_head = lm_head.to(model.dtype)
+
         model.lm_head.weight.data[personalized_token_ids] = lm_head
     except:
-        state_dict = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt')
+        state_dict = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt')
         model.model.load_state_dict(state_dict)
         
     # image = Image.open(args.image)
-    model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(f'./ckpt/{args.exp_name}/{args.sks_name}/{args.epoch}-token.pt').to(model.device).to(model.dtype)
+    model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-token.pt').to(model.device).to(model.dtype)
     prompt = f"{sks_prompt}\nCan you describe <reserved16300>? Answer in details."
     # prompt = f"{sks_prompt} Is <reserved16300> in this photo?"
     inputs = processor(prompt, images=None, return_tensors="pt").to(model.device)
@@ -74,7 +75,7 @@ if __name__ == '__main__':
         file.write('-------------------------\n')
         # file.write(result_without_special_tokens + '\n')
 
-    for index in range(0, 10):
+    for index in tqdm(range(0, 100)):
         # prompt_short = 'A photo of <reserved16300> in a sunflower field'
         prompt_short = args.prompt
         prompt = f"{sks_prompt}\n{prompt_short}"
@@ -88,8 +89,9 @@ if __name__ == '__main__':
         pixel_values = processor.postprocess_pixel_values(pixel_values)
         image = to_pil_image(pixel_values[0].detach().cpu())
         image.save('test.png')
-        prompt_short = prompt_short.replace('<reserved16300>', 'bo')
-        image.save(f"./generated_images/{args.exp_name}/epoch_{args.epoch}_{args.sks_name}_{prompt_short}_{args.token_len}_{index}.png")
+        prompt_short = prompt_short.replace('<reserved16300>', f'{args.sks_name}')
+        os.makedirs(f"./generated_images/{args.exp_name}/{args.epoch}/{args.token_len-1}", exist_ok=True)
+        image.save(f"./generated_images/{args.exp_name}/{args.epoch}/{args.token_len-1}/{prompt_short}_{index}.png")
         print('Done')
         # except Exception as e:
         #     print(e)
