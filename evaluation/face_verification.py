@@ -45,11 +45,11 @@ if __name__ == "__main__":
 				except Exception as e:
 					print(e)
 		data[setting] = 1-np.mean(scores)
-	with open("face_verification.json", "w") as f:
+	with open(f"{args.fake_folder}/face_verification.json", "w") as f:
 		json.dump(save_dict, f)
-	with open("overall_scores.json", "w") as f:
+	with open(f"{args.fake_folder}/overall_scores.json", "w") as f:
 		json.dump(data, f)
-
+	print('Saved at', f"{args.fake_folder}/face_verification.json")
 	# with open("overall_scores.json", "r") as f:
 	# 	data = json.load(f)
 

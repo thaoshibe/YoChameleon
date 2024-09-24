@@ -52,7 +52,6 @@ if __name__ == '__main__':
     try:
         lm_head = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt', map_location='cuda').to(model.lm_head.weight.data.device)
         lm_head = lm_head.to(model.dtype)
-
         model.lm_head.weight.data[personalized_token_ids] = lm_head
     except:
         state_dict = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt')

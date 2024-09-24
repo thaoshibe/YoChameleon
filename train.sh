@@ -32,7 +32,7 @@
 
 #----------------------------------------------
 
-NAME="ciin"
+NAME="thao"
 
 INPUT_FOLDER="/mnt/localssd/code/data/yollava-data/train/${NAME}"
 SAVE_FOLDER="${INPUT_FOLDER}/negative_example"

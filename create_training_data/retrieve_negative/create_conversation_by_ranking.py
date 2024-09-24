@@ -13,6 +13,7 @@ def get_args():
 	parser.add_argument("--limit", type=int, default=150, help="Number of similar images to retrieve")
 	parser.add_argument("--token_length", type=int, default=16, help="Token length")
 	parser.add_argument("--spacing", type=int, default=1, help="spacing")
+	parser.add_argument("--version", type=str, default="v4")
 	return parser.parse_args()
 # Read the JSON file
 def get_personalized_prompt(token_length=1):
@@ -88,6 +89,6 @@ if __name__ == "__main__":
 				"image": [image_path],
 				"conversations": conv
 			})
-	with open(os.path.join(args.input_folder, f'conversations-real.json'), 'w') as f:
+	with open(os.path.join(args.input_folder, f'conversations-{args.version}.json'), 'w') as f:
 		json.dump(data, f)
-	print(f"Saved conversation at: {args.input_folder}/conversations-real.json")
+	print(f"Saved conversation at: {args.input_folder}/conversations-{args.version}.json")
