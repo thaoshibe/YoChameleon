@@ -100,6 +100,8 @@ if __name__ == '__main__':
         except:
             state_dict = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config.resume_epoch}-model.pt')
             model.model.load_state_dict(state_dict)
+    else:
+        start_epoch = 0
 
     if config.whole_model:
         model.model.requires_grad_(True)
