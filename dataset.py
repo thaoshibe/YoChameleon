@@ -85,7 +85,7 @@ class PersonalizedDataset(Dataset):
             full_text,
             images=images,
             padding="max_length",
-            max_length=2048,
+            max_length=1500,
             )
         example['input_ids'] = example['input_ids'][0]
         example['attention_mask'] = example['attention_mask'][0]

@@ -7,10 +7,12 @@ import yaml
 
 from PIL import Image
 from dataset import PersonalizedDataset
+from itertools import cycle
 from torchvision import datasets
 from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
+from transformers.image_transforms import to_pil_image
 from utils import ChameleonVQVAEPreprocessor
 from utils import Config
 from utils import collate_fn
@@ -61,12 +63,12 @@ if __name__ == '__main__':
             processor=processor,
             # vqvae=pretrained_vqvae,
             )
-
+    
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
         # collate_fn=collate_fn
     )
-
+    dataloader_iter = cycle(train_dataloader)
     # --- Prepare for training
     token_embeds = model.get_input_embeddings().weight.data # this should have shape: torch.Size([65536, 8192]) which is #vocab x token-embed
     orig_embeds_params = model.get_input_embeddings().weight.data.clone()
@@ -106,6 +108,7 @@ if __name__ == '__main__':
     if config.whole_model:
         model.model.requires_grad_(True)
         model.model.embed_tokens.weight.requires_grad_(True)
+        model.model.vqmodel.requires_grad_(False)
         index_no_updates = torch.zeros((len(processor.tokenizer),), dtype=torch.bool)
     else:
         model.model.requires_grad_(False)
@@ -115,52 +118,59 @@ if __name__ == '__main__':
         model.model.resize_token_embeddings(len(processor.tokenizer))
 
     # --- Start training
-    for epoch in tqdm(range(start_epoch, config.epoch)):
-        # -- Check if train the correct parameters
-        for names, p in model.named_parameters():
-            if p.requires_grad:
-                print(names, "requires_grad")
-        for step, batch in enumerate(tqdm(train_dataloader)):
-            optimizer.zero_grad()
-            # check if in labels, there is any start-of-image-tokens
-            batch['pixel_values'] = batch['pixel_values'].to(model.dtype)
-            for i, item in enumerate(batch['labels']):
-                if len(torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX)) != 0:
-                    soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
-                    eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
-                    # current_img = batch['pixel_values'][None, i].to(model.dtype)
-                    image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
-                    batch['labels'][i, soi_index:eot_index] = image_tokens
-            batch = {k: v.to(model.device) for k, v in batch.items()}
-            # Forward pass
+    for iteration in tqdm(range(config.iteration)):
+        optimizer.zero_grad()
+        # check if in labels, there is any start-of-image-tokens
+        batch = next(dataloader_iter)
+        batch['pixel_values'] = batch['pixel_values'].to(model.dtype)
+        for i, item in enumerate(batch['labels']):
+            if len(torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX)) != 0:
+                soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
+                eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
+                # current_img = batch['pixel_values'][None, i].to(model.dtype)
+                image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+                batch['labels'][i, soi_index:eot_index] = image_tokens
+        batch = {k: v.to(model.device) for k, v in batch.items()}
+        # Forward pass
 
-            output = model(
-                input_ids=batch['input_ids'],
-                pixel_values=batch['pixel_values'],
-                attention_mask=batch['attention_mask'],
-                labels=batch['labels']
-            )
-            loss = output.loss
-            loss.backward()
-            # print(loss)
-            optimizer.step()
-            if config.whole_model =='False':
-                with torch.no_grad():
-                    model.get_input_embeddings().weight[
-                        index_no_updates
-                    ] = orig_embeds_params[index_no_updates]
-                    model.lm_head.weight[index_no_updates] = orig_lm_params[index_no_updates]
-            writer.add_scalar('Loss/Loss', loss, epoch*len(train_dataloader)+step)
-            
-            # writer.add_scalar('Norm/Vocab-Not-Update-Norm', model.get_input_embeddings().weight[index_no_updates].norm(), epoch*len(train_dataloader)+step)
-            # writer.add_scalar('Norm/Vocab', model.get_input_embeddings().weight.norm(), epoch*len(train_dataloader)+step)
-        
-        if epoch % config.save_every == 0:
+        output = model(
+            input_ids=batch['input_ids'],
+            pixel_values=batch['pixel_values'],
+            attention_mask=batch['attention_mask'],
+            labels=batch['labels']
+        )
+        loss = output.loss
+        loss.backward()
+        # print(loss)
+        optimizer.step()
+        if config.whole_model == False:
+            with torch.no_grad():
+                model.get_input_embeddings().weight[
+                    index_no_updates
+                ] = orig_embeds_params[index_no_updates]
+                model.lm_head.weight[index_no_updates] = orig_lm_params[index_no_updates]
+        writer.add_scalar('Loss/Loss', loss, iteration)
+
+        if iteration % config.save_every == 0:
             print('Save model at: ', save_location)
-            save_path_token = os.path.join(save_location, f'{epoch}-token.pt')
-            save_path_lmhead = os.path.join(save_location, f'{epoch}-lmhead.pt')
+            save_path_token = os.path.join(save_location, f'{iteration}-token.pt')
+            save_path_lmhead = os.path.join(save_location, f'{iteration}-lmhead.pt')
             torch.save(model.get_input_embeddings().weight.data[personalized_token_ids], save_path_token)
-            if config.whole_model =='True':
-                torch.save(model.model.state_dict(), os.path.join(save_location, f'{epoch}-model.pt'))
+            if config.whole_model:
+                torch.save(model.model.state_dict(), os.path.join(save_location, f'{iteration}-model.pt'))
             else:
                 torch.save(model.lm_head.weight.data[personalized_token_ids], save_path_lmhead)
+            with torch.no_grad():
+                print('Generate evaluation images')
+                # inputs = processor(sks_prompt + ' A photo of <reserved16300>.', return_tensors="pt").to(model.device)
+                inputs = processor(sks_prompt + ' A photo of <reserved16300>.', return_tensors="pt").to(model.device)
+                generate_ids = model.generate(**inputs,
+                    multimodal_generation_mode="image-only",
+                    max_new_tokens=1026,
+                    do_sample=True,)
+                response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
+                pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])
+                pixel_values = processor.postprocess_pixel_values(pixel_values)
+                image = to_pil_image(pixel_values[0].detach().cpu())
+                image.save(os.path.join(save_location, f'{iteration}-test.png'))
+                print('Generated images are saved in ', save_location)
