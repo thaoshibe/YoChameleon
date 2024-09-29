@@ -1,7 +1,7 @@
 model_id: 'leloy/Anole-7b-v0.1-hf'
 data_root: '/mnt/localssd/code/data/minithao/'
 json_file:
-  - '/mnt/localssd/code/data/yollava-data/train/thao/conversations-v4.json'
+  - '/sensei-fs/users/thaon/data/yollava-data/train/thao/conversations-v4.json'
 
 sks_name: 'thao'
 prefix_token: 16

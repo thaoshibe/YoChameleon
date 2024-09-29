@@ -78,6 +78,7 @@ if __name__ == '__main__':
         # prompt_short = 'A photo of <reserved16300> in a sunflower field'
         prompt_short = args.prompt
         prompt = f"{sks_prompt}\n{prompt_short}"
+        prompt = f"{prompt_short}"
         inputs = processor(prompt, return_tensors="pt").to(model.device)
         generate_ids = model.generate(**inputs,
             multimodal_generation_mode="image-only",
