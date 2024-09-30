@@ -1,8 +1,8 @@
 import argparse
-
 import os
 import requests
 import torch
+import wandb
 import yaml
 
 from PIL import Image
@@ -36,12 +36,13 @@ if __name__ == '__main__':
     
     #--- Set up basic stuffs
     writer, save_location = setup(config)
-    # breakpoint()
     processor = ChameleonProcessor.from_pretrained(config.model_id)
-    # pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(config.model_id)
     model = ChameleonForConditionalGeneration.from_pretrained(config.model_id, device_map="auto")#, torch_dtype=torch.float16)
     print(f'Loaded {config.model_id}!')
 
+    # Initialize W&B
+    wandb.init(project=config.project_name, name=config.exp_name, config=config_dict)
+    
     # --- Add personalized tokens
     prefix_tokens = [f'<reserved{16301+i}>' for i in range(config.prefix_token)]
     personalized_tokens = [f'<reserved16300>']
@@ -52,7 +53,6 @@ if __name__ == '__main__':
     print(f'Personalized tokens will be: {personalized_tokens}')
     print(f'Personalized token ids will be: {personalized_token_ids}')
     print(f'Personalized prompt: {sks_prompt}')
-    # breakpoint()
 
     # --- Dataloader
     train_dataset = PersonalizedDataset(
@@ -66,18 +66,18 @@ if __name__ == '__main__':
     
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
-        # collate_fn=collate_fn
     )
     dataloader_iter = cycle(train_dataloader)
+
     # --- Prepare for training
-    token_embeds = model.get_input_embeddings().weight.data # this should have shape: torch.Size([65536, 8192]) which is #vocab x token-embed
+    token_embeds = model.get_input_embeddings().weight.data
     orig_embeds_params = model.get_input_embeddings().weight.data.clone()
     orig_lm_params = model.lm_head.weight.data.clone()
 
     if config.whole_model:
         trainable_params = model.model.parameters()
         optimizer = torch.optim.AdamW(
-            trainable_params, # for optimize the embeddings and the head
+            trainable_params,
             lr=config.lr,
             betas=(0.9, 0.95),
             weight_decay=0.001,
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     else:
         trainable_params = [model.get_input_embeddings().weight, model.lm_head.weight]
         optimizer = torch.optim.AdamW(
-            trainable_params, # for optimize the embeddings and the head
+            trainable_params,
             lr=1e-3,
             betas=(0.9, 0.999),
             weight_decay=1e-2,
@@ -114,25 +114,21 @@ if __name__ == '__main__':
         model.model.embed_tokens.weight.requires_grad_(True)
         index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
         index_no_updates[personalized_token_ids] = False
-        # model.model.resize_token_embeddings(len(processor.tokenizer))
 
     # --- Start training
     for iteration in tqdm(range(config.iteration)):
         optimizer.zero_grad()
-        # breakpoint()
-        # check if in labels, there is any start-of-image-tokens
         batch = next(dataloader_iter)
         batch['pixel_values'] = batch['pixel_values'].to(model.dtype)
         for i, item in enumerate(batch['labels']):
             if len(torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX)) != 0:
                 soi_index = torch.nonzero(batch['labels'][i]==START_OF_IMAGE_INDEX).item()+1
                 eot_index = torch.nonzero(batch['labels'][i]==END_OF_IMAGE_INDEX).item()
-                # current_img = batch['pixel_values'][None, i].to(model.dtype)
                 image_tokens = model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
                 batch['labels'][i, soi_index:eot_index] = image_tokens
         batch = {k: v.to(model.device) for k, v in batch.items()}
+        
         # Forward pass
-
         output = model(
             input_ids=batch['input_ids'],
             pixel_values=batch['pixel_values'],
@@ -141,15 +137,15 @@ if __name__ == '__main__':
         )
         loss = output.loss
         loss.backward()
-        # print(loss)
         optimizer.step()
+
         if config.whole_model == False:
             with torch.no_grad():
-                model.get_input_embeddings().weight[
-                    index_no_updates
-                ] = orig_embeds_params[index_no_updates]
+                model.get_input_embeddings().weight[index_no_updates] = orig_embeds_params[index_no_updates]
                 model.lm_head.weight[index_no_updates] = orig_lm_params[index_no_updates]
-        writer.add_scalar('Loss/Loss', loss, iteration)
+        
+        # Log loss to W&B
+        wandb.log({"loss": loss.item(), "iteration": iteration})
 
         if iteration % config.save_every == 0:
             print('Save model at: ', save_location)
@@ -160,9 +156,9 @@ if __name__ == '__main__':
                 torch.save(model.model.state_dict(), os.path.join(save_location, f'{iteration}-model.pt'))
             else:
                 torch.save(model.lm_head.weight.data[personalized_token_ids], save_path_lmhead)
+
             with torch.no_grad():
                 print('Generate evaluation images')
-                # inputs = processor(sks_prompt + ' A photo of <reserved16300>.', return_tensors="pt").to(model.device)
                 inputs = processor(sks_prompt + ' A photo of <reserved16300>.', return_tensors="pt").to(model.device)
                 generate_ids = model.generate(**inputs,
                     multimodal_generation_mode="image-only",
@@ -172,6 +168,9 @@ if __name__ == '__main__':
                 pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])
                 pixel_values = processor.postprocess_pixel_values(pixel_values)
                 image = to_pil_image(pixel_values[0].detach().cpu())
-                writer.add_image('Generated image', pixel_values[0].detach().cpu(), iteration)
+                
+                # Save image locally and log it on W&B
                 image.save(os.path.join(save_location, f'{iteration}-test.png'))
+                wandb.log({"generated_image": wandb.Image(image)})
+
                 print('Generated images are saved in ', save_location)
