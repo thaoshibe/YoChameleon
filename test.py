@@ -61,8 +61,8 @@ def main():
     try:
         lm_head = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt', map_location='cuda')
         model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
-    except FileNotFoundError:
-        state_dict = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt')
+    except:
+        state_dict = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt').to(model.dtype)
         model.load_state_dict(state_dict)
 
     # Update token embeddings
