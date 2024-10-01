@@ -41,7 +41,7 @@ if __name__ == '__main__':
     print(f'Loaded {config.model_id}!')
 
     # Initialize W&B
-    wandb.init(project=config.project_name, name=config.exp_name, config=config_dict)
+    wandb.init(project=config.project_name, name=config.exp_name, entity="thaoshibe-university-of-wisconsin-madison", config=config_dict)
     
     # --- Add personalized tokens
     prefix_tokens = [f'<reserved{16301+i}>' for i in range(config.prefix_token)]
@@ -78,20 +78,23 @@ if __name__ == '__main__':
         trainable_params = model.model.parameters()
         optimizer = torch.optim.AdamW(
             trainable_params,
-            lr=config.lr,
-            betas=(0.9, 0.95),
+            lr=config.lr * 0.5,  # Reduce the learning rate by half
+            betas=(0.9, 0.999),  # More standard beta values for AdamW
             weight_decay=0.001,
-            eps=1e-08,
+            eps=1e-06,  # Slightly larger epsilon for numerical stability
         )
+
     else:
         trainable_params = [model.get_input_embeddings().weight, model.lm_head.weight]
         optimizer = torch.optim.AdamW(
             trainable_params,
             lr=1e-3,
             betas=(0.9, 0.999),
-            weight_decay=1e-2,
-            eps=1e-08,
+            weight_decay=1e-4,
+            eps=1e-6,
         )
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
     if config.resume:
         start_epoch = config.resume_epoch
         try:
