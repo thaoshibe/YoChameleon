@@ -78,7 +78,7 @@ if __name__ == '__main__':
         trainable_params = model.model.parameters()
         optimizer = torch.optim.AdamW(
             trainable_params,
-            lr=config.lr * 0.5,  # Reduce the learning rate by half
+            lr=config.lr,  # Reduce the learning rate by half
             betas=(0.9, 0.999),  # More standard beta values for AdamW
             weight_decay=0.001,
             eps=1e-06,  # Slightly larger epsilon for numerical stability
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         trainable_params = [model.get_input_embeddings().weight, model.lm_head.weight]
         optimizer = torch.optim.AdamW(
             trainable_params,
-            lr=1e-3,
+            lr=config.lr,
             betas=(0.9, 0.999),
             weight_decay=1e-4,
             eps=1e-6,
@@ -141,6 +141,7 @@ if __name__ == '__main__':
         loss = output.loss
         loss.backward()
         optimizer.step()
+        torch.nn.utils.clip_grad_value_(model.model.parameters(), clip_value=0.5)
 
         if config.whole_model == False:
             with torch.no_grad():
@@ -177,3 +178,5 @@ if __name__ == '__main__':
                 wandb.log({"generated_image": wandb.Image(image)})
 
                 print('Generated images are saved in ', save_location)
+                
+        torch.cuda.empty_cache()

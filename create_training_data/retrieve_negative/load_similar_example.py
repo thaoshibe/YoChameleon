@@ -28,6 +28,14 @@ def get_image_from_piat(objSample):
         npyImage = piat.get_image({'strSource': '256-pil-antialias'}, objSample['images_raw.strImagehash'])
     except:
         npyImage = piat.get_image({'strSource': 'raw'}, objSample['images_raw.strImagehash'])
+    # try:
+    #     npyImage = piat.get_image({'strSource': '256-pil-antialias'}, objSample['images_raw.strImagehash'])
+    # except:
+    #     try:
+    #         npyImage = piat.get_image({'strSource': 'raw'}, objSample['images_raw.strImagehash'])
+    #     except:
+    #         npyImage = None
+
     return npyImage
 
 def convert_to_cv2_format(image):
@@ -45,6 +53,9 @@ def retrieve_for_one_image(image_path, output_folder = 'piat_retrieved', limit=1
     image = np.array(Image.open(image_path))
     for objSample in search_similar_images(image, limit=limit):
         npyImage = get_image_from_piat(objSample)
+        if npyImage is None:
+            print(f"Could not retrieve image {objSample['images_raw.strImagehash']}")
+            continue
         npyImage = convert_to_cv2_format(npyImage)
         save_location = f"{output_folder}/{objSample['images_raw.strImagehash']}.png"
         # Add text to the image

@@ -54,20 +54,24 @@
 
 #!/bin/bash
 
-NAME="thao"
+# NAME="thao"
 
-CUDA_VISIBLE_DEVICES=0 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 3 &
-CUDA_VISIBLE_DEVICES=0 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 5 &
-CUDA_VISIBLE_DEVICES=1 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 7 &
-CUDA_VISIBLE_DEVICES=1 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 9 &
-CUDA_VISIBLE_DEVICES=2 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 11 &
-CUDA_VISIBLE_DEVICES=2 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 13 &
-CUDA_VISIBLE_DEVICES=3 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 15 &
-CUDA_VISIBLE_DEVICES=3 python test.py --sks_name $NAME --exp_name ${NAME}-v1 --epoch 50 --prompt "A photo of <reserved16300>" --token_len 17 &
+# CUDA_VISIBLE_DEVICES=0 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 3 &
+# CUDA_VISIBLE_DEVICES=0 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 5 &
+# CUDA_VISIBLE_DEVICES=1 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 7 &
+# CUDA_VISIBLE_DEVICES=1 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 9 &
+# CUDA_VISIBLE_DEVICES=2 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 11 &
+# CUDA_VISIBLE_DEVICES=2 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 13 &
+# CUDA_VISIBLE_DEVICES=3 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 15 &
+# CUDA_VISIBLE_DEVICES=3 python test.py --sks_name $NAME --exp_name ${NAME}-real --epoch 50 --prompt "A photo of <reserved16300>" --token_len 17 &
 
-# Wait for all background processes to finish
-wait
+# # Wait for all background processes to finish
+# wait
+# CUDA_VISIBLE_DEVICES=3 python test.py --sks_name thao --exp_name thao-debug --epoch 180 --prompt "A photo of <reserved16300>." --token_len 17
 
+CUDA_VISIBLE_DEVICES=6,7 python test.py --sks_name thao --exp_name thao-v3-adjusted-lr --epoch 1000 --prompt "A photo of <reserved16300>." --token_len 129 --prefix_token 128 --savedir ./ckpt
+CUDA_VISIBLE_DEVICES=0,1,2 python test.py --sks_name thao --exp_name thao-v1-adjusted-lr --epoch 1000 --prompt "A photo of <reserved16300>." --token_len 17 --prefix_token 16 --savedir ./ckpt
+CUDA_VISIBLE_DEVICES=3,4,5 python test.py --sks_name thao --exp_name thao-v2-adjusted-lr --epoch 1000 --prompt "A photo of <reserved16300>." --token_len 65 --prefix_token 64 --savedir ./ckpt
 
 # python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 2
 # python test.py --sks_name thao --exp_name thao-v1 --epoch 18 --prompt "A photo of <reserved16300> in a sunflower " --token_len 3

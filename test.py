@@ -62,8 +62,9 @@ def main():
         lm_head = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-lmhead.pt', map_location='cuda')
         model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
     except:
-        state_dict = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt')#.to(model.dtype)
-        model.load_state_dict(state_dict)
+        # breakpoint()
+        state_dict = torch.load(f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-model.pt', map_location='cuda')#.to(model.dtype)
+        model.model.load_state_dict(state_dict)
 
     # Update token embeddings
     embedding_path = f'{args.savedir}/{args.exp_name}/{args.sks_name}/{args.epoch}-token.pt'
@@ -90,6 +91,7 @@ def main():
     for i in tqdm(range(0, args.num_images, args.batch_size)):  # Step through by batch size
         prompt_short = args.prompt
         full_prompt = f"{sks_prompt} {prompt_short}"
+        # full_prompt = f"{prompt_short}"
         inputs = processor([full_prompt] * args.batch_size, return_tensors="pt").to(model.device)
         
         generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)

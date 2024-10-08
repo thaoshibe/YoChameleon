@@ -2,17 +2,18 @@ project_name: "YoChameleon"
 model_id: 'leloy/Anole-7b-v0.1-hf'
 data_root: '/mnt/localssd/code/data/minithao/'
 json_file:
-  - '/mnt/localssd/code/data/dathao_algined/conversations-v1.json'
+  - '/mnt/localssd/code/data/yollava-data/train/thao/conversations-thao-64-8-500real.json'
 
 sks_name: 'thao'
-prefix_token: 16
+prefix_token: 64
 
 iteration: 1501
-batch_size: 6
+batch_size: 2
 savedir: '/mnt/localssd/code/YoChameleon/ckpt'
-exp_name: 'thao-v1-adjusted-lr'
+exp_name: 'negative-64-8-500imgs'
 save_every: 50
 whole_model: False
 
 resume: False
+lr: 0.0001
 resume_epoch: 20

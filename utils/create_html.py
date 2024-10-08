@@ -1,75 +1,70 @@
-import json
+import os
 
-# Load the JSON data
-json_file = "/mnt/localssd/code/data/minibo/inpainted.json"
-with open(json_file, 'r') as file:
-    data = json.load(file)
+def generate_html_for_images(base_dir, output_html):
+    # HTML header
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Generated Images</title>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .folder { margin-bottom: 40px; }
+            h2 { color: #333; }
+            table { width: 100%; border-collapse: collapse; }
+            td { padding: 10px; text-align: center; vertical-align: top; }
+            img { max-width: 150px; height: auto; display: block; margin: 0 auto; }
+            .image-name { word-wrap: break-word; max-width: 150px; margin-top: 5px; }
+        </style>
+    </head>
+    <body>
+    <h1>Generated Images</h1>
+    """
 
-# Start the HTML content
-html_content = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Conversations</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .image-conversation {
-            margin-bottom: 40px;
-        }
-        .image-conversation img {
-            max-width: 100%;
-            height: auto;
-        }
-        .conversation {
-            margin-top: 10px;
-        }
-        .conversation span {
-            font-weight: bold;
-        }
-        .conversation .human {
-            color: blue;
-        }
-        .conversation .bot {
-            color: green;
-        }
-    </style>
-</head>
-<body>
-"""
-
-# Add the image and conversation data
-for item in data:
-    image_path = item["image"][0].replace('/mnt/localssd/code/data/minibo/', './')
-    conversations = item["conversations"]
-
-    html_content += f'<div class="image-conversation">'
-    html_content += f'<img src="{image_path}" alt="Image" width="300"/>'
-    
-    for conversation in conversations:
-        speaker = conversation["from"]
-        text = conversation["value"].replace("<sks>", "sks")
+    # Traverse the base directory and its subdirectories
+    for root, dirs, files in os.walk(base_dir):
+        # Sort directories and files
+        dirs.sort()
+        files.sort()
         
-        speaker_class = "human" if speaker == "human" else "bot"
-        html_content += f'<div class="conversation">'
-        html_content += f'<span class="{speaker_class}">{speaker.capitalize()}:</span> {text}'
-        html_content += f'</div>'
-    
-    html_content += f'</div>'
+        # Filter image files (only '.png' images)
+        images = [f for f in files if f.endswith('.png')]
+        if images:
+            relative_path = os.path.relpath(root, base_dir)
+            folder_name = os.path.basename(root)
+            
+            html_content += f"<div class='folder'>\n<h2>Folder: {relative_path}</h2>\n<table>\n<tr>\n"
+            
+            for i, image_name in enumerate(images):
+                image_path = os.path.join(relative_path, image_name)
+                html_content += f"""
+                <td>
+                    <img src='{image_path}' alt='{image_name}'>
+                    <div class='image-name'>{image_name}</div>
+                </td>
+                """
+                # Break the row after every 5 images
+                if (i + 1) % 5 == 0:
+                    html_content += "</tr>\n<tr>\n"
+            html_content += "</tr>\n</table>\n</div>\n"
 
-# Close the HTML content
-html_content += """
-</body>
-</html>
-"""
+    # HTML footer
+    html_content += """
+    </body>
+    </html>
+    """
 
-# Save the HTML content to a file
-output_html_file = "/mnt/localssd/code/data/minibo/bo-inpainting.html"
-with open(output_html_file, 'w') as file:
-    file.write(html_content)
+    # Write the HTML content to a file
+    with open(output_html, 'w') as file:
+        file.write(html_content)
 
-print(f"HTML file created: {output_html_file}")
+# Specify the directory containing the generated images and the output HTML file
+base_directory = '.'
+output_html_file = 'generated_images.html'
+
+# Generate the HTML file
+generate_html_for_images(base_directory, output_html_file)
+
+print(f"HTML file '{output_html_file}' has been generated.")
