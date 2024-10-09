@@ -1,12 +1,40 @@
+project_name: "YoChameleon"
 model_id: 'leloy/Anole-7b-v0.1-hf'
-data_root: './yollava-data/train/'
-json_file: './example_training_data/v1/mam.json'
+data_root: '/mnt/localssd/code/data/minithao/'
+json_file:
+  # - '/mnt/localssd/code/data/yollava-data/train/thao/conversations-real-4.json'
+  # - '/mnt/localssd/code/data/yollava-data/train/thao/conversations-caption-only.json'
+  - '/sensei-fs/users/thaon/data/json/conversations-thao-8.json'
+sks_name: 'thao'
+prefix_token: 8
 
-sks_name: 'mam'
-prefix_token: 16
+iteration: 500
+resume: False
+resume_iteration: 200
 
-epoch: 100
-batch_size: 3
-savedir: './ckpt'
-exp_name: 'basic'
-save_every: 5
+batch_size: 4
+savedir: '/sensei-fs/users/thaon/ckpt/'
+exp_name: 'thao-8'
+save_every: 50
+whole_model: False
+
+optimizer:
+  type: 'AdamW'
+  lr: 0.001
+  betas: [0.9, 0.999]
+  weight_decay: 1e-4
+  eps: 1e-6
+  grad_clip: 0.5
+
+scheduler:
+  type: 'StepLR'
+  step_size: 10
+  gamma: 0.05
+
+test:
+  prompt: "A photo of <reserved16300>."
+  token_len: 65
+  iteration: 500
+  save_dir: '/sensei-fs/users/thaon/generated_images/'
+  batch_size: 8
+  num_images: 500

@@ -27,21 +27,22 @@ def get_args():
     parser = argparse.ArgumentParser(description='Your Chameleon model')
     # model related
     parser.add_argument('--config', type=str, default='./config/basic.yml')
+    parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason')
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = get_args()
-    config_dict = yaml.load(open(args.config, 'r'), Loader=yaml.FullLoader)
+    config_dict = yaml.safe_load(open(args.config, 'r'))
     config = Config(config_dict)
-    
+    _, save_location = setup(config)
     #--- Set up basic stuffs
-    writer, save_location = setup(config)
     processor = ChameleonProcessor.from_pretrained(config.model_id)
     model = ChameleonForConditionalGeneration.from_pretrained(config.model_id, device_map="auto")#, torch_dtype=torch.float16)
     print(f'Loaded {config.model_id}!')
 
     # Initialize W&B
-    wandb.init(project=config.project_name, name=config.exp_name, entity="thaoshibe-university-of-wisconsin-madison", config=config_dict)
+    if not args.no_wandb:
+        wandb.init(project=config.project_name, name=config.exp_name, entity="thaoshibe-university-of-wisconsin-madison", config=config_dict)
     
     # --- Add personalized tokens
     prefix_tokens = [f'<reserved{16301+i}>' for i in range(config.prefix_token)]
@@ -49,10 +50,6 @@ if __name__ == '__main__':
     personalized_tokens.extend(prefix_tokens)
     sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}."
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
-
-    print(f'Personalized tokens will be: {personalized_tokens}')
-    print(f'Personalized token ids will be: {personalized_token_ids}')
-    print(f'Personalized prompt: {sks_prompt}')
 
     # --- Dataloader
     train_dataset = PersonalizedDataset(
@@ -67,6 +64,8 @@ if __name__ == '__main__':
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
     )
+    if not args.no_wandb:
+        wandb.log({"train_dataset_length": len(train_dataset)})
     dataloader_iter = cycle(train_dataloader)
 
     # --- Prepare for training
@@ -74,38 +73,47 @@ if __name__ == '__main__':
     orig_embeds_params = model.get_input_embeddings().weight.data.clone()
     orig_lm_params = model.lm_head.weight.data.clone()
 
+    optimizer_config = config.optimizer
     if config.whole_model:
         trainable_params = model.model.parameters()
         optimizer = torch.optim.AdamW(
             trainable_params,
-            lr=config.lr,  # Reduce the learning rate by half
-            betas=(0.9, 0.999),  # More standard beta values for AdamW
-            weight_decay=0.001,
-            eps=1e-06,  # Slightly larger epsilon for numerical stability
+            lr=float(optimizer_config.get('lr', 0.0000005)),
+            betas=tuple(optimizer_config.get('betas', [0.9, 0.999])),
+            weight_decay=float(optimizer_config.get('weight_decay', 0.001)),
+            eps=float(optimizer_config.get('eps', 1e-6))
         )
 
     else:
         trainable_params = [model.get_input_embeddings().weight, model.lm_head.weight]
         optimizer = torch.optim.AdamW(
             trainable_params,
-            lr=config.lr,
-            betas=(0.9, 0.999),
-            weight_decay=1e-4,
-            eps=1e-6,
+            lr=float(optimizer_config.get('lr', 0.001)),
+            betas=tuple(optimizer_config.get('betas', [0.9, 0.999])),
+            weight_decay=float(optimizer_config.get('weight_decay', 1e-4)),
+            eps=float(optimizer_config.get('eps', 1e-6))
         )
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
-
-    if config.resume:
-        start_epoch = config.resume_epoch
+    ori_personalized_token_ids = personalized_token_ids
+    if config.resume['resume']:
+        config_resume = Config(config.resume)
+        embedding_path = f'{config_resume.savedir}/{config_resume.exp_name}/{config_resume.sks_name}/{config_resume.resume_iteration}-token.pt'
+        
         try:
-            lm_head = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config.resume_epoch}-lmhead.pt', map_location='cuda').to(model.lm_head.weight.data.device)
+            lm_head = torch.load(f'{config_resume.savedir}/{config_resume.exp_name}/{config_resume.sks_name}/{config_resume.resume_iteration}-lmhead.pt', map_location='cuda').to(model.lm_head.weight.data.device)
             lm_head = lm_head.to(model.dtype)
-            model.lm_head.weight.data[personalized_token_ids] = lm_head
-        except:
-            state_dict = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config.resume_epoch}-model.pt')
+            # for sequential learning only
+            if config_resume.sequential_learning:
+                model.lm_head.weight.data[personalized_token_ids[:-config_resume.spacing]] = lm_head
+                model.get_input_embeddings().weight.data[personalized_token_ids[:-config_resume.spacing]] = torch.load(embedding_path).to(model.device).to(model.dtype)
+                personalized_token_ids = personalized_token_ids[:-config_resume.spacing]
+
+            else:
+                model.lm_head.weight.data[personalized_token_ids] = lm_head
+                model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
+        except :
+            state_dict = torch.load(f'{config_resume.savedir}/{config_resume.exp_name}/{config_resume.sks_name}/{config_resume.resume_iteration}-model.pt')
             model.model.load_state_dict(state_dict)
-    else:
-        start_epoch = 0
 
     if config.whole_model:
         model.model.requires_grad_(True)
@@ -117,7 +125,9 @@ if __name__ == '__main__':
         model.model.embed_tokens.weight.requires_grad_(True)
         index_no_updates = torch.ones((len(processor.tokenizer),), dtype=torch.bool)
         index_no_updates[personalized_token_ids] = False
-
+    print(f'Personalized tokens will be: {personalized_tokens}')
+    print(f'Personalized token ids will be: {personalized_token_ids}')
+    print(f'Personalized prompt: {sks_prompt}')
     # --- Start training
     for iteration in tqdm(range(config.iteration)):
         optimizer.zero_grad()
@@ -141,25 +151,27 @@ if __name__ == '__main__':
         loss = output.loss
         loss.backward()
         optimizer.step()
-        torch.nn.utils.clip_grad_value_(model.model.parameters(), clip_value=0.5)
+        if optimizer_config['grad_clip'] > 0:
+            torch.nn.utils.clip_grad_value_(model.model.parameters(), clip_value=optimizer_config['grad_clip'])
 
-        if config.whole_model == False:
+        if not config.whole_model:
             with torch.no_grad():
                 model.get_input_embeddings().weight[index_no_updates] = orig_embeds_params[index_no_updates]
                 model.lm_head.weight[index_no_updates] = orig_lm_params[index_no_updates]
         
         # Log loss to W&B
-        wandb.log({"loss": loss.item(), "iteration": iteration})
+        if not args.no_wandb:
+            wandb.log({"loss": loss.item(), "iteration": iteration})
 
         if iteration % config.save_every == 0:
             print('Save model at: ', save_location)
             save_path_token = os.path.join(save_location, f'{iteration}-token.pt')
             save_path_lmhead = os.path.join(save_location, f'{iteration}-lmhead.pt')
-            torch.save(model.get_input_embeddings().weight.data[personalized_token_ids], save_path_token)
+            torch.save(model.get_input_embeddings().weight.data[ori_personalized_token_ids], save_path_token)
             if config.whole_model:
                 torch.save(model.model.state_dict(), os.path.join(save_location, f'{iteration}-model.pt'))
             else:
-                torch.save(model.lm_head.weight.data[personalized_token_ids], save_path_lmhead)
+                torch.save(model.lm_head.weight.data[ori_personalized_token_ids], save_path_lmhead)
 
             with torch.no_grad():
                 print('Generate evaluation images')
@@ -175,8 +187,8 @@ if __name__ == '__main__':
                 
                 # Save image locally and log it on W&B
                 image.save(os.path.join(save_location, f'{iteration}-test.png'))
-                wandb.log({"generated_image": wandb.Image(image)})
+                if not args.no_wandb:
+                    wandb.log({"generated_image": wandb.Image(image)})
 
-                print('Generated images are saved in ', save_location)
-                
+                print('Generated images are saved in ', save_location)   
         torch.cuda.empty_cache()
