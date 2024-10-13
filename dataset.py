@@ -17,40 +17,24 @@ from transformers import ChameleonProcessor
 from transformers import ChameleonVQVAE
 from transformers import ChameleonVQVAEConfig
 from transformers.image_transforms import to_pil_image
-# from utils import ChameleonImageVocabularyMapping
-from utils import ChameleonVQVAEPreprocessor
-
-START_OF_IMAGE_INDEX = 8197 # <racm3:break>
-END_OF_IMAGE_INDEX = 8196 # <eoss>
-END_OF_TURN = 8710
-PAD_INDEX = 1
 
 # END-OF-TURN token: <reserved08706>
 
 class PersonalizedDataset(Dataset):
     def __init__(
         self,
-        data_root,
-        sks_name,
-        set="train",
         json_file=None,
-        placeholder_token="<sks>",
+        placeholder_token="<reserved16300>",
         center_crop=False,
-        personalized_prompt = False,
         repeat=10,
+        tokenizer_max_length=2048, 
         processor: ChameleonProcessor = None,
-        vqvae: ChameleonVQVAE = None
-        # get_image_tokens: ChameleonForConditionalGeneration = None,
-        # get_image_tokens = None,
+        END_OF_TURN: int = 8710,
     ):
-        self.data_root = data_root
-        self.sks_name = sks_name
-        self.questions = []
-        self.images_path = []
-        self.answers = []
-        self.personalized_prompt = personalized_prompt
         self.processor = processor
-        self.vqvae = vqvae
+        self.placeholder_token = placeholder_token
+        self.max_length = tokenizer_max_length
+        self.END_OF_TURN = END_OF_TURN
         # self.get_image_tokens = get_image_tokens
         # load json_files:
         data = []
@@ -67,10 +51,7 @@ class PersonalizedDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, i):
-        # image_paths = [os.path.join(self.data_root, self.sks_name, item) for item in self.data[i]['image']]
-        # image_paths = [os.path.join(self.data_root, item) for item in self.data[i]['image']]
         image_paths = self.data[i]['image']
-        # print(image_paths)
         images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         images = [self.flip_transform(image) for image in images]
 
@@ -79,20 +60,19 @@ class PersonalizedDataset(Dataset):
         conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
         # full_text = f'{self.personalized_prompt}\n{conversations}'
         full_text = f'{conversations}'
-        # print(full_text)
-        full_text = full_text.replace("<sks>", "<reserved16300>")
+        full_text = full_text.replace("<sks>", self.placeholder_token)
         example = self.processor(
             full_text,
             images=images,
             padding="max_length",
-            max_length=1500,
+            max_length=self.max_length,
             )
         example['input_ids'] = example['input_ids'][0]
         example['attention_mask'] = example['attention_mask'][0]
         example['pixel_values'] = example['pixel_values'][0]
 
         clone_inputs = example['input_ids'].clone()
-        eot_indices = (clone_inputs == END_OF_TURN).nonzero()[:]
+        eot_indices = (clone_inputs == self.END_OF_TURN).nonzero()[:]
         
         # Initialize a mask with the same shape as the tensor, filled with -100 (mask out question)
         labels = torch.full(clone_inputs.shape, -100)
@@ -121,30 +101,30 @@ if __name__ == "__main__":
 
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
-    model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
-    pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(model_id)
-    print(f'Loaded {model_id}!')
-    train_dataset = PersonalizedDataset(
-        data_root="/mnt/localssd/code/data/minibo/",
-        json_file=[
-            '/mnt/localssd/code/data/minibo/text-conversation.json',
-            '/mnt/localssd/code/data/minibo/recognition.json'
-            ],
-        sks_name='bo',
-        personalized_prompt="<bo> is a cat.",
-        processor=processor,
-        # vqvae=pretrained_vqvae,
-        )
-    print(train_dataset[0])
-    #-- test labels
-    labels = train_dataset[0]['labels']
-    pixel_values = model.decode_image_tokens(labels[1022:-2][None])
-    images = processor.postprocess_pixel_values(pixel_values)
-    image = to_pil_image(images[0].detach().cpu())
-    # image.save("test.png")
-    train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=3, shuffle=True, num_workers=0,
-    )
-    for i, batch in enumerate(train_dataloader):
-        print(len(batch['input_ids']), i)
-    print('Done one loop on dataset')
+    # model = ChameleonForConditionalGeneration.from_pretrained(model_id, device_map="auto")
+    # pretrained_vqvae = ChameleonVQVAEPreprocessor.from_pretrained(model_id)
+    # print(f'Loaded {model_id}!')
+    # train_dataset = PersonalizedDataset(
+    #     data_root="/mnt/localssd/code/data/minibo/",
+    #     json_file=[
+    #         '/mnt/localssd/code/data/minibo/text-conversation.json',
+    #         '/mnt/localssd/code/data/minibo/recognition.json'
+    #         ],
+    #     sks_name='bo',
+    #     personalized_prompt="<bo> is a cat.",
+    #     processor=processor,
+    #     # vqvae=pretrained_vqvae,
+    #     )
+    # print(train_dataset[0])
+    # #-- test labels
+    # labels = train_dataset[0]['labels']
+    # pixel_values = model.decode_image_tokens(labels[1022:-2][None])
+    # images = processor.postprocess_pixel_values(pixel_values)
+    # image = to_pil_image(images[0].detach().cpu())
+    # # image.save("test.png")
+    # train_dataloader = torch.utils.data.DataLoader(
+    #     train_dataset, batch_size=3, shuffle=True, num_workers=0,
+    # )
+    # for i, batch in enumerate(train_dataloader):
+    #     print(len(batch['input_ids']), i)
+    # print('Done one loop on dataset')

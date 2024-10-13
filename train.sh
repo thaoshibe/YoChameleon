@@ -31,6 +31,7 @@
 # python train.py --config ./config/bo-sdxl.yaml
 
 #----------------------------------------------
+export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
 NAME="thao"
 
@@ -38,6 +39,7 @@ INPUT_FOLDER="/mnt/localssd/code/data/yollava-data/train/${NAME}"
 SAVE_FOLDER="${INPUT_FOLDER}/negative_example"
 LIMIT=500
 
+python train.py --config config/basic.yml --no_wandb
 # python create_training_data/retrieve_negative/load_similar_example.py \
 #     --input_folder $INPUT_FOLDER \
 #     --save_folder $SAVE_FOLDER \
@@ -87,15 +89,15 @@ LIMIT=500
 #     --negative_image True \
 #     --num_of_real_images 0
 
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder /sensei-fs/users/thaon/data/json/ \
-    --version thao-24 \
-    --limit 500 \
-    --token_length 24 \
-    --spacing 8 \
-    --negative_image True \
-    --num_of_real_images 0
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-24 \
+#     --limit 500 \
+#     --token_length 24 \
+#     --spacing 8 \
+#     --negative_image True \
+#     --num_of_real_images 0
 
 # python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
 #     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
