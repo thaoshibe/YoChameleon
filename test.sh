@@ -69,7 +69,7 @@
 # wait
 # CUDA_VISIBLE_DEVICES=3 python test.py --sks_name thao --exp_name thao-debug --epoch 180 --prompt "A photo of <reserved16300>." --token_len 17
 
-CUDA_VISIBLE_DEVICES=6,7 python test.py --sks_name thao --exp_name thao-v3-adjusted-lr --epoch 1000 --prompt "A photo of <reserved16300>." --token_len 129 --prefix_token 128 --savedir ./ckpt
+CUDA_VISIBLE_DEVICES=6,7 python test.py --sks_name thao --exp_name caption-only --epoch 500 --prompt "A photo of <reserved16300>." --token_len 129 --prefix_token 128 --savedir ./ckpt
 CUDA_VISIBLE_DEVICES=0,1,2 python test.py --sks_name thao --exp_name thao-v1-adjusted-lr --epoch 1000 --prompt "A photo of <reserved16300>." --token_len 17 --prefix_token 16 --savedir ./ckpt
 CUDA_VISIBLE_DEVICES=3,4,5 python test.py --sks_name thao --exp_name thao-v2-adjusted-lr --epoch 1000 --prompt "A photo of <reserved16300>." --token_len 65 --prefix_token 64 --savedir ./ckpt
 

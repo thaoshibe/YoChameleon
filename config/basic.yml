@@ -4,19 +4,26 @@ data_root: '/mnt/localssd/code/data/minithao/'
 json_file:
   # - '/mnt/localssd/code/data/yollava-data/train/thao/conversations-real-4.json'
   # - '/mnt/localssd/code/data/yollava-data/train/thao/conversations-caption-only.json'
-  - '/sensei-fs/users/thaon/data/json/conversations-thao-8.json'
+  - '/sensei-fs/users/thaon/data/json/conversations-thao-16.json'
 sks_name: 'thao'
-prefix_token: 8
+prefix_token: 16
 
-iteration: 500
-resume: False
-resume_iteration: 200
-
+iteration: 201
 batch_size: 4
 savedir: '/sensei-fs/users/thaon/ckpt/'
-exp_name: 'thao-8'
+exp_name: 'thao-16'
 save_every: 50
 whole_model: False
+
+
+resume:
+  resume: True
+  resume_iteration: 150
+  savedir: '/sensei-fs/users/thaon/ckpt/' 
+  exp_name: 'thao-8'
+  sks_name: 'thao'
+  sequential_learning: True
+  spacing: 8
 
 optimizer:
   type: 'AdamW'

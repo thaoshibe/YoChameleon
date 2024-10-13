@@ -54,23 +54,93 @@ LIMIT=500
 # CUDA_VISIBLE_DEVICES=4,5,6,7 python train.py --config config/${NAME}-v1.yaml
 
 # Create training data with 64 tokens
-# python create_training_data/retrieve_negative/create_conversation_by_ranking.py --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ --save_folder /mnt/localssd/code/data/yollava-data/train/thao/negative_example --limit 500 --token_length 16 --spacing 4
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ --save_folder /sensei-fs/users/thaon/data/json/ --limit 500 --token_length 16 --spacing 4
 
 
 # Create training data with real image only
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder /mnt/localssd/code/data/yollava-data/train/thao/negative_example \
-    --version real-4 \
-    --limit 500 \
-    --token_length 64 \
-    --spacing 64 \
-    --num_of_real_images 500
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version real-4 \
+#     --limit 500 \
+#     --token_length 64 \
+#     --spacing 64 \
+#     --num_of_real_images 500
 
 # python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
 #     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-#     --save_folder /mnt/localssd/code/data/yollava-data/train/thao/negative_example \
-#     --version caption-only \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-8 \
+#     --limit 500 \
+#     --token_length 8 \
+#     --spacing 8 \
+#     --negative_image True \
+#     --num_of_real_images 0
+
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-16 \
+#     --limit 500 \
+#     --token_length 16 \
+#     --spacing 8 \
+#     --negative_image True \
+#     --num_of_real_images 0
+
+python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+    --save_folder /sensei-fs/users/thaon/data/json/ \
+    --version thao-24 \
+    --limit 500 \
+    --token_length 24 \
+    --spacing 8 \
+    --negative_image True \
+    --num_of_real_images 0
+
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-32 \
+#     --limit 500 \
+#     --token_length 32 \
+#     --spacing 8 \
+#     --negative_image True \
+#     --num_of_real_images 0
+
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-40 \
+#     --limit 500 \
+#     --token_length 40 \
+#     --spacing 8 \
+#     --negative_image True \
+#     --num_of_real_images 0
+
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-48 \
+#     --limit 500 \
+#     --token_length 48 \
+#     --spacing 8 \
+#     --negative_image True \
+#     --num_of_real_images 0
+
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-56 \
+#     --limit 500 \
+#     --token_length 56 \
+#     --spacing 8 \
+#     --negative_image True \
+#     --num_of_real_images 0
+
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder /sensei-fs/users/thaon/data/json/ \
+#     --version thao-64 \
 #     --limit 500 \
 #     --token_length 64 \
 #     --spacing 8 \

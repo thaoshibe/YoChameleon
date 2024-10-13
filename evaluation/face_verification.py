@@ -5,91 +5,98 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+import tensorflow as tf
+
 from deepface import DeepFace
 from tqdm import tqdm
 
 def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--real_folder", type=str, required=True)
-    parser.add_argument("--fake_folder", type=str, required=True)
-    args = parser.parse_args()
-    return args
+    parser = argparse.ArgumentParser(description="Facial similarity verification between real and fake images.")
+    parser.add_argument("--real_folder", type=str, required=True, help="Path to the folder containing real images.")
+    parser.add_argument("--fake_folder", type=str, required=True, help="Path to the folder containing fake images.")
+    return parser.parse_args()
 
-if __name__ == "__main__":
+def main():
     args = get_args()
-    # Thao: Currently verify with 4 images only
+
+    # Limit real images to the first 4 for verification
     real_images = glob.glob(os.path.join(args.real_folder, "*.png"))[:4]
-    
-    settings = os.listdir(args.fake_folder)
-    data = {}
-    save_dict = []
-    # breakpoint()
-    # Iterate over each setting in the fake folder
-    for setting in tqdm(settings):
-        # breakpoint()
+
+    fake_settings = os.listdir(args.fake_folder)
+    verification_data = []
+    overall_scores = {}
+
+    # Iterate over each subfolder in the fake folder
+    for setting in tqdm(fake_settings, desc="Processing settings"):
         fake_images = glob.glob(os.path.join(args.fake_folder, setting, "*.png"))
-        scores = []
-        for fake_image in tqdm(fake_images):
-            avg_score = []
+        distance_scores = []
+
+        for fake_image in tqdm(fake_images, desc=f"Processing images in {setting}", leave=False):
+            avg_distances = []
             for real_image in real_images:
                 try:
-                    # Perform DeepFace verification
+                    import time
+                    start_time = time.time()
+                    # Perform DeepFace verification between real and fake image
                     result = DeepFace.verify(img1_path=real_image, img2_path=fake_image)
-                    scores.append(result["distance"])
-                    avg_score.append(1-result["distance"])
-                    # Generate the image hash or use any identifier (optional, placeholder here)
-                    image_hash = os.path.basename(fake_image).split(".")[0]
-                    
-                    # Generate save location or use the fake image path
-                    save_location = fake_image
-                    
-                    # Append data in the requested format
-                except Exception as e:
-                    print(e)
-            save_dict.append(
-                {
-                    "image": image_hash,  # Placeholder for image hash
-                    "image_path": save_location,  # Save path of the fake image
-                    # "clip_score": result["distance"],  # Using distance as clip_score equivalent
-                    # "real_path": real_image,  # Real image path
-                    # "fake_path": fake_image,  # Fake image path
-                    "distance": np.mean(avg_score),  # Distance between real and fake image
-                    "verified": result["verified"]  # Verification status
-                }
-            )
-        data[setting] = 1 - np.mean(scores)
-    
-    # Save detailed results into face_verification.json
-    with open(f"{args.fake_folder}/face_scores.json", "w") as f:
-        json.dump(save_dict, f)
-    
-    # Save overall similarity scores into overall_scores.json
-    with open(f"{args.fake_folder}/overall_scores.json", "w") as f:
-        json.dump(data, f)
-    
-    print('Saved at', f"{args.fake_folder}/face_verification.json")
-    
-    # Sort data by token length and create plot
-    data = {k: v for k, v in data.items() if k.isdigit()}
-    sorted_data = dict(sorted(data.items(), key=lambda item: int(item[0])))
+                    distance = result["distance"]
+                    distance_scores.append(distance)
+                    avg_distances.append(1 - distance)
 
-    # Extracting keys and values from the sorted dictionary
+                    # Store verification result
+                    verification_data.append({
+                        "image": os.path.basename(fake_image).split(".")[0],  # Image hash or identifier
+                        "image_path": fake_image,
+                        "distance": np.mean(avg_distances),  # Mean similarity score
+                        "verified": result["verified"]  # Verification status
+                    })
+                    print(f"Processed {fake_image} with {real_image} in {time.time() - start_time} seconds")
+                    breakpoint()
+                except Exception as e:
+                    print(f"Error processing {fake_image} with {real_image}: {e}")
+
+        # Store the overall score (1 - mean distance) for the current setting
+        if distance_scores:
+            overall_scores[setting] = 1 - np.mean(distance_scores)
+
+    # Save verification data and overall scores to JSON files
+    save_json(verification_data, os.path.join(args.fake_folder, "face_scores.json"))
+    save_json(overall_scores, os.path.join(args.fake_folder, "overall_scores.json"))
+
+    # Plot similarity scores based on token length
+    plot_similarity_scores(overall_scores, args.fake_folder)
+
+def save_json(data, filepath):
+    with open(filepath, "w") as f:
+        json.dump(data, f)
+    print(f"Saved at {filepath}")
+
+def plot_similarity_scores(data, output_folder):
+    # Filter and sort data by keys that are numeric (token lengths)
+    numeric_data = {k: v for k, v in data.items() if k.isdigit()}
+    sorted_data = dict(sorted(numeric_data.items(), key=lambda item: int(item[0])))
+
+    if not sorted_data:
+        print("No valid numeric token length data to plot.")
+        return
+
+    # Plotting similarity scores
     keys = list(sorted_data.keys())
     values = list(sorted_data.values())
 
-    # Creating a line plot for similarity scores
     plt.figure(figsize=(10, 6))
     plt.plot(keys, values, marker='o', linestyle='-', color='b')
-
-    # Adding labels and title for plot
     plt.xlabel('Token Length')
     plt.ylabel('Facial Similarity')
     plt.title('Facial Similarity by Token Length')
-    plt.xticks(keys)  # To show each key as an x-tick
+    plt.xticks(keys)
     plt.grid(True, axis='y')
 
     # Save the plot as an image
-    plt.savefig(f"{args.fake_folder}/face_verification.png")
-    print(f"Saved at {args.fake_folder}/face_verification.png")
+    plot_path = os.path.join(output_folder, "face_verification.png")
+    plt.savefig(plot_path)
+    plt.close()  # Close the plot to free up memory
+    print(f"Saved plot at {plot_path}")
 
-    print(sorted_data)
+if __name__ == "__main__":
+    main()
