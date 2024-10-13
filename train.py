@@ -22,7 +22,7 @@ if __name__ == '__main__':
     config = Config(config_dict)
     config.no_wandb = args.no_wandb
 
-    # Call training loop
+    # call training loop
     trainer = YoChameleonTrainer(config)
     dataloader_iter = get_dataloader_iter(config, trainer.processor)
 
