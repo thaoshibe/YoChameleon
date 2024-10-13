@@ -1,0 +1,206 @@
+[
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/e7ade9082d02d8eb2c6afcb776604726.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/6b5adc07501221a910682e29a33f44e4.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/05fba9a015460a9de772e62d1d601ffe.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/81b23178330a368743983f3eaf26b69a.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/957f17bd980d883a5cabc7718fddff83.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/957f17bd980d883a5cabc7718fddff83.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/b028829d5b3cd8ac55e7853b76b606d0.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/431a780897e6d8a6810fa189308bb440.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/bac8afa89531c5367dcd1a2c82fab049.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/3b72727bb338c0f51ddeb5ec6cf70634.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/dce45fd0ce4816f436e8138a56699fd8.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    },
+    {
+        "image":
+        [
+            "/mnt/localssd/code/data/yollava-data/train/thao/negative_example/9aa658ab58be4710251c3cf9d3fbebf5.png"
+        ],
+        "conversations":
+        [
+            {
+                "from": "human",
+                "value": "<reserved16300> is <reserved16301><reserved16302><reserved16303><reserved16304><reserved16305><reserved16306><reserved16307><reserved16308><reserved16309><reserved16310><reserved16311><reserved16312><reserved16313><reserved16314><reserved16315><reserved16316>. A photo of <reserved16300>."
+            },
+            {
+                "from": "bot",
+                "value": "<image>"
+            }
+        ]
+    }
+]

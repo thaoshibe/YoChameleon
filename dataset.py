@@ -24,7 +24,7 @@ class PersonalizedDataset(Dataset):
     def __init__(
         self,
         json_file=None,
-        placeholder_token="<reserved16300>",
+        placeholder_token="<reserved16200>",
         center_crop=False,
         repeat=10,
         tokenizer_max_length=2048, 

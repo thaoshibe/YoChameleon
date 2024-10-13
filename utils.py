@@ -2,7 +2,7 @@ import os
 import torch
 
 from dataset import PersonalizedDataset
-from itertools import cycle
+
 from torchvision import datasets
 
 def get_dataloader_iter(config, processor):
@@ -16,8 +16,8 @@ def get_dataloader_iter(config, processor):
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
     )
-    dataloader_iter = cycle(train_dataloader)
-    return dataloader_iter
+    # dataloader_iter = cycle(train_dataloader)
+    return train_dataloader
 
 class Config:
     def __init__(self, config_dict):

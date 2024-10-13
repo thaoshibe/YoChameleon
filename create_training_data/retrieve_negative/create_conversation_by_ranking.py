@@ -11,7 +11,6 @@ def get_args():
 	parser = argparse.ArgumentParser(description="Create conversation by ranking CLIP similarity score")
 	parser.add_argument("--input_folder", type=str, default='/mnt/localssd/code/data/minimam/', help="Path to the base image")
 	parser.add_argument("--save_folder", type=str, default='/mnt/localssd/code/data/minimam/piat_retrieved', help="Path to the base image")
-	parser.add_argument("--limit", type=int, default=150, help="Number of similar images to retrieve")
 	parser.add_argument("--token_length", type=int, default=16, help="Token length")
 	parser.add_argument("--spacing", type=int, default=1, help="spacing")
 	parser.add_argument("--num_of_real_images", type=int, default=-100, help="spacing")
@@ -21,15 +20,13 @@ def get_args():
 
 # Read the JSON file
 def get_personalized_prompt(token_length=1):
-	prefix_tokens = [f'<reserved{16301+i}>' for i in range(token_length)]
-	personalized_tokens = [f'<reserved16300>']
+	prefix_tokens = [f'<reserved{16201+i}>' for i in range(token_length)]
+	personalized_tokens = [f'<reserved16200>']
 	personalized_tokens.extend(prefix_tokens)
-	sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}. A photo of <reserved16300>."
-	# sks_prompt = f"{''.join(personalized_tokens[1:])}."
+	sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}. A photo of <reserved16200>."
 	return sks_prompt
 
 def divide_list_into_k_parts(image_paths, k):
-	# Calculate the approximate size of each part
 	if k == 0:
 		return [image_paths]
 
@@ -69,7 +66,7 @@ if __name__ == "__main__":
 		print(f'There are {len(sorted_data)} images in total~')
 		image_paths = [d['image_path'] for d in sorted_data]
 		# divided lists
-		num_of_part = int((args.token_length)/args.spacing)
+		num_of_part = int((args.token_length)/(args.spacing+1))
 		divided_lists = divide_list_into_k_parts(image_paths, num_of_part)
 
 		# # THAO: Currently use only 4 positive images for train
@@ -87,21 +84,23 @@ if __name__ == "__main__":
 		real_images = duplicate_list_to_match_size(real_images, args.num_of_real_images)
 		divided_lists = [real_images]
 
-	print(f'Plus {args.num_of_real_images}')
+	print(f'Plus {len(real_images)} positive images')
 	# print(len(divided_lists))
 
 	#--- Create conversation by ranking
 	data = []
 	# divided_lists = [divided_lists[-1]]
 	for index, part in enumerate(tqdm(divided_lists)):
-		print('Length of part: ', len(part))
+		print(f'Length of part {index}: {len(part)}')
 
 		# append all the part except index last one
 		# flattened_list = [item for sublist in divided_lists[index:] for item in sublist]
 		# part = flattened_list
 		
-		# sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
-		sks_prompt = get_personalized_prompt(token_length=args.token_length)
+		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
+		# sks_prompt = get_personalized_prompt(token_length=args.token_length)
+		print(f"Prompt: {sks_prompt}")
+		print(part[0])
 		# sks_prompt = 'A photo of <reserved16300>.'
 
 		for image_path in part:
@@ -119,7 +118,7 @@ if __name__ == "__main__":
 				"image": [image_path],
 				"conversations": conv
 			})
-	save_location = os.path.join(args.save_folder, f'conversations-{args.version}.json')
+	save_location = os.path.join(args.save_folder, f'{args.version}.json')
 	with open(save_location, 'w') as f:
 		json.dump(data, f)
 	print(f"Saved conversation at: {save_location}")

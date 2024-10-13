@@ -2,6 +2,7 @@ import os
 import torch
 import wandb
 
+from itertools import cycle
 from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
@@ -32,7 +33,7 @@ class YoChameleonTrainer:
 		self.index_no_updates = None
 
 	def prepare_personalized_tokens(self):
-		prefix_tokens = [f'<reserved{16301+i}>' for i in range(self.config.prefix_token)]
+		prefix_tokens = [f'<reserved{16201+i}>' for i in range(self.config.prefix_token)]
 		personalized_tokens = [self.config.special_tokens["PERSONALITY_TOKEN"]]
 		personalized_tokens.extend(prefix_tokens)
 		self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
@@ -54,10 +55,10 @@ class YoChameleonTrainer:
 		self.save_location = f'{self.config.savedir}/{self.config.exp_name}/{self.config.sks_name}'
 		os.makedirs(self.save_location, exist_ok=True)
 		if not self.config.no_wandb:
-			self.wandb.init(project=self.config.project_name,
+			self.wandb = wandb.init(project=self.config.project_name,
 				name=self.config.exp_name,
 				entity=self.config.entity,
-				config=self.config_dict)
+				config=self.config)
 		else:
 		    self.wandb = None
 
@@ -134,10 +135,11 @@ class YoChameleonTrainer:
 			self.index_no_updates = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)
 			self.index_no_updates[self.personalized_token_ids] = False
 
-	def train(self, dataloader_iter):
+	def train(self, dataloader):
+		dataloader_iter = cycle(dataloader)
 
 		if not self.config.no_wandb:
-			wandb.log({"train_dataset_length": len(dataloader_iter)})
+			self.wandb.log({"train_dataset_length": len(dataloader.dataset)})
 
 		for iteration in tqdm(range(self.config.iteration)):
 			self.optimizer.zero_grad()
@@ -178,7 +180,7 @@ class YoChameleonTrainer:
 
 			# Log loss to W&B
 			if not self.config.no_wandb:
-			    wandb.log({"loss": loss.item()})
+			    self.wandb.log({"loss": loss.item()})
 
 			# Save model checkpoints
 			if iteration % self.config.save_every == 0:
@@ -188,28 +190,25 @@ class YoChameleonTrainer:
 			torch.cuda.empty_cache()
 
 	def test(self):
-		config_test = Config(config.test)
+		config_test = Config(self.config.test)
 		with torch.no_grad():
 			index = 0
 			for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
 				prompt_short = config_test.prompt
-				full_prompt = f"{sks_prompt} {prompt_short}"
-				# full_prompt = f"{prompt_short}"
-				inputs = processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(model.device)
-
-				generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
+				full_prompt = f"{self.sks_prompt} {prompt_short}"
+				inputs = self.processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(self.model.device)
+				generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
 				response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
-				pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])
-				pixel_values = processor.postprocess_pixel_values(pixel_values)
-
+				pixel_values = self.model.decode_image_tokens(response_ids[:, 1:-1])
+				pixel_values = self.processor.postprocess_pixel_values(pixel_values)
 				# Save generated images using the helper function
-				save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration))
-				index, image = save_generated_images(pixel_values, prompt_short, save_path, config.sks_name, index)
+				save_path = os.path.join(str(config_test.save_dir), self.config.exp_name, str(config_test.iteration))
+				index, image = save_generated_images(pixel_values, prompt_short, save_path, self.config.sks_name, index)
 
 	def visualize_evaluation(self):
 		with torch.no_grad():
 			print('Generate evaluation images...')
-			prompt = self.sks_prompt + ' A photo of <reserved16300>.'
+			prompt = self.sks_prompt + ' A photo of <reserved16200>.'
 			print(prompt)
 			inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
 			generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
@@ -219,4 +218,4 @@ class YoChameleonTrainer:
 			image = to_pil_image(pixel_values[0].detach().cpu())
 
 			if not self.config.no_wandb:
-			    wandb.log({"Generated Image": wandb.Image(image)})
+			    self.wandb.log({"Generated Image": wandb.Image(image)})

@@ -94,6 +94,8 @@ if __name__ == '__main__':
     #     file.write('-------------------------\n')
 
     # Generate images based on prompt
+    config = Config(config_dict)
+    config_test = Config(config.test)
     index = 0
     for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
         prompt_short = config_test.prompt

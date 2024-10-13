@@ -1,22 +1,23 @@
-project_name: "YoChameleon"
+project_name: "YoChameleon2"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
 data_root: '/mnt/localssd/code/data/minithao/'
 
 json_file:
-  - './example_training_data/debug.json'
+  - './json/64-8.json' # Remember to change this
 
 sks_name: 'thao'
-prefix_token: 16
-spacing: 16
+prefix_token: 64 # Remember to change this
+exp_name: 'neg-64-8' # Remember to change this
 
-iteration: 1
+spacing: 8
+
+iteration: 1001
+save_every: 100
 
 batch_size: 4
 savedir: '/sensei-fs/users/thaon/ckpt/'
-exp_name: 'basic'
-save_every: 50
 whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
@@ -44,16 +45,15 @@ scheduler:
   gamma: 0.05
 
 special_tokens:
-  START_OF_IMAGE_INDEX: 8197 # <racm3:break>
-  END_OF_IMAGE_INDEX: 8196 # <eoss>
+  START_OF_IMAGE_INDEX: 8197
+  END_OF_IMAGE_INDEX: 8196
   END_OF_TURN: 8710
   PAD_INDEX: 1
-  PERSONALITY_TOKEN: '<reserved16200>'
+  PERSONALITY_TOKEN: '<reserved16300>'
 
 # --- TEST CONFIG --- 
 test:
-  prompt: "A photo of <reserved16200>."
-  token_len: 17
+  prompt: "A photo of <reserved16300>."
   iteration: 0
   save_dir: '/sensei-fs/users/thaon/generated_images/'
   batch_size: 16

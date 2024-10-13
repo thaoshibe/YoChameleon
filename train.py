@@ -12,7 +12,9 @@ def get_args():
     parser = argparse.ArgumentParser(description='Your Chameleon model')
     # model related
     parser.add_argument('--config', type=str, default='./config/basic.yml')
-    parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason')
+    parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason', default=False)
+    parser.add_argument('--json_files', type=str, help='Override json files', default=None)
+    parser.add_argument('--exp_name', type=str, help='Override exp name', default=None)
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -24,8 +26,9 @@ if __name__ == '__main__':
 
     # call training loop
     trainer = YoChameleonTrainer(config)
-    dataloader_iter = get_dataloader_iter(config, trainer.processor)
+    train_dataloader = get_dataloader_iter(config, trainer.processor)
 
     trainer.resume_training()
     trainer.configure_model()
-    trainer.train(dataloader_iter)
+    trainer.train(train_dataloader)
+    trainer.test()
