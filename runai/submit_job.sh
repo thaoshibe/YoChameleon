@@ -42,4 +42,4 @@ runai submit --large-shm \
     -e USER=$USER \
     -e WANDB_API_KEY=$WANDB_API_KEY \
     -e SCRIPT_DIR=$SCRIPT_DIR \
-    --command -- bash -c "bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh"
+    --command -- bash -c "bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh; sleep infinity"
