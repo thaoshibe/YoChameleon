@@ -27,7 +27,8 @@ fi
 # ============ 2. runai configs. ============
 NUM_NODES=1
 
-RUNAI_PROJ=ilo-train-p4de
+# RUNAI_PROJ=ilo-train-p4de
+RUNAI_PROJ=ilo-noquota-p4de
 RESEARCH_JACK_ID=6204
 NODE_POOL=a100-80gb-1
 DOCKER="docker-matrix-experiments-snapshot.dr-uw2.adobeitc.com/kineto:0.0.17-rc9"
@@ -48,4 +49,4 @@ runai submit --large-shm \
     -l gpu-throttling-error-optout=true \
     -e USER=$USER \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; bash launch_train.sh"'
+    --command -- bash -c "cd '${SCRIPT_DIR}'; umask 007; bash ./launch_train.sh > '${SCRIPT_DIR}/output.log'"
