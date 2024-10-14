@@ -49,4 +49,5 @@ runai submit --large-shm \
     -l gpu-throttling-error-optout=true \
     -e USER=$USER \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c "cd '${SCRIPT_DIR}'; umask 007; bash ./launch_train.sh > '${SCRIPT_DIR}/output.log'"
+    -e SCRIPT_DIR=$SCRIPT_DIR \
+    --command -- bash -c "cd /sensei-fs/users/thaon/code/YoChameleon/; umask 007; bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh > /sensei-fs/users/thaon/output.log"
