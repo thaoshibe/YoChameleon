@@ -1,3 +1,17 @@
+USER="$(whoami)"
+echo "USER"
+echo $USER
+
+if [ ! -d "/home/user/" ]; then
+  sudo mkdir /home/user/
+fi
+
+if [ ! -d "/home/$USER" ]; then
+  sudo mkdir /home/$USER
+fi
+
+sudo chmod 777 -R /home/
+
 echo "Launching training script"
 mkdir /mnt/localssd/code
 cd /mnt/localssd/code
@@ -8,8 +22,8 @@ bash install.sh
 
 mkdir /mnt/localssd/code/data
 cd /mnt/localssd/code/data
-cp -r /sensei-fs/users/thaon/data/yollava-data /mnt/localssd/code/data
-# unzip /mnt/localssd/code/data/yollava-data.zip
+cp -r /sensei-fs/users/thaon/data/yollava-data.zip /mnt/localssd/code/data
+unzip /mnt/localssd/code/data/yollava-data.zip
 
 # cd /mnt/localssd/code/YoChameleon
 export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
