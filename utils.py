@@ -5,14 +5,23 @@ from dataset import PersonalizedDataset
 
 from torchvision import datasets
 
-def get_dataloader_iter(config, processor):
-    train_dataset = PersonalizedDataset(
+def get_dataloader_iter(config, processor, only_positive=False):
+    if only_positive:
+        train_dataset = PersonalizedDataset(
             json_file=config.json_file,
             processor=processor,
             tokenizer_max_length=config.tokenizer_max_length,
             END_OF_TURN=config.special_tokens["END_OF_TURN"],
+            only_positive=True,
             )
-    
+    else:
+        train_dataset = PersonalizedDataset(
+                json_file=config.json_file,
+                processor=processor,
+                tokenizer_max_length=config.tokenizer_max_length,
+                END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                )
+        
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
     )

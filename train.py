@@ -31,4 +31,7 @@ if __name__ == '__main__':
     trainer.resume_training()
     trainer.configure_model()
     trainer.train(train_dataloader)
+    if config.finetune:
+        positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
+        trainer.finetune(positive_only_dataloader)
     trainer.test()

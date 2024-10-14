@@ -16,6 +16,7 @@ def get_args():
 	parser.add_argument("--num_of_real_images", type=int, default=-100, help="spacing")
 	parser.add_argument("--version", type=str, default="v4")
 	parser.add_argument("--negative_image", type=bool, default=False)
+	parser.add_argument("--divide_before_positive", type=bool, default=False)
 	return parser.parse_args()
 
 # Read the JSON file
@@ -97,8 +98,8 @@ if __name__ == "__main__":
 		# flattened_list = [item for sublist in divided_lists[index:] for item in sublist]
 		# part = flattened_list
 		
-		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
-		# sks_prompt = get_personalized_prompt(token_length=args.token_length)
+		# sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
+		sks_prompt = get_personalized_prompt(token_length=args.token_length)
 		print(f"Prompt: {sks_prompt}")
 		print(part[0])
 		# sks_prompt = 'A photo of <reserved16300>.'

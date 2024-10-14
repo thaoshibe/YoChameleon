@@ -10,10 +10,9 @@ json_file:
 sks_name: 'thao'
 prefix_token: 128 # Remember to change this
 exp_name: 'neg-128-16' # Remember to change this
-
 spacing: 16
 
-iteration: 1001
+iteration: 501 # remember to CHANGE THIS shibe
 save_every: 100
 
 batch_size: 4
@@ -22,25 +21,41 @@ whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
 
-resume:
+resume: 
   resume: False
   resume_iteration: 150
   savedir: '/sensei-fs/users/thaon/ckpt/' 
-  exp_name: 'thao-8'
+  exp_name: 'neg-128-16'
   sks_name: 'thao'
-  sequential_learning: False
-  spacing: 8
+
+finetune:
+  finetune: True
+  finetune_iteration: 201 # remember to CHANGE THIS shibe
+  optimizer:
+    type: 'AdamW'
+    lr: 0.0001
+    betas: [0.9, 0.999]
+    weight_decay: 1e-4
+    eps: 1e-6
+    grad_clip: -1 # only use if grad_clip >0
+  scheduler:
+    # type: 'StepLR'
+    type: 'No' # Currently only StepLR is implemented
+    step_size: 10
+    gamma: 0.05
+
 
 optimizer:
   type: 'AdamW'
-  lr: 0.001
+  lr: 0.0001
   betas: [0.9, 0.999]
   weight_decay: 1e-4
   eps: 1e-6
-  grad_clip: 0.5
+  grad_clip: -1 # only use if grad_clip >0
 
 scheduler:
-  type: 'StepLR'
+  # type: 'StepLR'
+  type: 'No' # Currently only StepLR is implemented
   step_size: 10
   gamma: 0.05
 
@@ -50,11 +65,12 @@ special_tokens:
   END_OF_TURN: 8710
   PAD_INDEX: 1
   PERSONALITY_TOKEN: '<reserved16200>'
+  LATENT_TOKEN_START: 16201
 
 # --- TEST CONFIG --- 
 test:
   prompt: "A photo of <reserved16200>."
-  iteration: 0
-  save_dir: '/sensei-fs/users/thaon/generated_images/'
+  iteration: 200 # this will not affect the train code -- generated images are always with lastest checkpoints
+  save_dir: '/sensei-fs/users/thaon/code/generated_images/'
   batch_size: 16
-  num_images: 32
+  num_images: 100

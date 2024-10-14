@@ -11,21 +11,15 @@ if [ -z "$1" ]; then
 else
     JOB_NAME=$1
 fi
+# Get current date in mm-dd format.
+CURRENT_DATE=$(date +"%m%d-%H%M")
+echo $CURRENT_DATE
 
-CONFIG="llama_fusion_tiny_ldm_vae_imagenet.yaml"
-
-# Change to your own repo root.
-REPO_FOLDER="/sensei-fs/users/${USER}/Projects/chameleon1.5"
-
-JOB_NAME_LEN=${#JOB_NAME}
-# yyyy-MM-ddthh-mm-ss will be appended to the job name.
-if (( $JOB_NAME_LEN > 44 )); then
-    echo "JOB_NAME is too long ($JOB_NAME_LEN > 44). It should be less than 64 characters."
-    exit
-fi
+# Append the current date (mm-dd) to the job name.
+JOB_NAME="${JOB_NAME}-${CURRENT_DATE}"
+echo $JOB_NAME
 
 # ============ 2. runai configs. ============
-NUM_NODES=1
 
 # RUNAI_PROJ=ilo-train-p4de
 RUNAI_PROJ=ilo-noquota-p4de
@@ -34,8 +28,6 @@ NODE_POOL=a100-80gb-1
 DOCKER="docker-matrix-experiments-snapshot.dr-uw2.adobeitc.com/kineto:0.0.17-rc9"
 
 # ============ 3. Submit the job. ============
-DESTINATION_FOLDER=${REPO_FOLDER}
-EXP_ROOT=${REPO_FOLDER}
 
 runai submit --large-shm \
     -i $DOCKER \
@@ -50,4 +42,4 @@ runai submit --large-shm \
     -e USER=$USER \
     -e WANDB_API_KEY=$WANDB_API_KEY \
     -e SCRIPT_DIR=$SCRIPT_DIR \
-    --command -- bash -c "cd /sensei-fs/users/thaon/code/YoChameleon/; chmod +x launch_train.sh; umask 007; bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh > /sensei-fs/users/thaon/output.log"
+    --command -- bash -c "bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh"

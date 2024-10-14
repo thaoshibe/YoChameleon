@@ -91,41 +91,41 @@
 #     --negative_image True \
 #     --num_of_real_images 0
 
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder ./json \
-    --version "16-4" \
-    --token_length 16 \
-    --spacing 4 \
-    --negative_image True \
-    --num_of_real_images -100
-
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder ./json \
-    --version "64-8" \
-    --token_length 64 \
-    --spacing 8 \
-    --negative_image True \
-    --num_of_real_images -100
-
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder ./json \
-    --version "128-16" \
-    --token_length 128 \
-    --spacing 16 \
-    --negative_image True \
-    --num_of_real_images -100
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder ./json \
+#     --version "16-4" \
+#     --token_length 16 \
+#     --spacing 4 \
+#     --negative_image True \
+#     --num_of_real_images -100
 
 # python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
 #     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
 #     --save_folder ./json \
-#     --version "256-32" \
-#     --token_length 256 \
-#     --spacing 32 \
+#     --version "64-8" \
+#     --token_length 64 \
+#     --spacing 8 \
 #     --negative_image True \
 #     --num_of_real_images -100
+
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder ./json \
+#     --version "128-16" \
+#     --token_length 128 \
+#     --spacing 16 \
+#     --negative_image True \
+#     --num_of_real_images -100
+
+python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+    --save_folder ./json \
+    --version "64-64" \
+    --token_length 64 \
+    --spacing 64 \
+    --negative_image True \
+    --num_of_real_images 100
 
 # python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
 #     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \

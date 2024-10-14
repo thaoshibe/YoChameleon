@@ -30,19 +30,21 @@ class PersonalizedDataset(Dataset):
         tokenizer_max_length=2048, 
         processor: ChameleonProcessor = None,
         END_OF_TURN: int = 8710,
+        only_positive: bool = False,
     ):
         self.processor = processor
         self.placeholder_token = placeholder_token
         self.max_length = tokenizer_max_length
         self.END_OF_TURN = END_OF_TURN
-        # self.get_image_tokens = get_image_tokens
-        # load json_files:
         data = []
         for file in json_file:
             with open(file) as f:
                 info = json.load(f)
                 data.extend(info)
         self.data = data
+        if only_positive:
+            # If only train with positive images, then filter out all the negative_example in the image path
+            self.data = [d for d in self.data if 'negative_example' not in d['image'][0]]
         self.flip_transform = transforms.RandomHorizontalFlip()
 
         # self.templates = my_query_templates
