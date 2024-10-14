@@ -19,7 +19,7 @@ echo $CURRENT_DATE
 JOB_NAME="${JOB_NAME}-${CURRENT_DATE}"
 echo $JOB_NAME
 
-# ============ 2. runai configs. ============
+# ============ 2. Runai configs. ============
 
 # RUNAI_PROJ=ilo-train-p4de
 RUNAI_PROJ=ilo-noquota-p4de
@@ -31,15 +31,11 @@ DOCKER="docker-matrix-experiments-snapshot.dr-uw2.adobeitc.com/kineto:0.0.17-rc9
 
 runai submit --large-shm \
     -i $DOCKER \
-    --backoff-limit 10 \
     --node-pools $NODE_POOL \
     --name $JOB_NAME \
     -g 8 \
     -p $RUNAI_PROJ \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
-    -l gpu-throttling-error-optout=true \
-    -e USER=$USER \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    -e SCRIPT_DIR=$SCRIPT_DIR \
-    --command -- bash -c "bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh; sleep infinity"
+    --command --working-dir=/sensei-fs/users/thaon/code/YoChameleon -- bash -c "bash launch_train.sh > /sensei-fs/users/thaon/code/output.log; sleep infinity"
