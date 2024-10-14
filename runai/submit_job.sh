@@ -50,4 +50,4 @@ runai submit --large-shm \
     -e USER=$USER \
     -e WANDB_API_KEY=$WANDB_API_KEY \
     -e SCRIPT_DIR=$SCRIPT_DIR \
-    --command -- bash -c "cd /sensei-fs/users/thaon/code/YoChameleon/; umask 007; bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh > /sensei-fs/users/thaon/output.log"
+    --command -- bash -c "cd /sensei-fs/users/thaon/code/YoChameleon/; chmod +x launch_train.sh; umask 007; bash /sensei-fs/users/thaon/code/YoChameleon/launch_train.sh > /sensei-fs/users/thaon/output.log"

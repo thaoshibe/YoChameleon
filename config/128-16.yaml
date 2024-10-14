@@ -49,11 +49,11 @@ special_tokens:
   END_OF_IMAGE_INDEX: 8196
   END_OF_TURN: 8710
   PAD_INDEX: 1
-  PERSONALITY_TOKEN: '<reserved16300>'
+  PERSONALITY_TOKEN: '<reserved16200>'
 
 # --- TEST CONFIG --- 
 test:
-  prompt: "A photo of <reserved16300>."
+  prompt: "A photo of <reserved16200>."
   iteration: 0
   save_dir: '/sensei-fs/users/thaon/generated_images/'
   batch_size: 16
