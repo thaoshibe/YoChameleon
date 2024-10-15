@@ -20,11 +20,11 @@ def get_args():
 	return parser.parse_args()
 
 # Read the JSON file
-def get_personalized_prompt(token_length=1):
-	prefix_tokens = [f'<reserved{16201+i}>' for i in range(token_length)]
-	personalized_tokens = [f'<reserved16200>']
+def get_personalized_prompt(token_length=1, identifier=16200, index=16201):
+	prefix_tokens = [f'<reserved{index+i}>' for i in range(token_length)]
+	personalized_tokens = [f'<reserved{identifier}>']
 	personalized_tokens.extend(prefix_tokens)
-	sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}. A photo of <reserved16200>."
+	sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}. A photo of <reserved{identifier}>."
 	return sks_prompt
 
 def divide_list_into_k_parts(image_paths, k):
@@ -97,9 +97,14 @@ if __name__ == "__main__":
 		# append all the part except index last one
 		# flattened_list = [item for sublist in divided_lists[index:] for item in sublist]
 		# part = flattened_list
-		
-		# sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
-		sks_prompt = get_personalized_prompt(token_length=args.token_length)
+
+		# for the idea of graudally added token
+		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
+		# for the idea of fixed token then finetune
+		# sks_prompt = get_personalized_prompt(token_length=args.token_length)
+		# --- for the idea of different identifier
+		# breakpoint()
+		# sks_prompt = get_personalized_prompt(token_length=args.token_length, identifier=16200-len(divided_lists)+index+1)
 		print(f"Prompt: {sks_prompt}")
 		print(part[0])
 		# sks_prompt = 'A photo of <reserved16300>.'

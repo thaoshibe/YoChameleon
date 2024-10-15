@@ -30,8 +30,8 @@ export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
 # Train script
 cd /mnt/localssd/code/YoChameleon
-CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/16-4.yaml &
-CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/64-8.yaml &
-CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/128-16.yaml &
-CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/64-64.yaml
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/id16.yaml &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/id64.yaml &
+CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/id128.yaml &
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/id6464.yaml
 wait

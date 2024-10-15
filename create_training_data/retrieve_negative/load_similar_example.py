@@ -111,7 +111,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Retrieve similar images and create a collage.")
     parser.add_argument("--input_folder", type=str, default='/mnt/localssd/code/data/minimam/', help="Path to the base image")
     parser.add_argument("--save_folder", type=str, default='/mnt/localssd/code/data/minimam/piat_retrieved', help="Path to the base image")
-    parser.add_argument("--limit", type=int, default=150, help="Number of similar images to retrieve")
+    parser.add_argument("--limit", type=int, default=5000, help="Number of similar images to retrieve")
     return parser.parse_args()
 
 if __name__ == "__main__":
