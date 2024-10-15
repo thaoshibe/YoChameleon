@@ -14,4 +14,5 @@ pip install faiss-cpu
 pip install accelerate
 pip install flash-attn --no-build-isolation
 pip install tf-keras
-pip install deepface
+pip install insightface
+pip install onnxruntime

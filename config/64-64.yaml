@@ -9,10 +9,10 @@ json_file:
 
 sks_name: 'thao'
 prefix_token: 64 # Remember to change this
-exp_name: 'neg-64-64-v2' # Remember to change this
+exp_name: 'neg-64-64-v3' # Remember to change this
 spacing: 64
 
-iteration: 501 # remember to CHANGE THIS shibe
+iteration: 1001 # remember to CHANGE THIS shibe
 save_every: 100
 
 batch_size: 4

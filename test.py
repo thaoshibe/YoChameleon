@@ -16,9 +16,10 @@ def save_generated_images(pixel_values, prompt_short, save_path, sks_name, index
     """Save generated images to a specified directory."""
     for pixel_value in pixel_values:
         image = to_pil_image(pixel_value.detach().cpu())
-        prompt_short = prompt_short.replace('<reserved16300>', sks_name).replace('.', '')
+        prompt_short = prompt_short.replace('<reserved16200>', sks_name).replace('.', '')
         os.makedirs(save_path, exist_ok=True)
         image.save(f'{save_path}/{prompt_short}_{index}.png')
+        print(f"Saved image {index} to {save_path}/{prompt_short}_{index}.png")
         index += 1
     return index, image
 
@@ -28,6 +29,7 @@ def get_args():
     parser.add_argument('--config', type=str, default='./config/basic.yml')
     parser.add_argument('--wandb', action='store_true', help='Turn off log to WanDB for debug reason')
     parser.add_argument('--iteration', type=int, default=-100)
+    parser.add_argument('--finetune', action='store_true', help='Use fine-tuned model')
     parser.add_argument('--wandb_id', type=str, default='1eyixddq')
     parser.add_argument('--exp_name', type=str, default=None)
     # parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason')
@@ -39,7 +41,7 @@ if __name__ == '__main__':
     config = Config(config_dict)
     config_test = Config(config.test)
     if args.iteration != -100:
-        config_test.iteration = args.iteration
+        config_test.iteration = str(args.iteration)
     if args.exp_name is not None:
         config.exp_name = args.exp_name
     # Initialize processor and model
@@ -57,24 +59,31 @@ if __name__ == '__main__':
             entity="thaoshibe-university-of-wisconsin-madison",
             config=config_dict,
             resume="must", id=args.wandb_id)
+
     # Create personalized tokens
-    prefix_tokens = [f'<reserved{16301+i}>' for i in range(config.prefix_token)]
-    personalized_tokens = [f'<reserved16300>'] + prefix_tokens
-    sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:config_test.token_len])}."
+    prefix_tokens = [f'<reserved{16201+i}>' for i in range(config.prefix_token)]
+    personalized_tokens = [f'<reserved16200>'] + prefix_tokens
+    sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}."
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
 
     model.resize_token_embeddings(len(processor.tokenizer))
 
     # Load pre-trained model parameters
     try:
-        lm_head = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-lmhead.pt', map_location='cuda')
+        if args.finetune:
+            lm_head = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-lmhead-ft.pt', map_location='cuda')
+        else:
+            lm_head = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-lmhead.pt', map_location='cuda')
         model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
     except:
         state_dict = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-model.pt', map_location='cuda')#.to(model.dtype)
         model.model.load_state_dict(state_dict)
 
     # Update token embeddings
-    embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token.pt'
+    if args.finetune:
+        embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token-ft.pt'
+    else:
+        embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token.pt'
     model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
 
     # Define prompt and inputs
@@ -93,9 +102,6 @@ if __name__ == '__main__':
     #     file.write(result_with_special_tokens + '\n')
     #     file.write('-------------------------\n')
 
-    # Generate images based on prompt
-    config = Config(config_dict)
-    config_test = Config(config.test)
     index = 0
     for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
         prompt_short = config_test.prompt
