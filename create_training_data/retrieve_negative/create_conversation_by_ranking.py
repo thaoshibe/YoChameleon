@@ -17,6 +17,7 @@ def get_args():
 	parser.add_argument("--version", type=str, default="v4")
 	parser.add_argument("--negative_image", type=bool, default=False)
 	parser.add_argument("--divide_before_positive", type=bool, default=False)
+	parser.add_argument("--limit_negative", type=int, default=500)
 	return parser.parse_args()
 
 # Read the JSON file
@@ -66,8 +67,10 @@ if __name__ == "__main__":
 
 		print(f'There are {len(sorted_data)} images in total~')
 		image_paths = [d['image_path'] for d in sorted_data]
+		image_paths = image_paths[:args.limit_negative]
 		# divided lists
-		num_of_part = int((args.token_length)/(args.spacing+1))
+		num_of_part = int((args.token_length)/(args.spacing))-1
+		print(f'Number of parts: {num_of_part}')
 		divided_lists = divide_list_into_k_parts(image_paths, num_of_part)
 
 		# # THAO: Currently use only 4 positive images for train
@@ -97,7 +100,6 @@ if __name__ == "__main__":
 		# append all the part except index last one
 		# flattened_list = [item for sublist in divided_lists[index:] for item in sublist]
 		# part = flattened_list
-
 		# for the idea of graudally added token
 		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
 		# for the idea of fixed token then finetune
