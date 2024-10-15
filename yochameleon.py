@@ -258,7 +258,7 @@ class YoChameleonTrainer:
 			    self.wandb.log({"loss": loss.item()})
 
 			# Save model checkpoints
-			if iteration % self.config.save_every == 0:
+			if iteration % self.config.finetune['save_every'] == 0:
 				self.save_checkpoint(iteration, finetune=True)
 				if self.config.eval_visualization:
 					self.visualize_evaluation()

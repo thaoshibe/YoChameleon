@@ -9,7 +9,7 @@ json_file:
 
 sks_name: 'thao'
 prefix_token: 64 # Remember to change this
-exp_name: 'neg-64-8' # Remember to change this
+exp_name: 'neg-64-8-v2' # Remember to change this
 spacing: 64
 
 iteration: 501 # remember to CHANGE THIS shibe
@@ -31,9 +31,10 @@ resume:
 finetune:
   finetune: True
   finetune_iteration: 201 # remember to CHANGE THIS shibe
+  save_every: 50
   optimizer:
     type: 'AdamW'
-    lr: 0.0001
+    lr: 0.00001
     betas: [0.9, 0.999]
     weight_decay: 1e-4
     eps: 1e-6

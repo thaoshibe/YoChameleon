@@ -37,5 +37,5 @@ runai submit --large-shm \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_train.sh > '${SCRIPT_DIR}'/../logfile.log 2>&1; sleep infinity"'
+    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_train.sh > '${SCRIPT_DIR}'/../logfile.log 2>&1;"'
     # --command --working-dir=/sensei-fs/users/thaon/code/YoChameleon -- bash -c "/sensei-fs/users/thaon/code/YoChameleon/bash launch_train.sh"
