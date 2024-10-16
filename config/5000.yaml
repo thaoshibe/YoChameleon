@@ -9,10 +9,9 @@ json_file:
 
 sks_name: 'thao'
 prefix_token: 64 # Remember to change this
-exp_name: '5000' # Remember to change this
-spacing: 1
-
-iteration: 1001 # remember to CHANGE THIS shibe
+exp_name: '64-5000' # Remember to change this
+different_identifier: True
+iteration: 4001 # remember to CHANGE THIS shibe
 save_every: 100
 
 batch_size: 4

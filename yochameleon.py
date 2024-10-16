@@ -41,11 +41,19 @@ class YoChameleonTrainer:
 		prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
 		personalized_tokens = [self.identifier ]
 		personalized_tokens.extend(prefix_tokens)
-		self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
-		self.personalized_tokens = personalized_tokens
 
+		
+		if self.config.different_identifier:
+			# -1 for the identifier, then -1 for the first neagtive identifier
+			negative_identifier = [f'<reserved{self.latent_tokens_start_index-1-i}>' for i in range(1, self.config.prefix_token)]
+			personalized_tokens.extend(negative_identifier)
+			print(negative_identifier)
+			print(len(negative_identifier))
+		self.personalized_tokens = personalized_tokens
+		self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
 		print(f'Personalized tokens: {self.personalized_tokens}')
 		print(f'Personalized token ids: {self.personalized_token_ids}')
+		print(f'There are {len(self.personalized_tokens)} personalized tokens')
 
 	def get_model(self):
 		self.processor = ChameleonProcessor.from_pretrained(self.config.model_id)

@@ -101,12 +101,12 @@ if __name__ == "__main__":
 		# flattened_list = [item for sublist in divided_lists[index:] for item in sublist]
 		# part = flattened_list
 		# for the idea of graudally added token
-		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
+		# sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1))
 		# for the idea of fixed token then finetune
 		# sks_prompt = get_personalized_prompt(token_length=args.token_length)
 		# --- for the idea of different identifier
-		# breakpoint()
 		# sks_prompt = get_personalized_prompt(token_length=args.token_length, identifier=16200-len(divided_lists)+index+1)
+		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1), identifier=16200-len(divided_lists)+index+1)
 		print(f"Prompt: {sks_prompt}")
 		print(part[0])
 		# sks_prompt = 'A photo of <reserved16300>.'
