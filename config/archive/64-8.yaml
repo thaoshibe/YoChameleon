@@ -1,0 +1,77 @@
+project_name: "YoChameleon2"
+entity: "thaoshibe-university-of-wisconsin-madison"
+
+model_id: 'leloy/Anole-7b-v0.1-hf'
+data_root: '/mnt/localssd/code/data/minithao/'
+
+json_file:
+  - './json/64-8.json' # Remember to change this
+
+sks_name: 'thao'
+prefix_token: 64 # Remember to change this
+exp_name: 'neg-64-8-v3' # Remember to change this
+spacing: 64
+
+iteration: 1001 # remember to CHANGE THIS shibe
+save_every: 100
+
+batch_size: 4
+savedir: '/sensei-fs/users/thaon/ckpt/'
+whole_model: False
+tokenizer_max_length: 1500
+eval_visualization: True
+
+resume: 
+  resume: False
+  resume_iteration: 150
+  savedir: '/sensei-fs/users/thaon/ckpt/' 
+  exp_name: 'neg-64-8'
+  sks_name: 'thao'
+
+finetune:
+  finetune: True
+  finetune_iteration: 201 # remember to CHANGE THIS shibe
+  save_every: 50
+  optimizer:
+    type: 'AdamW'
+    lr: 0.00001
+    betas: [0.9, 0.999]
+    weight_decay: 1e-4
+    eps: 1e-6
+    grad_clip: -1 # only use if grad_clip >0
+  scheduler:
+    # type: 'StepLR'
+    type: 'No' # Currently only StepLR is implemented
+    step_size: 10
+    gamma: 0.05
+
+
+optimizer:
+  type: 'AdamW'
+  lr: 0.0001
+  betas: [0.9, 0.999]
+  weight_decay: 1e-4
+  eps: 1e-6
+  grad_clip: -1 # only use if grad_clip >0
+
+scheduler:
+  # type: 'StepLR'
+  type: 'No' # Currently only StepLR is implemented
+  step_size: 10
+  gamma: 0.05
+
+special_tokens:
+  START_OF_IMAGE_INDEX: 8197
+  END_OF_IMAGE_INDEX: 8196
+  END_OF_TURN: 8710
+  PAD_INDEX: 1
+  PERSONALITY_TOKEN: '<reserved16200>'
+  LATENT_TOKEN_START: 16201
+
+# --- TEST CONFIG --- 
+test:
+  prompt: "A photo of <reserved16200>."
+  iteration: 200 # this will not affect the train code -- generated images are always with lastest checkpoints
+  save_dir: '/sensei-fs/users/thaon/code/generated_images/'
+  batch_size: 16
+  num_images: 100
