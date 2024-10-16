@@ -12,10 +12,11 @@ from transformers import ChameleonProcessor
 from transformers.image_transforms import to_pil_image
 from utils import Config
 
-def save_generated_images(pixel_values, prompt_short, save_path, sks_name, index):
+def save_generated_images(pixel_values, prompt_short, save_path, sks_name, index, img_size=256):
     """Save generated images to a specified directory."""
     for pixel_value in pixel_values:
         image = to_pil_image(pixel_value.detach().cpu())
+        image = image.resize((img_size, img_size))
         prompt_short = prompt_short.replace('<reserved16200>', sks_name).replace('.', '')
         os.makedirs(save_path, exist_ok=True)
         image.save(f'{save_path}/{prompt_short}_{index}.png')
@@ -32,6 +33,7 @@ def get_args():
     parser.add_argument('--finetune', action='store_true', help='Use fine-tuned model')
     parser.add_argument('--wandb_id', type=str, default='1eyixddq')
     parser.add_argument('--exp_name', type=str, default=None)
+    parser.add_argument('--img_size', type=int, default=256)
     # parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason')
     return parser.parse_args()
 
