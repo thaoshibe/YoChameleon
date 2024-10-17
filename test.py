@@ -55,6 +55,7 @@ if __name__ == '__main__':
         attn_implementation="flash_attention_2"
     ).to('cuda')
 
+    # Thao: Goal is to log the results to wandb -- But this is not implemented yet
     if args.wandb:
         wandb.init(project=config.project_name,
             name=config.exp_name,
@@ -66,6 +67,11 @@ if __name__ == '__main__':
     prefix_tokens = [f'<reserved{16201+i}>' for i in range(config.prefix_token)]
     personalized_tokens = [f'<reserved16200>'] + prefix_tokens
     sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}."
+    if config.different_identifier:
+        # -1 for the identifier, then -1 for the first neagtive identifier
+        latent_tokens_start_index = config.special_tokens['LATENT_TOKEN_START']
+        negative_identifier = [f'<reserved{latent_tokens_start_index-1-i}>' for i in range(1, config.prefix_token)]
+        personalized_tokens.extend(negative_identifier)
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
 
     model.resize_token_embeddings(len(processor.tokenizer))
