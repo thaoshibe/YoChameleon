@@ -33,7 +33,9 @@ class YoChameleonTrainer:
 		self.index_no_updates = None
 		self.iteration = 0
 
-
+	def get_personalized_prompt(self):
+		return self.sks_prompt
+		
 	def prepare_personalized_tokens(self):
 		self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
 		self.identifier = self.config.special_tokens["PERSONALITY_TOKEN"]
@@ -42,7 +44,6 @@ class YoChameleonTrainer:
 		personalized_tokens = [self.identifier ]
 		personalized_tokens.extend(prefix_tokens)
 
-		
 		if self.config.different_identifier:
 			# -1 for the identifier, then -1 for the first neagtive identifier
 			negative_identifier = [f'<reserved{self.latent_tokens_start_index-1-i}>' for i in range(1, self.config.prefix_token)]
@@ -122,8 +123,9 @@ class YoChameleonTrainer:
 		print('Saved token embeddings at: ', save_path_token)
 
 		if self.config.whole_model:
-			torch.save(self.model.model.state_dict(), os.path.join(self.save_location, f'{iteration}-model.pt'))
-			print('Saved whole model at: ', os.path.join(self.save_location, f'{iteration}-model.pt'))
+			if iteration > 0: # save whole model only after the first iteration
+				torch.save(self.model.model.state_dict(), os.path.join(self.save_location, f'{iteration}-model.pt'))
+				print('Saved whole model at: ', os.path.join(self.save_location, f'{iteration}-model.pt'))
 		else:
 			torch.save(self.model.lm_head.weight.data[self.personalized_token_ids], save_path_lmhead)
 			print('Saved lm_head at: ', save_path_lmhead)

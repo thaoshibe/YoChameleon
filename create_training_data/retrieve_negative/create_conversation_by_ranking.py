@@ -54,8 +54,7 @@ if __name__ == "__main__":
 	args = get_args()
 	# Thao: Uncomment this if you want to use the scores.json file
 	if args.negative_image:
-		# file_path = os.path.join(args.input_folder, 'face_scores.json')
-		file_path = os.path.join(args.input_folder, 'scores.json')
+		file_path = os.path.join(args.input_folder, 'negative_image', 'scores.json')
 		with open(file_path, 'r') as f:
 			data = json.load(f)
 		# print('Input Data: ', data)

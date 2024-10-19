@@ -13,8 +13,7 @@ def get_args():
     # model related
     parser.add_argument('--config', type=str, default='./config/basic.yml')
     parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason', default=False)
-    parser.add_argument('--json_files', type=str, help='Override json files', default=None)
-    parser.add_argument('--exp_name', type=str, help='Override exp name', default=None)
+    parser.add_argument('--sks_name', type=str, help='Override sks_name', default=None)
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -23,15 +22,25 @@ if __name__ == '__main__':
     config_dict = yaml.safe_load(open(args.config, 'r'))
     config = Config(config_dict)
     config.no_wandb = args.no_wandb
-
+    # Load the universal config only, override sks name with actual sks_name
+    if args.sks_name is not None:
+        config.sks_name = args.sks_name
+        config.json_file = [x.replace('SKS_NAME', config.sks_name) for x in config.json_file]
     # call training loop
     trainer = YoChameleonTrainer(config)
-    train_dataloader = get_dataloader_iter(config, trainer.processor)
-
+    personalized_prompt = trainer.get_personalized_prompt()
+    print(f"Personalized prompt: {personalized_prompt}")
+    train_dataloader = get_dataloader_iter(
+        config,
+        trainer.processor,
+        personalized_prompt=personalized_prompt
+        )
     trainer.resume_training()
     trainer.configure_model()
     trainer.train(train_dataloader)
+
     if config.finetune:
         positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
         trainer.finetune(positive_only_dataloader)
+        
     trainer.test()

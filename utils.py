@@ -5,7 +5,7 @@ from dataset import PersonalizedDataset
 
 from torchvision import datasets
 
-def get_dataloader_iter(config, processor, only_positive=False):
+def get_dataloader_iter(config, processor, only_positive=False, personalized_prompt=None):
     if only_positive:
         train_dataset = PersonalizedDataset(
             json_file=config.json_file,
@@ -13,6 +13,7 @@ def get_dataloader_iter(config, processor, only_positive=False):
             tokenizer_max_length=config.tokenizer_max_length,
             END_OF_TURN=config.special_tokens["END_OF_TURN"],
             only_positive=True,
+            personalized_prompt=personalized_prompt
             )
     else:
         train_dataset = PersonalizedDataset(
@@ -20,6 +21,7 @@ def get_dataloader_iter(config, processor, only_positive=False):
                 processor=processor,
                 tokenizer_max_length=config.tokenizer_max_length,
                 END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                personalized_prompt=personalized_prompt
                 )
         
     train_dataloader = torch.utils.data.DataLoader(

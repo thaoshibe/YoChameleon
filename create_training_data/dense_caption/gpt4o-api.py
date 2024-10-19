@@ -91,24 +91,39 @@ def get_image_caption(input_image_folder, prompt_file_path, client):
             print("Failed to get a response for image:", image_path)
     return data
 
-def get_text_conversation(input_image_folder, prompt_file_path, client):
+def get_text_conversation(input_image_folder, prompt_file_path, client, human=False, limit=None):
     prompt = read_prompt_from_file(prompt_file_path)  
-    questions = [
-    "What color is Charlie?",
-    "What shape does Charlie have?",
-    "What is the overall vibe of Charlie?",
-    "What material is Charlie made of?",
-    "What size is Charlie?",
-    "Does Charlie have any patterns or markings?",
-    "What type of object is Charlie?",
-    "Does Charlie have any distinctive features or details?",
-    "What’s Charlie's general texture like?",
-    "How would you describe Charlie's overall appearance?"
+    if human:
+        questions = [
+        "What is Charlie hair color?",
+        "What is Charlie height?",
+        "What is Charlie skin tone?",
+        "How would you describe Charlie hairstyle?",
+        "Does Charlie wear glasses or any accessories?",
+        "What style of clothing does Charlie typically choose?",
+        "Does Charlie have any distinctive facial features?",
+        "What is Charlie overall build or physique?",
+        "What is Charlie general expression or demeanor?",
+        "How would you describe Charlie overall appearance?",
     ]
+    else:
+        questions = [
+        "What color is Charlie?",
+        "What shape does Charlie have?",
+        "What is the overall vibe of Charlie?",
+        "What material is Charlie made of?",
+        "What size is Charlie?",
+        "Does Charlie have any patterns or markings?",
+        "What type of object is Charlie?",
+        "Does Charlie have any distinctive features or details?",
+        "What’s Charlie's general texture like?",
+        "How would you describe Charlie's overall appearance?"
+        ]
     data = []
     # Loop over all images in the folder
     image_paths = glob.glob(os.path.join(input_image_folder, "*.png"))
-    
+    if limit is not None:
+        image_paths = sorted(image_paths)[:limit]
     for image_path in tqdm(image_paths):
         print(f"Processing image: {image_path}")
         for question in questions:
@@ -140,20 +155,27 @@ def get_text_conversation(input_image_folder, prompt_file_path, client):
             else:
                 print("Failed to get a response for image:", image_path)
     return data
+
 def main():
     parser = argparse.ArgumentParser(description='Process images in a folder and prompt for GPT-4 API.')
     parser.add_argument('--input_image_folder', type=str, required=True, help='Path to the folder containing input images.')
     parser.add_argument('--prompt_file_path', type=str, required=True, help='Path to the text file containing the prompt.')
     parser.add_argument('--output_file', type=str, required=True, help='Path to the output JSON file.')
     parser.add_argument('--text_conversation', default=False, action='store_true')
+    parser.add_argument('--human', default=False, action='store_true')
+    parser.add_argument('--limit', type=int, default=None)
     args = parser.parse_args()
+
     if args.text_conversation:
-        data = get_text_conversation(args.input_image_folder, args.prompt_file_path, client)
+        data = get_text_conversation(args.input_image_folder, args.prompt_file_path, client, human=args.human, limit=args.limit)
     else:
         data = get_image_caption(args.input_image_folder, args.prompt_file_path, client)
-    with open(args.output_file, 'w') as file:
+
+    output_file = os.path.join(args.output_file, 'text_conversation.json')
+    os.makedirs(os.path.dirname(args.output_file), exist_ok=True)
+    with open(output_file, 'w') as file:
         json.dump(data, file)
-    print('JSON file created successfully! at', args.output_file)
+    print('JSON file created successfully! at', output_file)
 
 if __name__ == "__main__":
     main()

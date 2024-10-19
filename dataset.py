@@ -31,13 +31,16 @@ class PersonalizedDataset(Dataset):
         processor: ChameleonProcessor = None,
         END_OF_TURN: int = 8710,
         only_positive: bool = False,
+        personalized_prompt: str = None,
     ):
         self.processor = processor
         self.placeholder_token = placeholder_token
         self.max_length = tokenizer_max_length
+        self.personalized_prompt = personalized_prompt
         self.END_OF_TURN = END_OF_TURN
         data = []
         for file in json_file:
+            print(f"Loading {file}")
             with open(file) as f:
                 info = json.load(f)
                 data.extend(info)
@@ -46,8 +49,8 @@ class PersonalizedDataset(Dataset):
             # If only train with positive images, then filter out all the negative_example in the image path
             self.data = [d for d in self.data if 'negative_example' not in d['image'][0]]
         self.flip_transform = transforms.RandomHorizontalFlip()
-
         # self.templates = my_query_templates
+
 
     def __len__(self):
         return len(self.data)
@@ -58,11 +61,14 @@ class PersonalizedDataset(Dataset):
         images = [self.flip_transform(image) for image in images]
 
         conv = self.data[i]['conversations']
+        # Manually added personalized prompt for text-only generation and image understanding
+        if conv[-1]['value'] != "<image>":
+            conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
+            print(conv)
         chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
         conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
-        # full_text = f'{self.personalized_prompt}\n{conversations}'
-        full_text = f'{conversations}'
-        full_text = full_text.replace("<sks>", self.placeholder_token)
+
+        full_text = conversations.replace("<sks>", self.placeholder_token)
         example = self.processor(
             full_text,
             images=images,
