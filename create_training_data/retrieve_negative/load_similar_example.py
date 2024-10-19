@@ -18,14 +18,17 @@ def load_base_image(image_path):
     """Load the base image using PIL and convert to a numpy array."""
     return np.array(Image.open(image_path))
 
-def search_similar_images(base_image, limit=100):
+def search_similar_images(base_image, limit=100, origin=None):
     """Search for similar images using PIAT."""
-    return piat.search_similar(base_image, intLimit=limit)
+    if origin is None:
+        return piat.search_similar(base_image, intLimit=limit)
+    else:
+        return piat.search_similar(base_image, origin=origin, intLimit=limit)
 
 def get_image_from_piat(objSample):
     """Retrieve image from PIAT using various sources."""
     try:
-        npyImage = piat.get_image({'strSource': '256-pil-antialias'}, objSample['images_raw.strImagehash'])
+        npyImage = piat.get_image({'strSource': '1024-pil-antialias'}, objSample['images_raw.strImagehash'])
     except:
         npyImage = piat.get_image({'strSource': 'raw'}, objSample['images_raw.strImagehash'])
     # try:
@@ -69,6 +72,7 @@ def retrieve_for_one_image(image_path, output_folder = 'piat_retrieved', limit=1
             "clip_score": clip_score
             }
         )
+        print('Shape:', npyImage.shape)
         cv2.imwrite(save_location, npyImage)
     # index = image_path.split('/')[-1].split('.')[0]
     with open(f"{output_folder}/scores.json", 'w') as f:
@@ -112,6 +116,7 @@ def get_args():
     parser.add_argument("--input_folder", type=str, default='/mnt/localssd/code/data/minimam/', help="Path to the base image")
     parser.add_argument("--save_folder", type=str, default='/mnt/localssd/code/data/minimam/piat_retrieved', help="Path to the base image")
     parser.add_argument("--limit", type=int, default=5000, help="Number of similar images to retrieve")
+    parser.add_argument("--origin", type=str, default=None, help="origin")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -119,7 +124,7 @@ if __name__ == "__main__":
     args = get_args()
     os.makedirs(args.save_folder, exist_ok=True)
     print(f"Images will be saved in {args.save_folder}")
-    input_images = glob.glob(args.input_folder + '/*.png')[:4]
+    input_images = glob.glob(args.input_folder + '/*.png')
     data_dict = retrieve_multiple_images(input_images,
                 output_folder=args.save_folder,
                 limit=args.limit)

@@ -38,15 +38,39 @@
 
 # INPUT_FOLDER="/mnt/localssd/code/data/yollava-data/train/${NAME}"
 # SAVE_FOLDER="${INPUT_FOLDER}/negative_example"
-# LIMIT=500
-
-# python train.py --config config/basic.yml #--no_wandb
+# LIMIT=5000
 
 # python create_training_data/retrieve_negative/load_similar_example.py \
 #     --input_folder $INPUT_FOLDER \
 #     --save_folder $SAVE_FOLDER \
 #     --limit $LIMIT
 
+NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup" "thuytien"
+       "brown-duck" "dug" "mydieu" "shiba-black" "tokyo-keyboard"
+       "butin" "elephant" "neurips-cup" "shiba-gray" "toodles-galore"
+       "cat-cup" "fire" "nha-tho-hanoi" "shiba-sleep" "viruss"
+       "chua-thien-mu" "henry" "nha-tho-hcm" "shiba-yellow" "water"
+       "ciin" "khanhvy" "oong" "thao" "willinvietnam"
+       "denisdang" "lamb" "phuc-map" "thap-but" "yellow-duck"
+       "dragon" "mam" "pig-cup" "thap-cham" "yuheng")
+
+LIMIT=150
+
+for NAME in "${NAMES[@]}"; do
+  INPUT_FOLDER="/mnt/localssd/code/data/yollava-data/train/${NAME}"
+  SAVE_FOLDER="${INPUT_FOLDER}/negative_example"
+  
+  echo "Processing folder: ${NAME}"
+  
+  python create_training_data/retrieve_negative/load_similar_example.py \
+    --input_folder $INPUT_FOLDER \
+    --save_folder $SAVE_FOLDER \
+    --limit $LIMIT \
+    --origin "l2"
+done
+
+
+# python train.py --config config/basic.yml #--no_wandb
 # python evaluation/face_verification.py --real_folder $INPUT_FOLDER \
 #     --fake_folder $INPUT_FOLDER
 
@@ -154,42 +178,42 @@
 #     --negative_image True \
 #     --num_of_real_images -100
 
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder ./json \
-    --version "500" \
-    --token_length 64 \
-    --spacing 1 \
-    --negative_image True \
-    --num_of_real_images -100 \
-    --limit_negative 500
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder ./json \
+#     --version "500" \
+#     --token_length 64 \
+#     --spacing 1 \
+#     --negative_image True \
+#     --num_of_real_images -100 \
+#     --limit_negative 500
 
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder ./json \
-    --version "1000" \
-    --token_length 64 \
-    --spacing 1 \
-    --negative_image True \
-    --num_of_real_images -100 \
-    --limit_negative 1000
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder ./json \
+#     --version "1000" \
+#     --token_length 64 \
+#     --spacing 1 \
+#     --negative_image True \
+#     --num_of_real_images -100 \
+#     --limit_negative 1000
 
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder ./json \
-    --version "2000" \
-    --token_length 64 \
-    --spacing 1 \
-    --negative_image True \
-    --num_of_real_images -100 \
-    --limit_negative 2000
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder ./json \
+#     --version "2000" \
+#     --token_length 64 \
+#     --spacing 1 \
+#     --negative_image True \
+#     --num_of_real_images -100 \
+#     --limit_negative 2000
 
-python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
-    --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
-    --save_folder ./json \
-    --version "5000" \
-    --token_length 64 \
-    --spacing 1 \
-    --negative_image True \
-    --num_of_real_images -100 \
-    --limit_negative 5000
+# python create_training_data/retrieve_negative/create_conversation_by_ranking.py \
+#     --input_folder /mnt/localssd/code/data/yollava-data/train/thao/ \
+#     --save_folder ./json \
+#     --version "5000" \
+#     --token_length 64 \
+#     --spacing 1 \
+#     --negative_image True \
+#     --num_of_real_images -100 \
+#     --limit_negative 5000

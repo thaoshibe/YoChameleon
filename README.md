@@ -1,37 +1,25 @@
 # Yo'Chameleon
 
-<img src="./images/yochameleon.png" alt="YoChameleon" width="300">
+<img src="./images/yochameleon.png" alt="YoChameleon" width="400">
 
 ### Getting Started
 
 ```
-# extract the dataset
-rsync --progress /sensei-fs/users/thaon/data.tar.bz2 .
-tar -cjvf data.tar.bz2 data
+bash install.sh
 ```
 
-### Prerequisites
+### Creating dataset
 
 ```
-git clone https://github.com/huggingface/transformers.git
-cd transformers
-git fetch origin pull/32013/head:pr-32013
-git checkout pr-32013
-pip install -e .
+# Retrieve data from LAION-2B
+cd create_training_data/retrieve_negative
+bash retrieve.sh
 ```
 
 ### Training
 
 ```
-# Chameleon + YoLLaVA
-python train_yochameleon.py --sks_name bo
-test_yochameleon.py --sks_name bo --epoch 10
 
-# Anole + YoLLaVA
-python train_anole.py --sks_name bo
-
-# Chameleon + Anole + YoLLaVA
-python train.py --sks_name bo
 ```
 
 ### Create training json

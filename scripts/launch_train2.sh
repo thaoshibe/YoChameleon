@@ -18,7 +18,7 @@ cd /mnt/localssd/code
 cp -r /sensei-fs/users/thaon/code/YoChameleon /mnt/localssd/code
 
 cd /mnt/localssd/code/YoChameleon
-bash install.sh
+bash scripts/install.sh
 
 mkdir /mnt/localssd/code/data
 cd /mnt/localssd/code/data

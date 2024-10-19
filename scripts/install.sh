@@ -1,11 +1,11 @@
 source /opt/venv/bin/activate
-cd ..
+cd /mnt/localssd/code
 git clone https://github.com/huggingface/transformers.git
 cd transformers
 git fetch origin pull/32013/head:pr-32013
 git checkout pr-32013
 pip install -e .
-cd ../YoChameleon
+cd /mnt/localssd/code/YoChameleon
 
 # for piat-retrieval
 pip install /sensei-fs/users/sniklaus/piat/models/adobeone-0.0.3-py2.py3-none-any.whl

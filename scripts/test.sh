@@ -1,4 +1,6 @@
 # CONFIGS=("config/id16.yaml" "config/id64.yaml" "config/id6464.yaml" "config/id128.yaml")
+cd ..
+
 CONFIGS=("config/500.yaml")
 
 for CONFIG in "${CONFIGS[@]}"
