@@ -41,12 +41,12 @@ if __name__ == '__main__':
         config.iteration = config.epoch
         config.finetune['finetune_iteration'] = config.finetune['finetune_epoch']
         trainer.train_epoch(train_dataloader)
-        if config.finetune.finetune:
+        if config.finetune['finetune']:
             positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
             trainer.finetune_epoch(positive_only_dataloader)
     else:
         trainer.train_epoch(train_dataloader)
-        if config.finetune.finetune:
+        if config.finetune['finetune']:
             positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
             trainer.finetune_epoch(positive_only_dataloader)
     # trainer.train(train_dataloader)

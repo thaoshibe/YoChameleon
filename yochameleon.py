@@ -222,7 +222,7 @@ class YoChameleonTrainer:
 	def train_epoch(self, dataloader):
 		# dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
-			self.wandb.log({"train_dataset_length": len(dataloader.dataset)})
+			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
 
 		for iteration in tqdm(range(self.config.iteration)):
 			for batch in tqdm(dataloader):
@@ -279,7 +279,7 @@ class YoChameleonTrainer:
 		self.get_optimizer_and_scheduler(self.config.finetune)
 		dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
-			self.wandb.log({"finetune_dataset_length": len(dataloader.dataset)})
+			self.wandb.log({"Dataset/Finetune_dataset_length": len(dataloader.dataset)})
 
 		total_iter = self.iteration + self.config.finetune['finetune_iteration']
 		for iteration in tqdm(range(self.iteration, total_iter)):
@@ -425,8 +425,11 @@ class YoChameleonTrainer:
 			inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
 			output = self.model.generate(**inputs, max_new_tokens=200)
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
-
+			# breakpoint()
 			if not self.config.no_wandb:
-			    self.wandb.log({"Generated Image": wandb.Image(image)})
-			    self.wandb.log({"Text Response": result_with_special_tokens})
+				# self.wandb.log({"Images/Prediction": wandb.Image(image)})
+				import html
+				escaped_string = html.escape(result_with_special_tokens)
+				print(escaped_string)
+				self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
 
