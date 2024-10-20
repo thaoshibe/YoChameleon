@@ -64,7 +64,7 @@ class PersonalizedDataset(Dataset):
         # Manually added personalized prompt for text-only generation and image understanding
         if conv[-1]['value'] != "<image>":
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
-            print(conv)
+            # print(conv)
         chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
         conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
 

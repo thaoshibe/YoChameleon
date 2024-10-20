@@ -30,9 +30,22 @@ export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
 # Train script
 cd /mnt/localssd/code/YoChameleon
+# ("thao" "yuheng" "thuytien" "viruss" "ciin" "khanhvy" "oong" "willinvietnam" "denisdang" "phuc-map")
 
-CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/universal_wholemodel.yaml --sks_name "thao"&
-CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/universal_wholemodel.yaml --sks_name "yuheng"&
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/universal_wholemodel.yaml --sks_name "thao" &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/universal_wholemodel.yaml --sks_name "yuheng" &
 CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/universal_wholemodel.yaml --sks_name "thuytien" &
 CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/universal_wholemodel.yaml --sks_name "viruss" 
+wait
+
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/universal_wholemodel.yaml --sks_name "ciin" &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/universal_wholemodel.yaml --sks_name "khanhvy" &
+CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/universal_wholemodel.yaml --sks_name "oong" &
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/universal_wholemodel.yaml --sks_name "willinvietnam" 
+wait
+
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/universal_wholemodel.yaml --sks_name "denisdang" &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/universal_wholemodel.yaml --sks_name "phuc-map"
+CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/universal_wholemodel.yaml --sks_name "oong" &
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/universal_wholemodel.yaml --sks_name "willinvietnam" 
 wait

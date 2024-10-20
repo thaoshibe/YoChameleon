@@ -2,23 +2,24 @@ project_name: "YoChameleon3"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
+data_root: '/mnt/localssd/code/data/minithao/'
 
 json_file: # Remember to change this
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/image_gen_positive_only.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: 'wholemodel' # Remember to change this
+exp_name: 'prefix-positive-only' # Remember to change this
 different_identifier: False
-iteration: 5001 # remember to CHANGE THIS shibe
-epoch: 31 # remember to CHANGE THIS shibe
+iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+epoch: 16 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5
 
-batch_size: 2
-savedir: '/mnt/localssd/code/ckpt'
-whole_model: True
+batch_size: 4
+savedir: '/sensei-fs/users/thaon/ckpt/'
+whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
 
@@ -32,7 +33,8 @@ resume:
 finetune:
   finetune: False
   finetune_iteration: 201 # remember to CHANGE THIS shibe
-  save_every: 50
+  finetune_epoch: 6 # remember to CHANGE THIS shibe
+  save_every: 1
   optimizer:
     type: 'AdamW'
     lr: 0.00001
@@ -49,7 +51,7 @@ finetune:
 
 optimizer:
   type: 'AdamW'
-  lr: 0.00001
+  lr: 0.0001
   betas: [0.9, 0.999]
   weight_decay: 1e-4
   eps: 1e-6

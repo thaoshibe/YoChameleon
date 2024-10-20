@@ -37,10 +37,18 @@ if __name__ == '__main__':
         )
     trainer.resume_training()
     trainer.configure_model()
-    trainer.train(train_dataloader)
-
-    if config.finetune:
-        positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
-        trainer.finetune(positive_only_dataloader)
+    if config.epoch > 0:
+        config.iteration = config.epoch
+        config.finetune['finetune_iteration'] = config.finetune['finetune_epoch']
+        trainer.train_epoch(train_dataloader)
+        if config.finetune.finetune:
+            positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
+            trainer.finetune_epoch(positive_only_dataloader)
+    else:
+        trainer.train_epoch(train_dataloader)
+        if config.finetune.finetune:
+            positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
+            trainer.finetune_epoch(positive_only_dataloader)
+    # trainer.train(train_dataloader)
         
-    trainer.test()
+    # trainer.test()

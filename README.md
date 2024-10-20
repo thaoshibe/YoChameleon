@@ -181,3 +181,7 @@ done
 ```
 python train.py --config config/basic.yaml
 ```
+
+### Castrophic Forgetting Evaluation
+
+```

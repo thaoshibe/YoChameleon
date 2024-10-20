@@ -1,24 +1,25 @@
+#--- THIS IS NOT YET READY
+
 project_name: "YoChameleon3"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
 
 json_file: # Remember to change this
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/image_gen_positive_only.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
 exp_name: 'wholemodel' # Remember to change this
 different_identifier: False
-iteration: 5001 # remember to CHANGE THIS shibe
-epoch: 31 # remember to CHANGE THIS shibe
-save_every: 5
+iteration: 1001 # remember to CHANGE THIS shibe
+save_every: 100
 
-batch_size: 2
+batch_size: 4
 savedir: '/mnt/localssd/code/ckpt'
-whole_model: True
+whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
 
@@ -35,7 +36,7 @@ finetune:
   save_every: 50
   optimizer:
     type: 'AdamW'
-    lr: 0.00001
+    lr: 0.000001
     betas: [0.9, 0.999]
     weight_decay: 1e-4
     eps: 1e-6
@@ -49,7 +50,7 @@ finetune:
 
 optimizer:
   type: 'AdamW'
-  lr: 0.00001
+  lr: 0.000001
   betas: [0.9, 0.999]
   weight_decay: 1e-4
   eps: 1e-6
