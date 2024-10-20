@@ -22,7 +22,7 @@
 #     --origin "l2"
 # done
 
-###--- Create recognition data ---###
+##--- Create recognition data ---###
 # cd create_training_data/conversation_data
 # # List of names or folders to process
 # NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup" "thuytien"

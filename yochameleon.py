@@ -427,7 +427,7 @@ class YoChameleonTrainer:
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
 			# breakpoint()
 			if not self.config.no_wandb:
-				# self.wandb.log({"Images/Prediction": wandb.Image(image)})
+				self.wandb.log({"Images/Prediction": wandb.Image(image)})
 				import html
 				escaped_string = html.escape(result_with_special_tokens)
 				print(escaped_string)

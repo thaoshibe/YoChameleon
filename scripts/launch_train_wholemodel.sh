@@ -1,35 +1,35 @@
-USER="$(whoami)"
-echo "USER"
-echo $USER
+# USER="$(whoami)"
+# echo "USER"
+# echo $USER
 
-if [ ! -d "/home/user/" ]; then
-  sudo mkdir /home/user/
-fi
+# if [ ! -d "/home/user/" ]; then
+#   sudo mkdir /home/user/
+# fi
 
-if [ ! -d "/home/$USER" ]; then
-  sudo mkdir /home/$USER
-fi
+# if [ ! -d "/home/$USER" ]; then
+#   sudo mkdir /home/$USER
+# fi
 
-sudo chmod 777 -R /home/
+# sudo chmod 777 -R /home/
 
-echo "Launching training script"
-mkdir /mnt/localssd/code
-cd /mnt/localssd/code
-cp -r /sensei-fs/users/thaon/code/YoChameleon /mnt/localssd/code
-
-cd /mnt/localssd/code/YoChameleon
-bash scripts/install.sh
-
-mkdir /mnt/localssd/code/data
-cd /mnt/localssd/code/data
-cp -r /sensei-fs/users/thaon/data/yochameleon-data.zip /mnt/localssd/code/data
-unzip /mnt/localssd/code/data/yochameleon-data.zip
+# echo "Launching training script"
+# mkdir /mnt/localssd/code
+# cd /mnt/localssd/code
+# cp -r /sensei-fs/users/thaon/code/YoChameleon /mnt/localssd/code
 
 # cd /mnt/localssd/code/YoChameleon
-export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
+# bash scripts/install.sh
 
-# Train script
-cd /mnt/localssd/code/YoChameleon
+# mkdir /mnt/localssd/code/data
+# cd /mnt/localssd/code/data
+# cp -r /sensei-fs/users/thaon/data/yochameleon-data.zip /mnt/localssd/code/data
+# unzip /mnt/localssd/code/data/yochameleon-data.zip
+
+# # cd /mnt/localssd/code/YoChameleon
+# export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
+
+# # Train script
+# cd /mnt/localssd/code/YoChameleon
 # ("thao" "yuheng" "thuytien" "viruss" "ciin" "khanhvy" "oong" "willinvietnam" "denisdang" "phuc-map")
 
 CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/universal_wholemodel.yaml --sks_name "thao" &

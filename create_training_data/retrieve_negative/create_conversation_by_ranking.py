@@ -25,7 +25,10 @@ def get_personalized_prompt(token_length=1, identifier=16200, index=16201):
 	prefix_tokens = [f'<reserved{index+i}>' for i in range(token_length)]
 	personalized_tokens = [f'<reserved{identifier}>']
 	personalized_tokens.extend(prefix_tokens)
-	sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}. A photo of <reserved{identifier}>."
+	if identifier == 16200:
+		sks_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}. A photo of <reserved{identifier}>."
+	else:
+		sks_prompt = f"A photo of {''.join(personalized_tokens[1:])}."
 	return sks_prompt
 
 def divide_list_into_k_parts(image_paths, k):
@@ -54,7 +57,7 @@ if __name__ == "__main__":
 	args = get_args()
 	# Thao: Uncomment this if you want to use the scores.json file
 	if args.negative_image:
-		file_path = os.path.join(args.input_folder, 'negative_image', 'scores.json')
+		file_path = os.path.join(args.input_folder, 'negative_example', 'scores.json')
 		with open(file_path, 'r') as f:
 			data = json.load(f)
 		# print('Input Data: ', data)
@@ -105,6 +108,9 @@ if __name__ == "__main__":
 		# sks_prompt = get_personalized_prompt(token_length=args.token_length)
 		# --- for the idea of different identifier
 		# sks_prompt = get_personalized_prompt(token_length=args.token_length, identifier=16200-len(divided_lists)+index+1)
+		# This code will assigne different identifier for each chunk
+		# sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1), identifier=16200-len(divided_lists)+index+1)
+		# This code will simply use "A photo of ..." for different chunk
 		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1), identifier=16200-len(divided_lists)+index+1)
 		print(f"Prompt: {sks_prompt}")
 		print(part[0])
