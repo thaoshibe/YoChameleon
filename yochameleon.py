@@ -343,7 +343,7 @@ class YoChameleonTrainer:
 		for iteration in tqdm(range(self.iteration, total_iter)):
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
-				batch = next(dataloader_iter)
+
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
 
 				# Process labels with image tokens
@@ -383,12 +383,12 @@ class YoChameleonTrainer:
 				if not self.config.no_wandb:
 				    self.wandb.log({"loss": loss.item()})
 
-		# Save model checkpoints
-		if iteration % self.config.finetune['save_every'] == 0:
-			self.save_checkpoint(iteration, finetune=True)
-			if self.config.eval_visualization:
-				self.visualize_evaluation()
-		torch.cuda.empty_cache()
+			# Save model checkpoints
+			if iteration % self.config.finetune['save_every'] == 0:
+				self.save_checkpoint(iteration, finetune=True)
+				if self.config.eval_visualization:
+					self.visualize_evaluation()
+			torch.cuda.empty_cache()
 		self.iteration = iteration
 
 	# TODO: Add support test with config iteration?

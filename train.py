@@ -39,7 +39,7 @@ if __name__ == '__main__':
     trainer.configure_model()
     if config.epoch > 0:
         config.iteration = config.epoch
-        trainer.train_epoch(train_dataloader)
+        # trainer.train_epoch(train_dataloader)
         if config.finetune['finetune']:
             config.finetune['finetune_iteration'] = config.finetune['finetune_epoch']
             positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
