@@ -20,8 +20,8 @@ echo $JOB_NAME
 
 # ============ 2. Runai configs. ============
 
-# RUNAI_PROJ=ilo-train-p4de
-RUNAI_PROJ=ilo-noquota-p4de
+RUNAI_PROJ=ilo-train-p4de
+# RUNAI_PROJ=ilo-noquota-p4de
 RESEARCH_JACK_ID=6204
 NODE_POOL=a100-80gb-1
 DOCKER="docker-matrix-experiments-snapshot.dr-uw2.adobeitc.com/kineto:0.0.17-rc9"
@@ -37,7 +37,9 @@ runai submit --large-shm \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000negative.sh;"'
+    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
+    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text.sh > /sensei-fs/users/thaon/code/log.txt;"'
+    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000negative.sh;"'
     # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_yollava.sh;"'
     # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_train3.sh;"'
     # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_yollava.sh;"'

@@ -159,7 +159,7 @@ done
 </details>
 
 <details>
-<summary>Image generation data </summary>
+<summary> Image generation data </summary>
 
 ```
 cd create_training_data/retrieve_negative
