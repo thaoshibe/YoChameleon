@@ -1,69 +1,93 @@
-# CONFIGS=("config/id16.yaml" "config/id64.yaml" "config/id6464.yaml" "config/id128.yaml")
-cd ..
+# # CONFIGS=("config/id16.yaml" "config/id64.yaml" "config/id6464.yaml" "config/id128.yaml")
+# # cd sc
 
-CONFIGS=("config/500.yaml")
+# CONFIGS=("./config/1000negative.yaml" "./config/1000neg-text.yaml" "./config/1000neg-text-recog.yaml" "./config/universal_prefix_positive.yaml")
 
-for CONFIG in "${CONFIGS[@]}"
-do
-  CUDA_VISIBLE_DEVICES=0 python test.py --config $CONFIG --iteration 200 &
-  CUDA_VISIBLE_DEVICES=1 python test.py --config $CONFIG --iteration 300 &
-  CUDA_VISIBLE_DEVICES=2 python test.py --config $CONFIG --iteration 400 &
-  CUDA_VISIBLE_DEVICES=3 python test.py --config $CONFIG --iteration 500 &
+# for CONFIG in "${CONFIGS[@]}"
+# do
+#   CUDA_VISIBLE_DEVICES=0 python test.py --sks_name "thao" --config $CONFIG --iteration 5 &
+#   CUDA_VISIBLE_DEVICES=1 python test.py --sks_name "bo" --config $CONFIG --iteration 5 &
+#   CUDA_VISIBLE_DEVICES=2 python test.py --sks_name "mam" --config $CONFIG --iteration 5 &
+#   CUDA_VISIBLE_DEVICES=3 python test.py --sks_name "yuheng" --config $CONFIG --iteration 5 &
+#   CUDA_VISIBLE_DEVICES=4 python test.py --sks_name "ciin" --config $CONFIG --iteration 5 &
+#   CUDA_VISIBLE_DEVICES=5 python test.py --sks_name "willinvietnam" --config $CONFIG --iteration 5 &
+#   CUDA_VISIBLE_DEVICES=6 python test.py --sks_name "oong" --config $CONFIG --iteration 5 &
+#   CUDA_VISIBLE_DEVICES=7 python test.py --sks_name "khanhvy" --config $CONFIG --iteration 5 &
+#   wait
 
-  CUDA_VISIBLE_DEVICES=4 python test.py --config $CONFIG --iteration 550 --finetune &
-  CUDA_VISIBLE_DEVICES=5 python test.py --config $CONFIG --iteration 600 --finetune &
-  CUDA_VISIBLE_DEVICES=6 python test.py --config $CONFIG --iteration 650 --finetune &
-  CUDA_VISIBLE_DEVICES=7 python test.py --config $CONFIG --iteration 700 --finetune &
+#   CUDA_VISIBLE_DEVICES=0 python test.py --sks_name "thao" --config $CONFIG --iteration 10 &
+#   CUDA_VISIBLE_DEVICES=1 python test.py --sks_name "bo" --config $CONFIG --iteration 10 &
+#   CUDA_VISIBLE_DEVICES=2 python test.py --sks_name "mam" --config $CONFIG --iteration 10 &
+#   CUDA_VISIBLE_DEVICES=3 python test.py --sks_name "yuheng" --config $CONFIG --iteration 10 &
+#   CUDA_VISIBLE_DEVICES=4 python test.py --sks_name "ciin" --config $CONFIG --iteration 10 &
+#   CUDA_VISIBLE_DEVICES=5 python test.py --sks_name "willinvietnam" --config $CONFIG --iteration 10 &
+#   CUDA_VISIBLE_DEVICES=6 python test.py --sks_name "oong" --config $CONFIG --iteration 10 &
+#   CUDA_VISIBLE_DEVICES=7 python test.py --sks_name "khanhvy" --config $CONFIG --iteration 10 &
+#   wait
 
+#   CUDA_VISIBLE_DEVICES=0 python test.py --sks_name "thao" --config $CONFIG --iteration 15 &
+#   CUDA_VISIBLE_DEVICES=1 python test.py --sks_name "bo" --config $CONFIG --iteration 15 &
+#   CUDA_VISIBLE_DEVICES=2 python test.py --sks_name "mam" --config $CONFIG --iteration 15 &
+#   CUDA_VISIBLE_DEVICES=3 python test.py --sks_name "yuheng" --config $CONFIG --iteration 15 &
+#   CUDA_VISIBLE_DEVICES=4 python test.py --sks_name "ciin" --config $CONFIG --iteration 15 &
+#   CUDA_VISIBLE_DEVICES=5 python test.py --sks_name "willinvietnam" --config $CONFIG --iteration 15 &
+#   CUDA_VISIBLE_DEVICES=6 python test.py --sks_name "oong" --config $CONFIG --iteration 15 &
+#   CUDA_VISIBLE_DEVICES=7 python test.py --sks_name "khanhvy" --config $CONFIG --iteration 15 &
+#   wait
+
+#   CUDA_VISIBLE_DEVICES=0 python test.py --sks_name "thao" --config $CONFIG --iteration 15 --finetune &
+#   CUDA_VISIBLE_DEVICES=1 python test.py --sks_name "bo" --config $CONFIG --iteration 15 --finetune &
+#   CUDA_VISIBLE_DEVICES=2 python test.py --sks_name "mam" --config $CONFIG --iteration 15 --finetune &
+#   CUDA_VISIBLE_DEVICES=3 python test.py --sks_name "yuheng" --config $CONFIG --iteration 15 --finetune &
+#   CUDA_VISIBLE_DEVICES=4 python test.py --sks_name "ciin" --config $CONFIG --iteration 15 --finetune &
+#   CUDA_VISIBLE_DEVICES=5 python test.py --sks_name "willinvietnam" --config $CONFIG --iteration 15 --finetune &
+#   CUDA_VISIBLE_DEVICES=6 python test.py --sks_name "oong" --config $CONFIG --iteration 15 --finetune &
+#   CUDA_VISIBLE_DEVICES=7 python test.py --sks_name "khanhvy" --config $CONFIG --iteration 15 --finetune &
+#   wait
+
+#   CUDA_VISIBLE_DEVICES=0 python test.py --sks_name "thao" --config $CONFIG --iteration 17 --finetune &
+#   CUDA_VISIBLE_DEVICES=1 python test.py --sks_name "bo" --config $CONFIG --iteration 17 --finetune &
+#   CUDA_VISIBLE_DEVICES=2 python test.py --sks_name "mam" --config $CONFIG --iteration 17 --finetune &
+#   CUDA_VISIBLE_DEVICES=3 python test.py --sks_name "yuheng" --config $CONFIG --iteration 17 --finetune &
+#   CUDA_VISIBLE_DEVICES=4 python test.py --sks_name "ciin" --config $CONFIG --iteration 17 --finetune &
+#   CUDA_VISIBLE_DEVICES=5 python test.py --sks_name "willinvietnam" --config $CONFIG --iteration 17 --finetune &
+#   CUDA_VISIBLE_DEVICES=6 python test.py --sks_name "oong" --config $CONFIG --iteration 17 --finetune &
+#   CUDA_VISIBLE_DEVICES=7 python test.py --sks_name "khanhvy" --config $CONFIG --iteration 17 --finetune &
+#   wait
+
+#   CUDA_VISIBLE_DEVICES=0 python test.py --sks_name "thao" --config $CONFIG --iteration 20 --finetune &
+#   CUDA_VISIBLE_DEVICES=1 python test.py --sks_name "bo" --config $CONFIG --iteration 20 --finetune &
+#   CUDA_VISIBLE_DEVICES=2 python test.py --sks_name "mam" --config $CONFIG --iteration 20 --finetune &
+#   CUDA_VISIBLE_DEVICES=3 python test.py --sks_name "yuheng" --config $CONFIG --iteration 20 --finetune &
+#   CUDA_VISIBLE_DEVICES=4 python test.py --sks_name "ciin" --config $CONFIG --iteration 20 --finetune &
+#   CUDA_VISIBLE_DEVICES=5 python test.py --sks_name "willinvietnam" --config $CONFIG --iteration 20 --finetune &
+#   CUDA_VISIBLE_DEVICES=6 python test.py --sks_name "oong" --config $CONFIG --iteration 20 --finetune &
+#   CUDA_VISIBLE_DEVICES=7 python test.py --sks_name "khanhvy" --config $CONFIG --iteration 20 --finetune &
+#   wait
+# done
+
+CONFIGS=("./config/1000negative.yaml" "./config/1000neg-text.yaml" "./config/1000neg-text-recog.yaml" "./config/universal_prefix_positive.yaml")
+SKS_NAMES=("thao" "bo" "mam" "yuheng" "ciin" "willinvietnam" "oong" "khanhvy")
+ITERATIONS=(5 10 15)
+FINETUNE_ITERATIONS=(15 17 20)
+
+run_tests() {
+  local config=$1
+  local iteration=$2
+  local finetune=$3
+
+  for i in {0..7}; do
+    CUDA_VISIBLE_DEVICES=$i python test.py --sks_name "${SKS_NAMES[$i]}" --config $config --iteration $iteration $finetune &
+  done
   wait
-done
+}
 
-CONFIGS=("config/1000.yaml")
+for CONFIG in "${CONFIGS[@]}"; do
+  for ITER in "${ITERATIONS[@]}"; do
+    run_tests $CONFIG $ITER ""
+  done
 
-for CONFIG in "${CONFIGS[@]}"
-do
-  CUDA_VISIBLE_DEVICES=0 python test.py --config $CONFIG --iteration 300 &
-  CUDA_VISIBLE_DEVICES=1 python test.py --config $CONFIG --iteration 500 &
-  CUDA_VISIBLE_DEVICES=2 python test.py --config $CONFIG --iteration 800 &
-  CUDA_VISIBLE_DEVICES=3 python test.py --config $CONFIG --iteration 1000 &
-
-  CUDA_VISIBLE_DEVICES=4 python test.py --config $CONFIG --iteration 1050 --finetune &
-  CUDA_VISIBLE_DEVICES=5 python test.py --config $CONFIG --iteration 1100 --finetune &
-  CUDA_VISIBLE_DEVICES=6 python test.py --config $CONFIG --iteration 1150 --finetune &
-  CUDA_VISIBLE_DEVICES=7 python test.py --config $CONFIG --iteration 1200 --finetune &
-
-  wait
-done
-
-CONFIGS=("config/2000.yaml")
-
-for CONFIG in "${CONFIGS[@]}"
-do
-  CUDA_VISIBLE_DEVICES=0 python test.py --config $CONFIG --iteration 300 &
-  CUDA_VISIBLE_DEVICES=1 python test.py --config $CONFIG --iteration 500 &
-  CUDA_VISIBLE_DEVICES=2 python test.py --config $CONFIG --iteration 800 &
-  CUDA_VISIBLE_DEVICES=3 python test.py --config $CONFIG --iteration 1500 &
-
-  CUDA_VISIBLE_DEVICES=4 python test.py --config $CONFIG --iteration 1550 --finetune &
-  CUDA_VISIBLE_DEVICES=5 python test.py --config $CONFIG --iteration 1600 --finetune &
-  CUDA_VISIBLE_DEVICES=6 python test.py --config $CONFIG --iteration 1650 --finetune &
-  CUDA_VISIBLE_DEVICES=7 python test.py --config $CONFIG --iteration 1700 --finetune &
-
-  wait
-done
-
-CONFIGS=("config/5000.yaml")
-for CONFIG in "${CONFIGS[@]}"
-do
-  CUDA_VISIBLE_DEVICES=0 python test.py --config $CONFIG --iteration 1000 &
-  CUDA_VISIBLE_DEVICES=1 python test.py --config $CONFIG --iteration 2000 &
-  CUDA_VISIBLE_DEVICES=2 python test.py --config $CONFIG --iteration 3000 &
-  CUDA_VISIBLE_DEVICES=3 python test.py --config $CONFIG --iteration 4000 &
-
-  CUDA_VISIBLE_DEVICES=4 python test.py --config $CONFIG --iteration 4050 --finetune &
-  CUDA_VISIBLE_DEVICES=5 python test.py --config $CONFIG --iteration 4100 --finetune &
-  CUDA_VISIBLE_DEVICES=6 python test.py --config $CONFIG --iteration 4150 --finetune &
-  CUDA_VISIBLE_DEVICES=7 python test.py --config $CONFIG --iteration 4200 --finetune &
-
-  wait
+  for FINETUNE_ITER in "${FINETUNE_ITERATIONS[@]}"; do
+    run_tests $CONFIG $FINETUNE_ITER "--finetune"
+  done
 done

@@ -42,7 +42,7 @@ class CustomDataset(Dataset):
     def __getitem__(self, index):
         line = self.questions[index]
         image_file = line["image"]
-        question = line["text"] + '<image><reserved08706>'
+        question = "<image>\n" + line["text"] + '<reserved08706>'
         image = [Image.open(os.path.join(self.image_folder, image_file)).convert('RGB')]
         inputs = self.processor(
             question,
@@ -89,6 +89,8 @@ def eval_model(args):
         print(f"A new model path are given, thus, loading model from {args.model_path}")
         state_dict = torch.load(args.model_path, map_location='cuda')#.to(model.dtype)
         model.model.load_state_dict(state_dict)
+    else:
+        args.model_path = "leloy/Anole-7b-v0.1-hf"
 
     # Create dataset 
     questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
@@ -101,7 +103,6 @@ def eval_model(args):
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=0)
 
     for batch in tqdm(dataloader):
-        # inputs = processor(question, image, return_tensors="pt").to(model.device)
         batch['inputs'] = batch['inputs'].to(model.device)
         # reshape tensor to remove batch dimension
         batch['inputs'] = {k: v.squeeze(1) for k, v in batch['inputs'].items()}
@@ -120,11 +121,12 @@ def eval_model(args):
         question_ids = batch['question_id']
         questions = batch['question']
         for question_id, question, answer in zip(question_ids, questions, answers):
+            # print(question_id.item(), answer)
             answer = re.findall(pattern, answer)[0]
             answer = answer.replace('<reserved08706>', '')
             answer = answer.replace('.', '')
+            
             ans_id = shortuuid.uuid()
-            # print(answer)
             ans_file.write(json.dumps({"question_id": question_id.item(),
                                        "prompt": question,
                                        "text": answer,

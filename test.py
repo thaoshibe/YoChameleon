@@ -33,6 +33,7 @@ def get_args():
     parser.add_argument('--finetune', action='store_true', help='Use fine-tuned model')
     parser.add_argument('--wandb_id', type=str, default='1eyixddq')
     parser.add_argument('--exp_name', type=str, default=None)
+    parser.add_argument('--sks_name', type=str, default=None)
     parser.add_argument('--img_size', type=int, default=256)
     # parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason')
     return parser.parse_args()
@@ -46,6 +47,8 @@ if __name__ == '__main__':
         config_test.iteration = str(args.iteration)
     if args.exp_name is not None:
         config.exp_name = args.exp_name
+    if args.sks_name is not None:
+        config.sks_name = args.sks_name
 
     # Initialize processor and model
     processor = ChameleonProcessor.from_pretrained(config.model_id)
@@ -80,12 +83,15 @@ if __name__ == '__main__':
     # Load pre-trained model parameters
     try:
         if args.finetune:
-            lm_head = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-lmhead-ft.pt', map_location='cuda')
+            lm_head_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-lmhead-ft.pt')
+            lm_head = torch.load(lm_head_path, map_location='cuda')
         else:
-            lm_head = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-lmhead.pt', map_location='cuda')
+            lm_head_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-lmhead.pt')
+            lm_head = torch.load(lm_head_path, map_location='cuda')
         model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
     except:
-        state_dict = torch.load(f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-model.pt', map_location='cuda')#.to(model.dtype)
+        model_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-model.pt')
+        state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
         model.model.load_state_dict(state_dict)
 
     # Update token embeddings
@@ -124,7 +130,10 @@ if __name__ == '__main__':
         pixel_values = processor.postprocess_pixel_values(pixel_values)
 
         # Save generated images using the helper function
-        save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration))
+        if args.finetune:
+            save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration)+'ft', config.sks_name)
+        else:
+            save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration), config.sks_name)
         index, image = save_generated_images(pixel_values, prompt_short, save_path, config.sks_name, index)
         # if not args.no_wandb:
         #     wandb.log({"test_generated_images": image}, step=i)

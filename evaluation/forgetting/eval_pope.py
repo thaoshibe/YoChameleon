@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import os
 
@@ -61,23 +62,40 @@ def eval_pope(answers, label_file):
     print('F1 score: {}'.format(f1))
     print('Yes ratio: {}'.format(yes_ratio))
     print('%.3f, %.3f, %.3f, %.3f, %.3f' % (f1, acc, precision, recall, yes_ratio) )
+    return f1, acc, precision, recall, yes_ratio
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--annotation-dir", type=str)
     parser.add_argument("--question-file", type=str)
     parser.add_argument("--result-file", type=str)
+    parser.add_argument("--save_to_txt", type=str)
     args = parser.parse_args()
+
+    print(args.annotation_dir)
+    print(args.question_file)
+    print(args.result_file)
 
     questions = [json.loads(line) for line in open(args.question_file)]
     questions = {question['question_id']: question for question in questions}
     answers = [json.loads(q) for q in open(args.result_file)]
-    for file in os.listdir(args.annotation_dir):
-        # breakpoint()
-        if file.startswith('coco_pope_'):
-            if file.endswith('.json'):
-                category = file[10:-5]
-                cur_answers = [x for x in answers if questions[x['question_id']]['category'] == category]
-                print('Category: {}, # samples: {}'.format(category, len(cur_answers)))
-                eval_pope(cur_answers, os.path.join(args.annotation_dir, file))
-                print("====================================")
+
+    with open(args.save_to_txt, 'a') as f:
+        f.write("\n")
+        f.write("\n")
+        f.write("\n")
+        f.write(args.result_file + '\n')
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        f.write(f"Evaluation on POPE on time: {current_time}\n")
+        for file in os.listdir(args.annotation_dir):
+            if file.startswith('coco_pope_'):
+                if file.endswith('.json'):
+                    category = file[10:-5]
+                    cur_answers = [x for x in answers if questions[x['question_id']]['category'] == category]
+                    f1, acc, precision, recall, yes_ratio = eval_pope(cur_answers, os.path.join(args.annotation_dir, file))
+                    f.write("====================================\n")
+                    f.write('Category: {}, # samples: {}\n'.format(category, len(cur_answers)))
+                    f.write('TP\tFP\tTN\tFN\n')
+                    f.write('%.3f, %.3f, %.3f, %.3f, %.3f\n' % (f1, acc, precision, recall, yes_ratio))
+        f.write("====================================\n")
+    print('Results saved at:', args.save_to_txt)

@@ -60,8 +60,6 @@ Then, you can run the following command:
 bash scripts/eval/eval_pope.sh
 ```
 
-- TODO: This is not in batch script yet!
-
 ### TextVQA
 
 This is done, and it has the same function as the original llava (number can be directly put in the paper)
@@ -77,7 +75,7 @@ bash scripts/eval/eval_textvqa.sh
 - an image folder which can be downloaded from `download_anno_and_images.sh`
 
 
-### VQAV2
+### VQAV2 --- Thao -- TODO
 
 
 You will have to download [eval.zip](https://drive.google.com/file/d/1atZSBBrAX54yYpxtVVW33zFvcnaHeFPy/view), unzip it.
