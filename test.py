@@ -46,6 +46,7 @@ if __name__ == '__main__':
         config_test.iteration = str(args.iteration)
     if args.exp_name is not None:
         config.exp_name = args.exp_name
+
     # Initialize processor and model
     processor = ChameleonProcessor.from_pretrained(config.model_id)
     model = ChameleonForConditionalGeneration.from_pretrained(
