@@ -35,8 +35,10 @@ if __name__ == '__main__':
         trainer.processor,
         personalized_prompt=personalized_prompt
         )
+
     trainer.resume_training()
     trainer.configure_model()
+
     if config.epoch > 0:
         config.iteration = config.epoch
         trainer.train_epoch(train_dataloader)

@@ -131,25 +131,33 @@ class YoChameleonTrainer:
 			print('Saved lm_head at: ', save_path_lmhead)
 
 	def resume_training(self):
-		# Thao: TODO, recheck this
 		if self.config.resume['resume']:
 			print('Resuming training... from iteration:', self.config.resume['resume_iteration'])
 			config_resume = Config(self.config.resume)
-			embedding_path = f'{config_resume.savedir}/{config_resume.exp_name}/{config_resume.sks_name}/{config_resume.resume_iteration}-token.pt'
+			# embedding_path = f'{config_resume.savedir}/{config_resume.exp_name}/{self.config.sks_name}/{config_resume.resume_iteration}-token.pt'
 			try:
-				lm_head = torch.load(f'{config_resume.savedir}/{config_resume.exp_name}/{config_resume.sks_name}/{config_resume.resume_iteration}-lmhead.pt', map_location='cuda').to(self.model.lm_head.weight.data.device)
+				lm_head_path = os.path.join(config_resume.savedir, config_resume.exp_name, self.config.sks_name, str(config_resume.resume_iteration) + '-lmhead.pt')
+				lm_head = torch.load(lm_head_path, map_location='cuda').to(self.model.lm_head.weight.data.device)
 				lm_head = lm_head.to(self.model.dtype)
-				# For sequential learning
-				if config_resume.sequential_learning:
-					self.model.lm_head.weight.data[self.personalized_token_ids[:-config_resume.spacing]] = lm_head
-					self.model.get_input_embeddings().weight.data[self.personalized_token_ids[:-config_resume.spacing]] = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
-					self.personalized_token_ids = self.personalized_token_ids[:-config_resume.spacing]
-				else:
-					self.model.lm_head.weight.data[self.personalized_token_ids] = lm_head
-					self.model.get_input_embeddings().weight.data[self.personalized_token_ids] = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
+
+				# For sequential learning -- This idea is not supported anymore
+				# if config_resume.sequential_learning:
+				# 	self.model.lm_head.weight.data[self.personalized_token_ids[:-config_resume.spacing]] = lm_head
+				# 	self.model.get_input_embeddings().weight.data[self.personalized_token_ids[:-config_resume.spacing]] = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
+				# 	self.personalized_token_ids = self.personalized_token_ids[:-config_resume.spacing]
+				# else:
+
+				self.model.lm_head.weight.data[self.personalized_token_ids] = lm_head
+				embedding_path = os.path.join(config_resume.savedir, config_resume.exp_name, self.config.sks_name, str(config_resume.resume_iteration) + '-token.pt')
+
+				self.model.get_input_embeddings().weight.data[self.personalized_token_ids] = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
+				print('Resumed token embeddings from:', lm_head_path, embedding_path)
 			except:
-				state_dict = torch.load(f'{config_resume.savedir}/{config_resume.exp_name}/{config_resume.sks_name}/{config_resume.resume_iteration}-model.pt')
+				model_path = os.path.join(config_resume.savedir, config_resume.exp_name, self.config.sks_name, str(config_resume.resume_iteration) + '-model.pt')
+				state_dict = torch.load(model_path)
 				self.model.model.load_state_dict(state_dict)
+				print('Resumed model from:', model_path)
+			self.iteration = config_resume.resume_iteration
 		else:
 			print('Starting training from scratch...')
 
@@ -169,7 +177,8 @@ class YoChameleonTrainer:
 		dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
 			self.wandb.log({"train_dataset_length": len(dataloader.dataset)})
-		for iteration in tqdm(range(self.config.iteration)):
+		print('Start training... from iteration:', self.iteration)
+		for iteration in tqdm(range(self.iteration, self.config.iteration)):
 			self.optimizer.zero_grad()
 			batch = next(dataloader_iter)
 			batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)

@@ -5,8 +5,9 @@ import insightface
 import json
 import numpy as np
 import os
-
 import sklearn
+
+from datetime import datetime
 
 from scipy.spatial.distance import cosine
 from tqdm import tqdm
@@ -121,18 +122,36 @@ def face_verification(fake_folder, real_folder, output_file):
     else:
         overall_avg_distance = None
 
-    # Save results to a JSON file
-    output_data = {
-        'results': result_list,
-        'overall_avg_distance': overall_avg_distance,
-        'no_face_count': no_face_count,
-        'total_images': len(fake_images)
-    }
-    save_location = os.path.join(fake_folder, output_file)
-    with open(save_location, 'w') as f:
-        json.dump(output_data, f, indent=4)
-    print(f"Results saved to {save_location}")
-    print(f"With {fake_folder} and {real_folder}, overall_avg_distance: {overall_avg_distance}")
+    with open(output_file, "a") as f:
+        f.write('\n')
+        
+        # Get the current date and time
+        current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Write the date
+        f.write(f"==================================================\nEvaluation on date: {current_date}\n")
+        
+        # Write folder info and overall average distance
+        f.write(f'''
+            {fake_folder}
+            and
+            {real_folder}
+            overall_avg_distance: {overall_avg_distance}
+            no_face_count: {no_face_count}
+            total_images: {len(fake_images)}
+        ==================================================
+            ''')
+    with open(output_file.replace('.txt', '.json'), "a") as f:
+        # Prepare the output data as JSON string and add to log file
+        output_data = {
+            'results': result_list,
+            'overall_avg_distance': overall_avg_distance,
+            'no_face_count': no_face_count,
+            'total_images': len(fake_images)
+        }
+        
+        # Write the output data in a pretty-printed JSON format
+        f.write(json.dumps(output_data, indent=4) + '\n')
     return output_file
 
 if __name__ == "__main__":

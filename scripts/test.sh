@@ -66,7 +66,8 @@
 #   wait
 # done
 
-CONFIGS=("./config/1000negative.yaml" "./config/1000neg-text.yaml" "./config/1000neg-text-recog.yaml" "./config/universal_prefix_positive.yaml")
+# CONFIGS=("./config/1000negative.yaml" "./config/1000neg-text.yaml" "./config/1000neg-text-recog.yaml" "./config/universal_prefix_positive.yaml")
+CONFIGS=("./config/universal_yollava.yaml" "./config/universal_wholemodel.yaml")
 SKS_NAMES=("thao" "bo" "mam" "yuheng" "ciin" "willinvietnam" "oong" "khanhvy")
 ITERATIONS=(5 10 15)
 FINETUNE_ITERATIONS=(15 17 20)
