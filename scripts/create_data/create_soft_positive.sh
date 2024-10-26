@@ -26,10 +26,11 @@ for NAME in "${NAMES[@]}"; do
   python create_conversation_by_ranking.py \
     --input_folder "$POSITIVE_IMAGE_FOLDER" \
     --save_folder "$OUTPUT_FILE" \
-    --version '2000' \
+    --version '1000E' \
     --num_of_real_images -100 \
     --token_length 16 \
     --spacing 1 \
     --negative_image True \
-    --limit_negative 2000
+    --limit_negative 1000 \
+    --consistent_prompt True # This mean, we will use the same prompt for all negative images and positive images
 done

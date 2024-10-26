@@ -45,7 +45,7 @@ wait
 CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text.yaml --sks_name "oong" &
 CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/1000neg-text.yaml --sks_name "willinvietnam" &
 CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/1000neg-text.yaml --sks_name "phuc-map" &
-CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text.yaml --sks_name "willinvietnam" 
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text.yaml --sks_name "denisdang" 
 wait
 
 CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text.yaml --sks_name "bo" &

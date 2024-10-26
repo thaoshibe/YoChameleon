@@ -5,6 +5,7 @@ import math
 import os
 
 from tqdm import tqdm
+from utils import Config
 
 def get_args():
 	"""Parse command-line arguments."""
@@ -18,6 +19,7 @@ def get_args():
 	parser.add_argument("--negative_image", type=bool, default=False)
 	parser.add_argument("--divide_before_positive", type=bool, default=False)
 	parser.add_argument("--limit_negative", type=int, default=500)
+	parser.add_argument("--consistent_prompt", type=bool, default=False)
 	return parser.parse_args()
 
 # Read the JSON file
@@ -111,7 +113,10 @@ if __name__ == "__main__":
 		# This code will assigne different identifier for each chunk
 		# sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1), identifier=16200-len(divided_lists)+index+1)
 		# This code will simply use "A photo of ..." for different chunk
-		sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1), identifier=16200-len(divided_lists)+index+1)
+		if args.consistent_prompt:
+			sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1), identifier=16200)
+		else:
+			sks_prompt = get_personalized_prompt(token_length=args.spacing*(index+1), identifier=16200-len(divided_lists)+index+1)
 		print(f"Prompt: {sks_prompt}")
 		print(part[0])
 		# sks_prompt = 'A photo of <reserved16300>.'

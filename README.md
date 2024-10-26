@@ -4,9 +4,13 @@
 
 ### TODO
 - [ ] Training
+  - [x] Change to bfloat16?
   - [ ] Link the retrieval and training together?
-  - [ ] Create json files?
   - [ ] Create augmented data for the model?
+  - [ ] Support: Setting E ("A photo of <sks>") -- Create json file
+  - [ ] Support: Two set of tokens?
+  - [ ] Support: Three set of tokens?
+  - [ ] Support: Train with augmented dataset
 
 - [ ] Evaluation
   - [ ] Recognition evaluation: Yes/No accuracy/ Recall?
@@ -14,7 +18,7 @@
   - [ ] Image quality generation: CLIP score/ DINO scores?
   
 - [ ] Minor
-  - [ ] Create a list of <reserved> tokens for the model?
+  - [x] Create a list of <reserved> tokens for the model?
   - [ ] 
 
 

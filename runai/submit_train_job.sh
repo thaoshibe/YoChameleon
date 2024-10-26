@@ -38,20 +38,6 @@ runai submit --large-shm \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog_3.sh;"'
+    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text.sh;"'
     # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
-    
     # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
-    
-    
-    
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text.sh > /sensei-fs/users/thaon/code/log.txt;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; uma/sk 007; bash ./launch_1000negative.sh;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_2000neg_text_recog.sh;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text.sh > /sensei-fs/users/thaon/code/log.txt;"'
-    
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_yollava.sh;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_train3.sh;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_yollava.sh;"'
-    # --command --working-dir=/sensei-fs/users/thaon/code/YoChameleon -- bash -c "/sensei-fs/users/thaon/code/YoChameleon/bash launch_train.sh"

@@ -5,16 +5,16 @@ model_id: 'leloy/Anole-7b-v0.1-hf'
 data_root: '/mnt/localssd/code/data/minithao/'
 
 json_file: # Remember to change this
-  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: '1000neg-text' # Remember to change this
+exp_name: 'lr0005' # Remember to change this
 different_identifier: False
 iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
-epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+epoch: 10 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5
 
 batch_size: 8
@@ -24,10 +24,10 @@ tokenizer_max_length: 1500
 eval_visualization: True
 
 resume: 
-  resume: False
+  resume: No
   resume_iteration: 15
-  savedir: '/sensei-fs/users/thaon/ckpt/' 
-  exp_name: '1000neg-text'
+  savedir: '/sensei-fs/users/thaon/ckpt/'
+  exp_name: '1000neg-text-recog'
 
 finetune:
   finetune: True
@@ -50,7 +50,7 @@ finetune:
 
 optimizer:
   type: 'AdamW'
-  lr: 0.0001
+  lr: 0.005
   betas: [0.9, 0.999]
   weight_decay: 1e-4
   eps: 1e-6
