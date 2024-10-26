@@ -1,4 +1,4 @@
-project_name: "YoChameleon4"
+project_name: "YoChameleon5"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -14,19 +14,19 @@ prefix_token: 16 # Remember to change this
 exp_name: '1000neg-text-recog' # Remember to change this
 different_identifier: False
 iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
-epoch: 101 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5
 
-batch_size: 4
+batch_size: 8
 savedir: '/sensei-fs/users/thaon/ckpt/'
 whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
 
 resume: 
-  resume: Yes
+  resume: No
   resume_iteration: 15
-  savedir: '/sensei-fs/users/thaon/ckpt/' 
+  savedir: '/sensei-fs/users/thaon/ckpt/'
   exp_name: '1000neg-text-recog'
 
 finetune:

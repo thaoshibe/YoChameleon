@@ -95,7 +95,7 @@ if __name__ == "__main__":
                     f1, acc, precision, recall, yes_ratio = eval_pope(cur_answers, os.path.join(args.annotation_dir, file))
                     f.write("====================================\n")
                     f.write('Category: {}, # samples: {}\n'.format(category, len(cur_answers)))
-                    f.write('TP\tFP\tTN\tFN\n')
+                    f.write('f1\tacc\tprecision\trecall\tyes_ratio\n')
                     f.write('%.3f, %.3f, %.3f, %.3f, %.3f\n' % (f1, acc, precision, recall, yes_ratio))
         f.write("====================================\n")
     print('Results saved at:', args.save_to_txt)

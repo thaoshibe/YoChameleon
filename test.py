@@ -89,18 +89,18 @@ if __name__ == '__main__':
             lm_head_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-lmhead.pt')
             lm_head = torch.load(lm_head_path, map_location='cuda')
         model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
+        # Update token embeddings
+        if args.finetune:
+            embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token-ft.pt'
+        else:
+            embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token.pt'
+        model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
+
     except:
         model_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-model.pt')
+        print(model_path)
         state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
         model.model.load_state_dict(state_dict)
-
-    # Update token embeddings
-    if args.finetune:
-        embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token-ft.pt'
-    else:
-        embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token.pt'
-    model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
-
     # Define prompt and inputs
     # prompt = f"{sks_prompt}\nCan you describe <reserved16300>? Answer in detail."
     # inputs = processor(prompt, return_tensors="pt").to(model.device)

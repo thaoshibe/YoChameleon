@@ -58,7 +58,7 @@ class YoChameleonTrainer:
 
 	def get_model(self):
 		self.processor = ChameleonProcessor.from_pretrained(self.config.model_id)
-		self.model = ChameleonForConditionalGeneration.from_pretrained(self.config.model_id, device_map="auto")#, torch_dtype=torch.float16)
+		self.model = ChameleonForConditionalGeneration.from_pretrained(self.config.model_id, device_map="auto", torch_dtype=torch.bfloat16)
 		print(f'Loaded {self.config.model_id}!')
 		# return processor, model
 
@@ -113,6 +113,7 @@ class YoChameleonTrainer:
 		# return optimizer, scheduler, optimizer_config, scheduler_config
 
 	def save_checkpoint(self, iteration, finetune=False):
+		iteration=iteration+1 # increment iteration to save the correct iteration as python starts from 0
 		if finetune:
 			save_path_token = os.path.join(self.save_location, f'{iteration}-token-ft.pt')
 			save_path_lmhead = os.path.join(self.save_location, f'{iteration}-lmhead-ft.pt')
@@ -123,7 +124,7 @@ class YoChameleonTrainer:
 		print('Saved token embeddings at: ', save_path_token)
 
 		if self.config.whole_model:
-			if iteration > 0: # save whole model only after the first iteration
+			if iteration > 1: # save whole model only after the first iteration to save space
 				torch.save(self.model.model.state_dict(), os.path.join(self.save_location, f'{iteration}-model.pt'))
 				print('Saved whole model at: ', os.path.join(self.save_location, f'{iteration}-model.pt'))
 		else:

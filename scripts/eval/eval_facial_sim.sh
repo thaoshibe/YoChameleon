@@ -1,8 +1,8 @@
 # Define the list of SKS_NAMES
-SKS_NAMES=("thao" "yuheng" "thuytien" "viruss" "ciin" "khanhvy" "oong" "willinvietnam" "denisdang" "phuc-map")
+SKS_NAMES=("yuheng" "khanhvy")
 
 # Please change this according to your setting name
-EXP_FOLDER="yollava"
+EXP_FOLDER="1000neg-text-recog"
 FAKE_FOLDER_BASE="/sensei-fs/users/thaon/code/generated_images"
 
 # Loop through each SKS_NAME
@@ -21,9 +21,19 @@ do
         "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/5/${SKS_NAME}"
         "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/10/${SKS_NAME}"
         "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/15/${SKS_NAME}"
-        "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/15ft/${SKS_NAME}"
-        "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/17ft/${SKS_NAME}"
-        "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/20ft/${SKS_NAME}"
+        "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/20/${SKS_NAME}"
+        "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/25/${SKS_NAME}"
+        "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/30/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/700/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/800/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/900/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1100/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1200/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1300/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1400/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1500/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1600/${SKS_NAME}"
+        # "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1700/${SKS_NAME}"
     )
 
     # Loop through each fake folder for the current SKS_NAME and run the evaluation

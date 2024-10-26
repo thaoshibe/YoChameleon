@@ -35,22 +35,22 @@ if __name__ == '__main__':
         trainer.processor,
         personalized_prompt=personalized_prompt
         )
-
     trainer.resume_training()
     trainer.configure_model()
 
-    if config.epoch > 0:
+    if config.epoch > 0: #If you want to train with epoch... Fine, here you go
         config.iteration = config.epoch
         trainer.train_epoch(train_dataloader)
         if config.finetune['finetune']:
             config.finetune['finetune_iteration'] = config.finetune['finetune_epoch']
             positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
             trainer.finetune_epoch(positive_only_dataloader)
-    else:
-        trainer.train_epoch(train_dataloader)
+    else: # This support train with iteration
+        print('Hello, train with iteration')
+        trainer.train(train_dataloader)
         if config.finetune['finetune']:
             positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
-            trainer.finetune_epoch(positive_only_dataloader)
+            trainer.finetune(positive_only_dataloader)
     # trainer.train(train_dataloader)
         
     # trainer.test()

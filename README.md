@@ -2,6 +2,22 @@
 
 <img src="./images/yochameleon.png" alt="YoChameleon" width="400">
 
+### TODO
+- [ ] Training
+  - [ ] Link the retrieval and training together?
+  - [ ] Create json files?
+  - [ ] Create augmented data for the model?
+
+- [ ] Evaluation
+  - [ ] Recognition evaluation: Yes/No accuracy/ Recall?
+  - [ ] Diversity image generation evaluation (CLIP)
+  - [ ] Image quality generation: CLIP score/ DINO scores?
+  
+- [ ] Minor
+  - [ ] Create a list of <reserved> tokens for the model?
+  - [ ] 
+
+
 ### Getting Started
 
 ```
@@ -244,6 +260,6 @@ done
 python train.py --config config/basic.yaml
 ```
 
-### Castrophic Forgetting Evaluation
+### Evaluation
 
-```
+Please reference the README.md in the `evaluation` folder for more details.

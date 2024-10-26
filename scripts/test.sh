@@ -67,28 +67,55 @@
 # done
 
 # CONFIGS=("./config/1000negative.yaml" "./config/1000neg-text.yaml" "./config/1000neg-text-recog.yaml" "./config/universal_prefix_positive.yaml")
-CONFIGS=("./config/universal_yollava.yaml" "./config/universal_wholemodel.yaml")
-SKS_NAMES=("thao" "bo" "mam" "yuheng" "ciin" "willinvietnam" "oong" "khanhvy")
-ITERATIONS=(5 10 15)
-FINETUNE_ITERATIONS=(15 17 20)
+# CONFIGS=("./config/universal_yollava.yaml" "./config/universal_wholemodel.yaml")
+# SKS_NAMES=("thao" "bo" "mam" "yuheng" "ciin" "willinvietnam" "oong" "khanhvy")
+# ITERATIONS=(5 10 15)
+# FINETUNE_ITERATIONS=(15 17 20)
 
-run_tests() {
-  local config=$1
-  local iteration=$2
-  local finetune=$3
+# run_tests() {
+#   local config=$1
+#   local iteration=$2
+#   local finetune=$3
 
-  for i in {0..7}; do
-    CUDA_VISIBLE_DEVICES=$i python test.py --sks_name "${SKS_NAMES[$i]}" --config $config --iteration $iteration $finetune &
-  done
+#   for i in {0..7}; do
+#     CUDA_VISIBLE_DEVICES=$i python test.py --sks_name "${SKS_NAMES[$i]}" --config $config --iteration $iteration $finetune &
+#   done
+#   wait
+# }
+
+# for CONFIG in "${CONFIGS[@]}"; do
+#   for ITER in "${ITERATIONS[@]}"; do
+#     run_tests $CONFIG $ITER ""
+#   done
+
+#   for FINETUNE_ITER in "${FINETUNE_ITERATIONS[@]}"; do
+#     run_tests $CONFIG $FINETUNE_ITER "--finetune"
+#   done
+# done
+
+#!/bin/bash
+
+# Configuration and arrays
+#!/bin/bash
+
+# Configuration and arrays
+CONFIGS=("./config/1000neg-text.yaml" "./config/1000neg-text-recog.yaml")
+SKS_NAMES=("ciin" "khanhvy" "thao" "yuheng" )
+# ITERATIONS=(1000 1100 1200 1300 1400 1500 1600 1700)
+
+# Loop through each sks_name and iteration
+for SKS_NAME in "${SKS_NAMES[@]}"; do
+  # for ITERATION in "${ITERATIONS[@]}"; do
+  # Execute the Python script with the current sks_name and iteration
+  CUDA_VISIBLE_DEVICES=0 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[0]}" --iteration 15 &
+  CUDA_VISIBLE_DEVICES=1 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[0]}" --iteration 20 &
+  CUDA_VISIBLE_DEVICES=2 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[0]}" --iteration 25 &
+  CUDA_VISIBLE_DEVICES=3 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[0]}" --iteration 30 &
+  CUDA_VISIBLE_DEVICES=4 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[1]}" --iteration 15 &
+  CUDA_VISIBLE_DEVICES=5 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[1]}" --iteration 20 &
+  CUDA_VISIBLE_DEVICES=6 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[1]}" --iteration 25 &
+  CUDA_VISIBLE_DEVICES=7 python test.py --sks_name "$SKS_NAME" --config "${CONFIGS[1]}" --iteration 30 &
   wait
-}
-
-for CONFIG in "${CONFIGS[@]}"; do
-  for ITER in "${ITERATIONS[@]}"; do
-    run_tests $CONFIG $ITER ""
-  done
-
-  for FINETUNE_ITER in "${FINETUNE_ITERATIONS[@]}"; do
-    run_tests $CONFIG $FINETUNE_ITER "--finetune"
-  done
+  # done
 done
+

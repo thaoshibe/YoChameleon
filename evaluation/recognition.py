@@ -1,4 +1,4 @@
-"Borrowed from https://github.com/haotian-liu/LLaVA/blob/main/llava/eval/model_vqa_loader.py"
+# "Many parts of this code are borrowed from https://github.com/haotian-liu/LLaVA/blob/main/llava/eval/model_vqa_loader.py"
 import argparse
 import json
 import os
@@ -6,7 +6,6 @@ import shortuuid
 import torch
 
 from tqdm import tqdm
-
 
 import math
 import re
@@ -25,12 +24,12 @@ def split_list(lst, n):
     """Split a list into n (roughly) equal-sized chunks"""
     chunk_size = math.ceil(len(lst) / n)  # integer division
     return [lst[i:i+chunk_size] for i in range(0, len(lst), chunk_size)]
-
+    
+# --- TODO: TURN THIS INTO RECOGNITION SCRIPTS
 
 def get_chunk(lst, n, k):
     chunks = split_list(lst, n)
     return chunks[k]
-
 
 # Custom dataset class
 class CustomDataset(Dataset):
@@ -62,14 +61,6 @@ class CustomDataset(Dataset):
 
     def __len__(self):
         return len(self.questions)
-
-def collate_fn(batch):
-    inputs = [item['inputs'] for item in batch]
-    images = [item['image'] for item in batch]
-    img_gen_bools = [item['image_generation'] for item in batch]
-    # question = [f'{questions[i]}{answers[i]}' for i in range(len(questions))]
-    example = processor(inputs, images, padding=True)
-    return example
 
 def eval_model(args):
     # Model

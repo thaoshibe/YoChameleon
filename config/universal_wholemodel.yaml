@@ -1,4 +1,4 @@
-project_name: "YoChameleon3"
+project_name: "YoChameleon4"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -12,9 +12,9 @@ sks_name: 'thao'
 prefix_token: 16 # Remember to change this
 exp_name: 'wholemodel' # Remember to change this
 different_identifier: False
-iteration: 5001 # remember to CHANGE THIS shibe
-epoch: 31 # remember to CHANGE THIS shibe
-save_every: 5
+iteration: 50000 # remember to CHANGE THIS shibe
+epoch: -10 # remember to CHANGE THIS shibe -- Negative means you will not use epoch
+save_every: 100
 
 batch_size: 2
 savedir: '/mnt/localssd/code/ckpt'
@@ -75,5 +75,5 @@ test:
   prompt: "A photo of <reserved16200>."
   iteration: 200 # this will not affect the train code -- generated images are always with lastest checkpoints
   save_dir: '/sensei-fs/users/thaon/code/generated_images/'
-  batch_size: 16
+  batch_size: 8
   num_images: 100
