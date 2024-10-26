@@ -1,4 +1,4 @@
-project_name: "YoChameleon4"
+project_name: "YoChameleon5"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -7,17 +7,21 @@ data_root: '/mnt/localssd/code/data/minithao/'
 json_file: # Remember to change this
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000.json'
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: '1000neg-text-recog' # Remember to change this
+exp_name: '1000disjoin' # Remember to change this
 different_identifier: False
+task_disjoin: True
+
+seperate_tasks: False # This means, the model will be trained on all tasks (recognition, gen) with same tokens, or seperate
+
 iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
-epoch: 101 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5
 
-batch_size: 4
+batch_size: 8
 savedir: '/sensei-fs/users/thaon/ckpt/'
 whole_model: False
 tokenizer_max_length: 1500
@@ -26,8 +30,8 @@ eval_visualization: True
 resume: 
   resume: No
   resume_iteration: 15
-  savedir: '/sensei-fs/users/thaon/ckpt/' 
-  exp_name: '1000neg-text-recog'
+  savedir: '/sensei-fs/users/thaon/ckpt/'
+  exp_name: '1000disjoin'
 
 finetune:
   finetune: True

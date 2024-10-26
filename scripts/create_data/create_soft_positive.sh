@@ -26,7 +26,7 @@ for NAME in "${NAMES[@]}"; do
   python create_conversation_by_ranking.py \
     --input_folder "$POSITIVE_IMAGE_FOLDER" \
     --save_folder "$OUTPUT_FILE" \
-    --version '1000E' \
+    --version '1000' \
     --num_of_real_images -100 \
     --token_length 16 \
     --spacing 1 \

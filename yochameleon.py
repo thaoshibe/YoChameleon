@@ -37,24 +37,75 @@ class YoChameleonTrainer:
 		return self.sks_prompt
 		
 	def prepare_personalized_tokens(self):
-		self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
-		self.identifier = self.config.special_tokens["PERSONALITY_TOKEN"]
+		# --- This is to train DIFFERENT set of latent tokens for each task
+		if hasattr(self.config, 'task_disjoin'):
+			print('')
+			print('')
+			print('            Task disjoin is enabled!')
+			print('')
+			print('')
 
-		prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
-		personalized_tokens = [self.identifier ]
-		personalized_tokens.extend(prefix_tokens)
+			self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
+			self.identifier = self.config.special_tokens["PERSONALITY_TOKEN"]
+			identifier_token_id = self.processor.tokenizer.convert_tokens_to_ids(self.identifier)
+			#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+			#          
+			#  Attention: If follow this setting, prompt is: <sks> is <understanding tokens><generation tokens>
+			#
+			#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-		if self.config.different_identifier:
-			# -1 for the identifier, then -1 for the first neagtive identifier
-			negative_identifier = [f'<reserved{self.latent_tokens_start_index-1-i}>' for i in range(1, self.config.prefix_token)]
-			personalized_tokens.extend(negative_identifier)
-			print(negative_identifier)
-			print(len(negative_identifier))
-		self.personalized_tokens = personalized_tokens
-		self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
-		print(f'Personalized tokens: {self.personalized_tokens}')
-		print(f'Personalized token ids: {self.personalized_token_ids}')
-		print(f'There are {len(self.personalized_tokens)} personalized tokens')
+			# generation tokens
+			understand_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
+			# understanding tokens
+			gen_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+self.config.prefix_token+i}>' for i in range(self.config.prefix_token)]
+			personalized_tokens = [self.identifier]
+
+			personalized_tokens.extend(understand_prefix_tokens)
+			personalized_tokens.extend(gen_prefix_tokens)
+
+			# --- This is for the negative identifier, which is not used anymore
+			# if self.config.different_identifier:
+			# 	# -1 for the identifier, then -1 for the first neagtive identifier
+			# 	negative_identifier = [f'<reserved{self.latent_tokens_start_index-1-i}>' for i in range(1, self.config.prefix_token)]
+			# 	personalized_tokens.extend(negative_identifier)
+			# 	print(negative_identifier)
+			# 	print(len(negative_identifier))
+
+			self.personalized_tokens = personalized_tokens
+			self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
+			self.understand_prefix_token_ids = self.processor.tokenizer.convert_tokens_to_ids(understand_prefix_tokens)
+			self.understand_prefix_token_ids.append(identifier_token_id)
+			self.generation_prefix_token_ids = self.processor.tokenizer.convert_tokens_to_ids(gen_prefix_tokens)
+			self.generation_prefix_token_ids.append(identifier_token_id)
+
+			print(f'Personalized tokens: {self.personalized_tokens}')
+			print(f'Personalized token ids: {self.personalized_token_ids}')
+			print(f'Understand prefix token ids: {self.understand_prefix_token_ids}')
+			print(f'Gen prefix token ids: {self.generation_prefix_token_ids}')
+			print(f'There are {len(self.personalized_tokens)} personalized tokens')
+
+		#--- This is train the SAME set of latent tokens for all the tasks
+		else:
+			self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
+			self.identifier = self.config.special_tokens["PERSONALITY_TOKEN"]
+
+			prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
+			personalized_tokens = [self.identifier]
+			personalized_tokens.extend(prefix_tokens)
+
+			# --- This is for the negative identifier, which is not used anymore
+			# if self.config.different_identifier:
+			# 	# -1 for the identifier, then -1 for the first neagtive identifier
+			# 	negative_identifier = [f'<reserved{self.latent_tokens_start_index-1-i}>' for i in range(1, self.config.prefix_token)]
+			# 	personalized_tokens.extend(negative_identifier)
+			# 	print(negative_identifier)
+			# 	print(len(negative_identifier))
+
+			self.personalized_tokens = personalized_tokens
+			self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
+			print(f'Personalized tokens: {self.personalized_tokens}')
+			print(f'Personalized token ids: {self.personalized_token_ids}')
+			print(f'There are {len(self.personalized_tokens)} personalized tokens')
 
 	def get_model(self):
 		self.processor = ChameleonProcessor.from_pretrained(self.config.model_id)
@@ -169,10 +220,24 @@ class YoChameleonTrainer:
 			self.model.model.vqmodel.requires_grad_(False)
 			self.index_no_updates = torch.zeros((len(self.processor.tokenizer),), dtype=torch.bool)
 		else:
-			self.model.model.requires_grad_(False)
-			self.model.model.embed_tokens.weight.requires_grad_(True)
-			self.index_no_updates = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)
-			self.index_no_updates[self.personalized_token_ids] = False
+			if hasattr(self.config, 'task_disjoin'):
+				print('')
+				print('')
+				print('            Task disjoin is enabled!')
+				print('')
+				print('')
+				self.model.model.requires_grad_(False)
+				self.model.model.embed_tokens.weight.requires_grad_(True)
+				self.index_no_updates_understand = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)
+				self.index_no_updates_understand[self.understand_prefix_token_ids] = False
+
+				self.index_no_updates_generation = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)
+				self.index_no_updates_generation[self.generation_prefix_token_ids] = False
+			else:
+				self.model.model.requires_grad_(False)
+				self.model.model.embed_tokens.weight.requires_grad_(True)
+				self.index_no_updates = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)
+				self.index_no_updates[self.personalized_token_ids] = False
 
 	def train(self, dataloader):
 		dataloader_iter = cycle(dataloader)
@@ -284,6 +349,87 @@ class YoChameleonTrainer:
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
+	def train_epoch_disjoin(self, dataloader):
+		# dataloader_iter = cycle(dataloader)
+		if not self.config.no_wandb:
+			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
+
+		for iteration in tqdm(range(self.config.iteration)):
+			for batch in tqdm(dataloader):
+				self.optimizer.zero_grad()
+				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
+
+				#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+				#
+				#          This training will separate the latent tokens into two parts: understanding and generation
+				#
+				#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+				# Process labels with image tokens
+				# Add a bool to check if the task is generation or understanding
+				
+				bool_img_gen = torch.zeros((len(batch['labels']),), dtype=torch.bool)
+				for i, item in enumerate(batch['labels']):
+					if len(torch.nonzero(batch['labels'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
+						soi_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+						eot_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+						batch['labels'][i, soi_index:eot_index] = image_tokens
+						bool_img_gen[i] = True
+
+				batch = {k: v.to(self.model.device) for k, v in batch.items()}
+				# Forward pass
+				if bool_img_gen.any():
+					output = self.model(
+						input_ids=batch['input_ids'][bool_img_gen],
+						pixel_values=batch['pixel_values'][bool_img_gen],
+						attention_mask=batch['attention_mask'][bool_img_gen],
+						labels=batch['labels'][bool_img_gen]
+					)
+					loss = output.loss
+					loss.backward()
+					self.optimizer.step()
+					with torch.no_grad():
+						self.model.get_input_embeddings().weight[self.index_no_updates_generation] = self.orig_embeds_params[self.index_no_updates_generation]
+						self.model.lm_head.weight[self.index_no_updates_generation] = self.orig_lm_params[self.index_no_updates_generation]
+					# Log loss to W&B
+					if not self.config.no_wandb:
+					    self.wandb.log({"loss": loss.item()})
+				if ~bool_img_gen.any():
+					print('index_no_updates_understand')
+					output = self.model(
+						input_ids=batch['input_ids'][~bool_img_gen],
+						pixel_values=batch['pixel_values'][~bool_img_gen],
+						attention_mask=batch['attention_mask'][~bool_img_gen],
+						labels=batch['labels'][~bool_img_gen]
+					)
+					loss = output.loss
+					loss.backward()
+					self.optimizer.step()
+					with torch.no_grad():
+						self.model.get_input_embeddings().weight[self.index_no_updates_understand] = self.orig_embeds_params[self.index_no_updates_understand]
+						self.model.lm_head.weight[self.index_no_updates_understand] = self.orig_lm_params[self.index_no_updates_understand]
+								# Log loss to W&B
+					if not self.config.no_wandb:
+					    self.wandb.log({"loss": loss.item()})
+				if self.scheduler is not None:
+					self.scheduler.step()
+
+				# Gradient clipping
+				if self.optimizer_config.grad_clip > 0:
+				    torch.nn.utils.clip_grad_value_(self.model.model.parameters(), clip_value=self.optimizer_config.grad_clip)
+
+
+
+			# Save model checkpoints
+			if iteration % self.config.save_every == 0:
+				self.save_checkpoint(iteration)
+				if self.config.eval_visualization:
+					self.visualize_evaluation()
+			torch.cuda.empty_cache()
+		self.iteration = iteration
+
+	
 	def finetune(self, dataloader):
 		# this code is similar to train, but it is used for finetuning
 		self.get_optimizer_and_scheduler(self.config.finetune)

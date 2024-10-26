@@ -117,7 +117,6 @@ class PersonalizedDataset(Dataset):
             #     cur_labels[soi_index:eot_index] = image_tokens
             # replace <image> to real vq-vae tokens
             # breakpoint()
-
             labels[start_idx:end_idx+1] = cur_labels
         example['labels'] = labels
         return example

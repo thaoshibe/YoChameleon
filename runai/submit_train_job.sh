@@ -38,6 +38,6 @@ runai submit --large-shm \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text.sh;"'
+    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000E.sh;"'
     # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
     # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
