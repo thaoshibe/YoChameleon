@@ -221,11 +221,6 @@ class YoChameleonTrainer:
 			self.index_no_updates = torch.zeros((len(self.processor.tokenizer),), dtype=torch.bool)
 		else:
 			if hasattr(self.config, 'task_disjoin'):
-				print('')
-				print('')
-				print('            Task disjoin is enabled!')
-				print('')
-				print('')
 				self.model.model.requires_grad_(False)
 				self.model.model.embed_tokens.weight.requires_grad_(True)
 				self.index_no_updates_understand = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)

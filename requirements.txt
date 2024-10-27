@@ -1,4 +1,5 @@
 absl-py==1.4.0
+accelerate==1.0.1
 adobeone @ file:///sensei-fs/users/sniklaus/piat/models/adobeone-0.0.3-py2.py3-none-any.whl#sha256=805ffbb275fe76ed8c1e8e0a800ccd1169f0609463444df32fbf3c366f1f16c8
 aiobotocore==2.7.0
 aiohttp==3.8.5
@@ -34,6 +35,7 @@ clean-fid==0.1.6
 click==8.1.7
 clip @ git+https://github.com/openai/CLIP.git@a1d071733d7111c9c014f024669f959182114e33
 cmake==3.27.2
+coloredlogs==15.0.1
 comm==0.2.2
 contourpy==1.1.0
 coverage==7.3.0
@@ -51,18 +53,20 @@ docker-pycreds==0.4.0
 dohq-artifactory==0.9.0
 dominate==2.8.0
 duckdb==0.10.2
+easydict==1.13
 einops==0.6.1
 einops-exts==0.0.4
 exceptiongroup==1.1.3
 executing==2.0.1
 ExifRead==3.0.0
-faiss-cpu==1.8.0.post1
+faiss-cpu==1.9.0
 fastapi==0.103.0
 fastjsonschema==2.19.1
 fastrlock==0.8.1
 filelock==3.12.2
 flake8==6.1.0
-flatbuffers==24.3.7
+flash-attn==2.6.3
+flatbuffers==24.3.25
 fonttools==4.42.1
 fqdn==1.5.1
 frozenlist==1.4.0
@@ -80,17 +84,19 @@ google-auth-oauthlib==1.0.0
 google-pasta==0.2.0
 grpcio==1.57.0
 h11==0.14.0
-h5py==3.10.0
+h5py==3.12.1
 hjson==3.1.0
 httpcore==1.0.4
 httpx==0.27.0
-huggingface-hub==0.25.0
+huggingface-hub==0.26.1
+humanfriendly==10.0
 hypothesis==6.102.4
 idna==3.4
 imageio==2.31.1
 imageio-ffmpeg==0.4.9
 importlib-metadata==6.8.0
 iniconfig==2.0.0
+insightface==0.7.3
 iopath==0.1.10
 ipykernel==6.29.3
 ipython==8.22.2
@@ -114,7 +120,7 @@ jupyter_server_terminals==0.5.3
 jupyterlab==4.1.4
 jupyterlab_pygments==0.3.0
 jupyterlab_server==2.25.4
-keras==3.0.5
+keras==3.6.0
 kiwisolver==1.4.5
 kornia==0.7.0
 lazy-object-proxy==1.9.0
@@ -133,7 +139,7 @@ matplotlib-inline==0.1.6
 mccabe==0.7.0
 mdurl==0.1.2
 mistune==3.0.2
-ml-dtypes==0.3.2
+ml-dtypes==0.4.1
 moviepy==1.0.3
 mpld3==0.5.9
 mpmath==1.3.0
@@ -147,7 +153,7 @@ nest-asyncio==1.6.0
 networkx==3.1
 ninja==1.11.1.1
 notebook_shim==0.2.4
-numpy==1.25.2
+numpy==1.26.4
 nvidia-cublas-cu12==12.2.5.6
 nvidia-cuda-cupti-cu12==12.2.142
 nvidia-cuda-nvrtc-cu12==12.2.140
@@ -161,11 +167,15 @@ nvidia-nccl-cu12==2.18.3
 nvidia-nvtx-cu12==12.2.140
 oauthlib==3.2.2
 omegaconf==2.3.0
+onnx==1.17.0
+onnxruntime==1.19.2
 open-clip-torch==2.22.0
 opencv-contrib-python==4.8.0.76
 opencv-python==4.8.0.76
 opencv-python-headless==4.8.0.76
 opt-einsum==3.3.0
+optree==0.13.0
+orjson==3.10.10
 overrides==7.7.0
 packaging==23.1
 pandas==2.0.3
@@ -174,12 +184,13 @@ parso==0.8.3
 pathlib==1.0.1
 pathtools==0.1.2
 pexpect==4.9.0
-piat==2024.8.16
+piat==2024.10.17
 Pillow==10.0.0
 Pillow-SIMD==9.0.0.post1
 platformdirs==3.10.0
 pluggy==1.2.0
 portalocker==2.8.2
+prettytable==3.11.0
 proglog==0.1.10
 prometheus_client==0.20.0
 prompt-toolkit==3.0.43
@@ -251,18 +262,19 @@ stack-data==0.6.3
 sympy==1.12
 tabulate==0.9.0
 tenacity==8.2.3
-tensorboard==2.16.2
+tensorboard==2.18.0
 tensorboard-data-server==0.7.1
 tensorboard-plugin-wit==1.8.1
-tensorflow==2.16.1
+tensorflow==2.18.0
 tensorflow-io-gcs-filesystem==0.36.0
 termcolor==2.3.0
 terminado==0.18.1
+tf_keras==2.18.0
 threadpoolctl==3.2.0
 tifffile==2023.8.12
 timm==0.9.7
 tinycss2==1.2.1
-tokenizers==0.19.1
+tokenizers==0.20.1
 tomli==2.0.1
 tomlkit==0.12.1
 torch @ file:///opt/pytorch/dist/torch-2.1.0-cp310-cp310-linux_x86_64.whl
@@ -274,7 +286,7 @@ torchvision @ file:///opt/vision/dist/torchvision-0.16.0a0%2B224cbc8-cp310-cp310
 tornado==6.4
 tqdm==4.66.1
 traitlets==5.14.2
--e git+https://github.com/huggingface/transformers.git@dae439cb93e7c2ef61943554b7a2f4590c2118cd#egg=transformers
+transformers==4.45.0
 triton @ git+https://github.com/openai/triton@e6216047b8b0aef1fe8da6ca8667a3ad0a016411#subdirectory=python
 typer==0.9.4
 types-python-dateutil==2.8.19.20240311

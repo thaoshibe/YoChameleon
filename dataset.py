@@ -38,12 +38,15 @@ class PersonalizedDataset(Dataset):
         END_OF_TURN: int = 8710,
         only_positive: bool = False,
         personalized_prompt: str = None,
+        task_disjoin: bool = False,
     ):
         self.processor = processor
         self.placeholder_token = placeholder_token
         self.max_length = tokenizer_max_length
         self.personalized_prompt = personalized_prompt
         self.END_OF_TURN = END_OF_TURN
+        self.chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
+        self.task_disjoin = task_disjoin
         data = []
         try:
             for file in json_file:
@@ -73,13 +76,17 @@ class PersonalizedDataset(Dataset):
         if conv[-1]['value'] != "<image>":
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
 
-        chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
-        conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
+        else:
+            if self.task_disjoin:
+                #if task disjoin, then have to add the understanding tokens for image generation
+                if 'negative_example' not in image_paths[0]:
+                    conv[0]['value'] = f'{self.personalized_prompt} A photo of <reserved16200>.'
 
+        conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>
         full_text = conversations.replace("<sks>", self.placeholder_token)
         example = self.processor(
-            full_text,
+            text=full_text,
             images=images,
             padding="max_length",
             max_length=self.max_length,
@@ -126,7 +133,7 @@ if __name__ == "__main__":
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
     #--- This is for debug purpose
-    config_file = './config/1000E.yaml'
+    config_file = './config/1000disjoin.yaml'
 
     config_dict = yaml.safe_load(open(config_file, 'r'))
     config = Config(config_dict)
@@ -140,4 +147,5 @@ if __name__ == "__main__":
             END_OF_TURN=config.special_tokens["END_OF_TURN"],
             personalized_prompt=personalized_prompt
             )
-    train_dataset.__getitem__(0)
+    for i in range(len(train_dataset)):
+        train_dataset.__getitem__(i)

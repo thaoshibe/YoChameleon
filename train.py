@@ -32,6 +32,7 @@ if __name__ == '__main__':
     trainer = YoChameleonTrainer(config)
     personalized_prompt = trainer.get_personalized_prompt()
     print(f"Personalized prompt: {personalized_prompt}")
+    
     train_dataloader = get_dataloader_iter(
         config,
         trainer.processor,
