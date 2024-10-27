@@ -5,10 +5,8 @@ chameleon/inference/.DS_Store
 
 __pycache__/
 *.pyc
-
+**/__pycache__
 /outputs
 
 /viewer
 sftp-config.json
-
-/transformers

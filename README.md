@@ -209,7 +209,7 @@ for NAME in "${NAMES[@]}"; do
     --input_folder "$POSITIVE_IMAGE_FOLDER" \
     --save_folder "$OUTPUT_FILE" \
     --version image_gen_positive_only \
-    --num_of_real_images 100 \
+    --num_of_real_images 100 \ch
     --token_length 16 \
     --spacing 16
 done
@@ -267,3 +267,13 @@ python train.py --config config/basic.yaml
 ### Evaluation
 
 Please reference the README.md in the `evaluation` folder for more details.
+
+### Acknowledgements 🤗
+
+This project will not be possible without the following open-source projects:
+- [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://github.com/facebookresearch/chameleon)
+- [Anole: An Open, Autoregressive and Native Multimodal Models for Interleaved Image-Text Generation](https://gair-nlp.github.io/anole/)
+- and amazing HuggingFace's community: [Chamleon on HuggingFace](https://huggingface.co/docs/transformers/en/model_doc/chameleon), [Anole on HuggingFace](https://github.com/huggingface/transformers/pull/32013)
+
+Thank you!
+

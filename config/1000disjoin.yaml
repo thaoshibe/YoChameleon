@@ -7,7 +7,7 @@ data_root: '/mnt/localssd/code/data/minithao/'
 json_file: # Remember to change this
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this

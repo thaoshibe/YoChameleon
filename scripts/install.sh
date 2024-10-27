@@ -1,10 +1,10 @@
 source /opt/venv/bin/activate
 cd /mnt/localssd/code
-git clone https://github.com/huggingface/transformers.git
-cd transformers
-git fetch origin pull/32013/head:pr-32013
-git checkout pr-32013
-pip install -e .
+# git clone https://github.com/huggingface/transformers.git
+# cd transformers
+# git fetch origin pull/32013/head:pr-32013
+# git checkout pr-32013
+# pip install -e .
 cd /mnt/localssd/code/YoChameleon
 
 # for piat-retrieval
@@ -16,4 +16,3 @@ pip install flash-attn --no-build-isolation
 pip install tf-keras
 pip install insightface
 pip install onnxruntime
-pip install transformers==4.45.0

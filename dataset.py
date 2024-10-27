@@ -85,12 +85,14 @@ class PersonalizedDataset(Dataset):
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>
         full_text = conversations.replace("<sks>", self.placeholder_token)
+
         example = self.processor(
             text=full_text,
             images=images,
             padding="max_length",
             max_length=self.max_length,
             )
+
         example['input_ids'] = example['input_ids'][0]
         example['attention_mask'] = example['attention_mask'][0]
         example['pixel_values'] = example['pixel_values'][0]
@@ -145,7 +147,7 @@ if __name__ == "__main__":
             processor=processor,
             tokenizer_max_length=config.tokenizer_max_length,
             END_OF_TURN=config.special_tokens["END_OF_TURN"],
-            personalized_prompt=personalized_prompt
+            personalized_prompt=personalized_prompt,
             )
     for i in range(len(train_dataset)):
         train_dataset.__getitem__(i)

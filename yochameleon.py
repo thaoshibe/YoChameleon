@@ -371,13 +371,21 @@ class YoChameleonTrainer:
 						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
 						batch['labels'][i, soi_index:eot_index] = image_tokens
 						bool_img_gen[i] = True
+				# Adding image tokens to the input_ids
+				for i, item in enumerate(batch['input_ids']):
+					if len(torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
+						soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+						eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+						batch['input_ids'][i, soi_index:eot_index] = image_tokens
+						# print('image tokens added to input_ids')
 
 				batch = {k: v.to(self.model.device) for k, v in batch.items()}
+
 				# Forward pass
 				if bool_img_gen.any():
 					output = self.model(
 						input_ids=batch['input_ids'][bool_img_gen],
-						pixel_values=batch['pixel_values'][bool_img_gen],
 						attention_mask=batch['attention_mask'][bool_img_gen],
 						labels=batch['labels'][bool_img_gen]
 					)
@@ -390,11 +398,10 @@ class YoChameleonTrainer:
 					# Log loss to W&B
 					if not self.config.no_wandb:
 					    self.wandb.log({"loss": loss.item()})
+					    
 				if ~bool_img_gen.any():
-					print('index_no_updates_understand')
 					output = self.model(
 						input_ids=batch['input_ids'][~bool_img_gen],
-						pixel_values=batch['pixel_values'][~bool_img_gen],
 						attention_mask=batch['attention_mask'][~bool_img_gen],
 						labels=batch['labels'][~bool_img_gen]
 					)
@@ -542,7 +549,6 @@ class YoChameleonTrainer:
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
-	# TODO: Add support test with config iteration?
 	def test(self):
 		config_test = Config(self.config.test)
 		with torch.no_grad():
