@@ -38,7 +38,7 @@ class YoChameleonTrainer:
 		
 	def prepare_personalized_tokens(self):
 		# --- This is to train DIFFERENT set of latent tokens for each task
-		if hasattr(self.config, 'task_disjoin'):
+		if self.config.task_disjoin:
 			print('')
 			print('')
 			print('            Task disjoin is enabled!')
@@ -220,7 +220,7 @@ class YoChameleonTrainer:
 			self.model.model.vqmodel.requires_grad_(False)
 			self.index_no_updates = torch.zeros((len(self.processor.tokenizer),), dtype=torch.bool)
 		else:
-			if hasattr(self.config, 'task_disjoin'):
+			if self.config.task_disjoin:
 				self.model.model.requires_grad_(False)
 				self.model.model.embed_tokens.weight.requires_grad_(True)
 				self.index_no_updates_understand = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)
@@ -251,13 +251,19 @@ class YoChameleonTrainer:
 					eot_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
 					image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
 					batch['labels'][i, soi_index:eot_index] = image_tokens
-
+			for i, item in enumerate(batch['input_ids']):
+				if len(torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
+					soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+					eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+					image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+					batch['input_ids'][i, soi_index:eot_index] = image_tokens
+					# print('image tokens added to input_ids')
 			batch = {k: v.to(self.model.device) for k, v in batch.items()}
 
 			# Forward pass
 			output = self.model(
 				input_ids=batch['input_ids'],
-				pixel_values=batch['pixel_values'],
+				# pixel_values=batch['pixel_values'],
 				attention_mask=batch['attention_mask'],
 				labels=batch['labels']
 			)
@@ -306,13 +312,20 @@ class YoChameleonTrainer:
 						eot_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
 						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
 						batch['labels'][i, soi_index:eot_index] = image_tokens
-
+				for i, item in enumerate(batch['input_ids']):
+					if len(torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
+						soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+						eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+						batch['input_ids'][i, soi_index:eot_index] = image_tokens
+						# print('image tokens added to input_ids')
+				torch.cuda.empty_cache()
 				batch = {k: v.to(self.model.device) for k, v in batch.items()}
 
 				# Forward pass
 				output = self.model(
 					input_ids=batch['input_ids'],
-					pixel_values=batch['pixel_values'],
+					# pixel_values=batch['pixel_values'],
 					attention_mask=batch['attention_mask'],
 					labels=batch['labels']
 				)
@@ -335,7 +348,6 @@ class YoChameleonTrainer:
 				# Log loss to W&B
 				if not self.config.no_wandb:
 				    self.wandb.log({"loss": loss.item()})
-
 			# Save model checkpoints
 			if iteration % self.config.save_every == 0:
 				self.save_checkpoint(iteration)
@@ -398,7 +410,7 @@ class YoChameleonTrainer:
 					# Log loss to W&B
 					if not self.config.no_wandb:
 					    self.wandb.log({"loss": loss.item()})
-					    
+
 				if ~bool_img_gen.any():
 					output = self.model(
 						input_ids=batch['input_ids'][~bool_img_gen],
@@ -452,13 +464,19 @@ class YoChameleonTrainer:
 					eot_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
 					image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
 					batch['labels'][i, soi_index:eot_index] = image_tokens
-
+			for i, item in enumerate(batch['input_ids']):
+				if len(torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
+					soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+					eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+					image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+					batch['input_ids'][i, soi_index:eot_index] = image_tokens
+					# print('image tokens added to input_ids')
 			batch = {k: v.to(self.model.device) for k, v in batch.items()}
 
 			# Forward pass
 			output = self.model(
 				input_ids=batch['input_ids'],
-				pixel_values=batch['pixel_values'],
+				# pixel_values=batch['pixel_values'],
 				attention_mask=batch['attention_mask'],
 				labels=batch['labels']
 			)
@@ -505,19 +523,26 @@ class YoChameleonTrainer:
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
 
 				# Process labels with image tokens
+				
 				for i, item in enumerate(batch['labels']):
 					if len(torch.nonzero(batch['labels'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
 						soi_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
 						eot_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
 						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
 						batch['labels'][i, soi_index:eot_index] = image_tokens
-
+				
+				for i, item in enumerate(batch['input_ids']):
+					if len(torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
+						soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+						eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+						batch['input_ids'][i, soi_index:eot_index] = image_tokens
 				batch = {k: v.to(self.model.device) for k, v in batch.items()}
 
 				# Forward pass
 				output = self.model(
 					input_ids=batch['input_ids'],
-					pixel_values=batch['pixel_values'],
+					# pixel_values=batch['pixel_values'],
 					attention_mask=batch['attention_mask'],
 					labels=batch['labels']
 				)
@@ -582,7 +607,7 @@ class YoChameleonTrainer:
 			inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
 			output = self.model.generate(**inputs, max_new_tokens=200)
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
-			# breakpoint()
+			
 			if not self.config.no_wandb:
 				self.wandb.log({"Images/Prediction": wandb.Image(image)})
 				import html

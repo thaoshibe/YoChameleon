@@ -17,7 +17,7 @@ iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs fo
 epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5
 
-batch_size: 8
+batch_size: 4
 savedir: '/sensei-fs/users/thaon/ckpt/'
 whole_model: False
 tokenizer_max_length: 1500

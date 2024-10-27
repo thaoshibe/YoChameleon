@@ -16,7 +16,7 @@ iteration: 50000 # remember to CHANGE THIS shibe
 epoch: -10 # remember to CHANGE THIS shibe -- Negative means you will not use epoch
 save_every: 100
 
-batch_size: 2
+batch_size: 4
 savedir: '/mnt/localssd/code/ckpt'
 whole_model: True
 tokenizer_max_length: 1500

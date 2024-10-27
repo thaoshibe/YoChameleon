@@ -7,11 +7,11 @@ data_root: '/mnt/localssd/code/data/minithao/'
 json_file: # Remember to change this
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
-  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: '1000disjoin2' # Remember to change this
+exp_name: '1000disjoin' # Remember to change this
 different_identifier: False
 task_disjoin: True
 
@@ -21,7 +21,7 @@ iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs fo
 epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5
 
-batch_size: 8
+batch_size: 4
 savedir: '/sensei-fs/users/thaon/ckpt/'
 whole_model: False
 tokenizer_max_length: 1500

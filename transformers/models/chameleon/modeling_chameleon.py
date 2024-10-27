@@ -1539,8 +1539,8 @@ class ChameleonModel(ChameleonPreTrainedModel):
             raise ValueError(
                 "You cannot specify both pixel_values and inputs_embeds at the same time, and must specify either one"
             )
-
-        if pixel_values is not None and pixel_values.numel() != 0:
+        
+        if pixel_values is not None:
             image_tokens = self.get_image_tokens(pixel_values)
             n_image_tokens_in_text = (input_ids == self.vocabulary_mapping.image_token_id).sum().item()
             n_image_features = image_tokens.shape[0] * image_tokens.shape[1]

@@ -27,7 +27,8 @@ if __name__ == '__main__':
     if args.sks_name is not None:
         config.sks_name = args.sks_name
         config.json_file = [x.replace('SKS_NAME', config.sks_name) for x in config.json_file]
-
+    if not hasattr(config, 'task_disjoin'):
+        config.task_disjoin = False
     # call training loop
     trainer = YoChameleonTrainer(config)
     personalized_prompt = trainer.get_personalized_prompt()
@@ -43,8 +44,7 @@ if __name__ == '__main__':
 
     if config.epoch > 0: #If you want to train with epoch... Fine, here you go
         config.iteration = config.epoch
-
-        if hasattr(config, 'task_disjoin'):
+        if config.task_disjoin:
             print('\n   Hello, this script will train with task disjoin !!!\n')
             trainer.train_epoch_disjoin(train_dataloader)
         else:
