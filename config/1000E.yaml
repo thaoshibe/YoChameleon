@@ -13,8 +13,7 @@ sks_name: 'thao'
 prefix_token: 16 # Remember to change this
 exp_name: '1000E' # Remember to change this
 different_identifier: False
-
-seperate_tasks: False # This means, the model will be trained on all tasks (recognition, gen) with same tokens, or seperate
+task_disjoin: False
 
 iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training

@@ -30,7 +30,7 @@ export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
 # Train script
 cd /mnt/localssd/code/YoChameleon
-("thao" "yuheng" "thuytien" "viruss" "ciin" "khanhvy" "oong" "willinvietnam" "denisdang" "phuc-map")
+# ("thao" "yuheng" "thuytien" "viruss" "ciin" "khanhvy" "oong" "willinvietnam" "denisdang" "phuc-map")
 
 CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/universal_yollava.yaml --sks_name "thao" &
 CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/universal_yollava.yaml --sks_name "yuheng" &

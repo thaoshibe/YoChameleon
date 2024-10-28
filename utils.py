@@ -2,6 +2,7 @@ import os
 import torch
 
 from dataset import PersonalizedDataset
+from dataset import RecognitionData
 
 from torchvision import datasets
 
@@ -10,29 +11,45 @@ def get_dataloader_iter(config, processor, only_positive=False, personalized_pro
         config.task_disjoin = False
     if only_positive:
         train_dataset = PersonalizedDataset(
-            json_file=config.json_file,
-            processor=processor,
-            tokenizer_max_length=config.tokenizer_max_length,
-            END_OF_TURN=config.special_tokens["END_OF_TURN"],
-            only_positive=True,
-            personalized_prompt=personalized_prompt,
-            task_disjoin=config.task_disjoin
+                json_file=config.json_file,
+                processor=processor,
+                placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
+                tokenizer_max_length=config.tokenizer_max_length,
+                END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                only_positive=True,
+                personalized_prompt=personalized_prompt,
+                task_disjoin=config.task_disjoin
             )
     else:
         train_dataset = PersonalizedDataset(
                 json_file=config.json_file,
                 processor=processor,
+                placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
                 tokenizer_max_length=config.tokenizer_max_length,
                 END_OF_TURN=config.special_tokens["END_OF_TURN"],
                 personalized_prompt=personalized_prompt,
                 task_disjoin=config.task_disjoin
-                )
+            )
         
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
     )
     # dataloader_iter = cycle(train_dataloader)
     return train_dataloader
+
+def get_eval_dataloader(config, processor, image_folder, personalized_prompt=None):
+    eval_dataset = RecognitionData(
+        sks_name=config.sks_name,
+        image_folder=image_folder,
+        placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
+        tokenizer_max_length=config.tokenizer_max_length,
+        processor=processor,
+        personalized_prompt=personalized_prompt,
+    )
+    eval_dataloader = torch.utils.data.DataLoader(
+        eval_dataset, batch_size=config.batch_size, shuffle=False, num_workers=1,
+    )
+    return eval_dataset
 
 class Config:
     def __init__(self, config_dict):

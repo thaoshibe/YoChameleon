@@ -1,4 +1,4 @@
-project_name: "YoChameleon5"
+project_name: "YoChameleon6"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -31,7 +31,7 @@ resume:
   resume: No
   resume_iteration: 15
   savedir: '/sensei-fs/users/thaon/ckpt/'
-  exp_name: '1000disjoin2'
+  exp_name: '1000disjoin'
 
 finetune:
   finetune: True
@@ -73,6 +73,13 @@ special_tokens:
   PAD_INDEX: 1
   PERSONALITY_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
+# --- EVAL CONFIG --- 
+eval:
+  recognition: True
+  recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
+  recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'
+  vqa: True
+  vqa_path_json: './baselines/yollava-visual-qa.json'
 
 # --- TEST CONFIG --- 
 test:

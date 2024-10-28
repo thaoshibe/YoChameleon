@@ -1,0 +1,1822 @@
+{
+    "shiba-gray":
+    {
+        "./yollava-data/test/shiba-gray/3.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Dog"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/shiba-gray/1.png":
+        {
+            "question": "What kind of animal does <sks> look like more?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/shiba-gray/10.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Mouse",
+                "B": "Dog"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/shiba-gray/0.png":
+        {
+            "question": "What is the pattern on the top of <sks>'s head?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Solid color"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "yuheng":
+    {
+        "./yollava-data/test/yuheng/3.png":
+        {
+            "question": "What is <sks> doing with their right hand?",
+            "options":
+            {
+                "A": "Holding a book",
+                "B": "Touching a statue's foot"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/yuheng/1.png":
+        {
+            "question": "What is behind <sks>?",
+            "options":
+            {
+                "A": "A lake",
+                "B": "A street"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/yuheng/4.png":
+        {
+            "question": "What color of garment is <sks> wearing on the upper body?",
+            "options":
+            {
+                "A": "Black",
+                "B": "White"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/yuheng/2.png":
+        {
+            "question": "What type of top is <sks> wearing?",
+            "options":
+            {
+                "A": "T-shirt",
+                "B": "Sweater"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/yuheng/0.png":
+        {
+            "question": "What is the color of <sks>'s shirt?",
+            "options":
+            {
+                "A": "Black",
+                "B": "White"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "thap-but":
+    {
+        "./yollava-data/test/thap-but/0.png":
+        {
+            "question": "What is the main structure <sks> standing on?",
+            "options":
+            {
+                "A": "A flat surface",
+                "B": "A pile of rocks"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "shiba-yellow":
+    {
+        "./yollava-data/test/shiba-yellow/3.png":
+        {
+            "question": "What type of animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Dog"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/shiba-yellow/9.png":
+        {
+            "question": "What type of animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Shiba Inu",
+                "B": "Penguin"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/shiba-yellow/0.png":
+        {
+            "question": "Is <sks> a real cat or a plush toy?",
+            "options":
+            {
+                "A": "Real cat",
+                "B": "Plush toy"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "willinvietnam":
+    {
+        "./yollava-data/test/willinvietnam/3.png":
+        {
+            "question": "What number is visible on <sks>'s shirt?",
+            "options":
+            {
+                "A": "45",
+                "B": "90"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/willinvietnam/1.png":
+        {
+            "question": "What is the color of <sks>'s shirt?",
+            "options":
+            {
+                "A": "White",
+                "B": "Black"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/willinvietnam/6.png":
+        {
+            "question": "What type of pattern is on <sks>'s shirt?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Polka dots"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/willinvietnam/4.png":
+        {
+            "question": "What color is <sks>'s jacket?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/willinvietnam/9.png":
+        {
+            "question": "Is <sks> looking at the camera?",
+            "options":
+            {
+                "A": "Yes",
+                "B": "No"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/willinvietnam/2.png":
+        {
+            "question": "Is <sks> smiling?",
+            "options":
+            {
+                "A": "Yes",
+                "B": "No"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/willinvietnam/7.png":
+        {
+            "question": "What gesture is <sks> making with their hand?",
+            "options":
+            {
+                "A": "Thumbs up",
+                "B": "Peace sign"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/willinvietnam/0.png":
+        {
+            "question": "What type of top is <sks> wearing?",
+            "options":
+            {
+                "A": "Sweater",
+                "B": "Button-up shirt"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/willinvietnam/5.png":
+        {
+            "question": "What is <sks> doing with their right hand?",
+            "options":
+            {
+                "A": "Holding a spoon",
+                "B": "Holding chopsticks"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "oong":
+    {
+        "./yollava-data/test/oong/3.png":
+        {
+            "question": "What is the color of <sks>'s sweater?",
+            "options":
+            {
+                "A": "Blue",
+                "B": "Red"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/oong/1.png":
+        {
+            "question": "What type of clothing is <sks> wearing?",
+            "options":
+            {
+                "A": "T-shirt",
+                "B": "Collared shirt"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/oong/6.png":
+        {
+            "question": "What type of garment is <sks> wearing?",
+            "options":
+            {
+                "A": "Sweater",
+                "B": "T-shirt"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/oong/4.png":
+        {
+            "question": "What gesture is <sks> making with their hand?",
+            "options":
+            {
+                "A": "Thumbs up",
+                "B": "Peace sign"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/oong/9.png":
+        {
+            "question": "What logo is featured on <sks>'s t-shirt?",
+            "options":
+            {
+                "A": "Microsoft",
+                "B": "Apple"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/oong/2.png":
+        {
+            "question": "What is <sks> wearing around their neck?",
+            "options":
+            {
+                "A": "A tie",
+                "B": "A lanyard"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/oong/8.png":
+        {
+            "question": "What type of clothing is <sks> wearing?",
+            "options":
+            {
+                "A": "T-shirt",
+                "B": "Collared shirt"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/oong/7.png":
+        {
+            "question": "What color is the cap worn by <sks>?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Blue"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/oong/0.png":
+        {
+            "question": "What type of pattern does <sks>'s scarf have?",
+            "options":
+            {
+                "A": "Polka dots",
+                "B": "Plaid"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/oong/5.png":
+        {
+            "question": "What pattern is on <sks>'s shirt?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Plaid"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "viruss":
+    {
+        "./yollava-data/test/viruss/1.png":
+        {
+            "question": "What is the predominant color of <sks>'s jacket?",
+            "options":
+            {
+                "A": "White",
+                "B": "Black"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/viruss/4.png":
+        {
+            "question": "What is the color of <sks>'s top?",
+            "options":
+            {
+                "A": "Red",
+                "B": "White"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/viruss/8.png":
+        {
+            "question": "What color is <sks>'s jacket?",
+            "options":
+            {
+                "A": "White",
+                "B": "Black"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/viruss/7.png":
+        {
+            "question": "What color is <sks>'s outfit?",
+            "options":
+            {
+                "A": "White",
+                "B": "Black"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/viruss/0.png":
+        {
+            "question": "What is the pattern on <sks>'s attire?",
+            "options":
+            {
+                "A": "Stars",
+                "B": "Stripes"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/viruss/5.png":
+        {
+            "question": "What is the primary color of <sks>'s jacket?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "toodles-galore":
+    {
+        "./yollava-data/test/toodles-galore/1.png":
+        {
+            "question": "What color is the cushion <sks> is sitting on?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/toodles-galore/6.png":
+        {
+            "question": "What color is the bow around <sks>'s neck?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Purple"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/toodles-galore/4.png":
+        {
+            "question": "What is the color of <sks>'s bow?",
+            "options":
+            {
+                "A": "Purple",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/toodles-galore/2.png":
+        {
+            "question": "What is the color of the bow around <sks>'s neck?",
+            "options":
+            {
+                "A": "Purple",
+                "B": "Red"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/toodles-galore/0.png":
+        {
+            "question": "What color is the bow around <sks>'s neck?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Blue"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "khanhvy":
+    {
+        "./yollava-data/test/khanhvy/3.png":
+        {
+            "question": "What type of clothing is <sks> wearing on the upper body?",
+            "options":
+            {
+                "A": "A red sleeveless top",
+                "B": "A blue long-sleeve shirt"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/khanhvy/1.png":
+        {
+            "question": "What pattern is on <sks>'s shirt?",
+            "options":
+            {
+                "A": "Polka dots",
+                "B": "Stripes"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/khanhvy/4.png":
+        {
+            "question": "What is the predominant color of <sks>'s scarf?",
+            "options":
+            {
+                "A": "Pink",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/khanhvy/9.png":
+        {
+            "question": "What type of garment is <sks> wearing?",
+            "options":
+            {
+                "A": "Sweater",
+                "B": "Sleeveless top"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/khanhvy/2.png":
+        {
+            "question": "What color is <sks>'s shirt?",
+            "options":
+            {
+                "A": "Green",
+                "B": "Red"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/khanhvy/8.png":
+        {
+            "question": "What is the pattern on <sks>'s shirt?",
+            "options":
+            {
+                "A": "Polka dots",
+                "B": "Stripes"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/khanhvy/0.png":
+        {
+            "question": "What type of floral accessory is <sks> wearing?",
+            "options":
+            {
+                "A": "A pink flower",
+                "B": "A red ribbon"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/khanhvy/5.png":
+        {
+            "question": "What kind of pattern is on <sks>'s dress?",
+            "options":
+            {
+                "A": "Floral",
+                "B": "Stripes"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "dug":
+    {
+        "./yollava-data/test/dug/3.png":
+        {
+            "question": "Which toy is <sks> holding in its mouth?",
+            "options":
+            {
+                "A": "A purple pig",
+                "B": "A yellow duck"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/dug/2.png":
+        {
+            "question": "What is the expression on <sks>'s face?",
+            "options":
+            {
+                "A": "Angry",
+                "B": "Happy"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/dug/0.png":
+        {
+            "question": "What is the shape of the object on <sks>'s collar?",
+            "options":
+            {
+                "A": "Square",
+                "B": "Round"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "dragon":
+    {
+        "./yollava-data/test/dragon/3.png":
+        {
+            "question": "What is the predominant color of <sks>?",
+            "options":
+            {
+                "A": "Pink",
+                "B": "Blue"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "cat-cup":
+    {
+        "./yollava-data/test/cat-cup/1.png":
+        {
+            "question": "What is the design on <sks>?",
+            "options":
+            {
+                "A": "A cat face",
+                "B": "A plain color"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/cat-cup/4.png":
+        {
+            "question": "What animal motif is on <sks>?",
+            "options":
+            {
+                "A": "Dog",
+                "B": "Cat"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/cat-cup/2.png":
+        {
+            "question": "What animal is represented on <sks>?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Dog"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/cat-cup/0.png":
+        {
+            "question": "What animal is <sks> designed to resemble?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Dog"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "yellow-duck":
+    {
+        "./yollava-data/test/yellow-duck/1.png":
+        {
+            "question": "What is the primary color of the object <sks> is resting on?",
+            "options":
+            {
+                "A": "Yellow",
+                "B": "Black"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/yellow-duck/6.png":
+        {
+            "question": "What is the posture of <sks> in the image?",
+            "options":
+            {
+                "A": "Standing upright",
+                "B": "Lying down"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "bo":
+    {
+        "./yollava-data/test/bo/3.png":
+        {
+            "question": "What position is <sks> in?",
+            "options":
+            {
+                "A": "Sitting",
+                "B": "Lying down"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/bo/1.png":
+        {
+            "question": "What is the color of <sks>'s fur?",
+            "options":
+            {
+                "A": "Brown and white",
+                "B": "Black and grey"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/bo/6.png":
+        {
+            "question": "What is the expression on <sks>'s face?",
+            "options":
+            {
+                "A": "Happy",
+                "B": "Angry"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/bo/4.png":
+        {
+            "question": "What is the predominant color of <sks>'s fur?",
+            "options":
+            {
+                "A": "Brown",
+                "B": "Grey"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/bo/9.png":
+        {
+            "question": "What type of flooring is <sks> sitting on?",
+            "options":
+            {
+                "A": "Hardwood",
+                "B": "Carpet"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/bo/2.png":
+        {
+            "question": "What is the main fur color of <sks>?",
+            "options":
+            {
+                "A": "Brown",
+                "B": "Grey"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/bo/8.png":
+        {
+            "question": "What is the predominant color of <sks>'s fur?",
+            "options":
+            {
+                "A": "Black",
+                "B": "Brown"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/bo/0.png":
+        {
+            "question": "What is the primary color of <sks>'s fur?",
+            "options":
+            {
+                "A": "Brown",
+                "B": "Grey"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "fire":
+    {
+        "./yollava-data/test/fire/3.png":
+        {
+            "question": "What element represents <sks>'s hair?",
+            "options":
+            {
+                "A": "Water",
+                "B": "Fire"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/fire/1.png":
+        {
+            "question": "What element is <sks> associated with?",
+            "options":
+            {
+                "A": "Water",
+                "B": "Fire"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/fire/6.png":
+        {
+            "question": "What is the main color of <sks>'s body?",
+            "options":
+            {
+                "A": "Orange",
+                "B": "Purple"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/fire/4.png":
+        {
+            "question": "What is the predominant visual effect around <sks>?",
+            "options":
+            {
+                "A": "Water splashes",
+                "B": "Fire flames"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/fire/9.png":
+        {
+            "question": "What is <sks> doing?",
+            "options":
+            {
+                "A": "Riding a motobike",
+                "B": "Grilling food"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/fire/8.png":
+        {
+            "question": "What is the main visual theme of <sks>?",
+            "options":
+            {
+                "A": "Water",
+                "B": "Fire"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/fire/7.png":
+        {
+            "question": "What is the predominant color of the flames surrounding <sks>?",
+            "options":
+            {
+                "A": "Blue",
+                "B": "Orange"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/fire/0.png":
+        {
+            "question": "What is the appearance of <sks>?",
+            "options":
+            {
+                "A": "Covered in flames",
+                "B": "Icy and frozen"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/fire/5.png":
+        {
+            "question": "What type of pattern is on <sks>'s attire?",
+            "options":
+            {
+                "A": "Polka dots",
+                "B": "Paisley"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "pig-cup":
+    {
+        "./yollava-data/test/pig-cup/3.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Pig",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/pig-cup/1.png":
+        {
+            "question": "What animal is <sks> designed to resemble?",
+            "options":
+            {
+                "A": "Pig",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/pig-cup/6.png":
+        {
+            "question": "What fruit is depicted on the lid of <sks>?",
+            "options":
+            {
+                "A": "Apple",
+                "B": "Peach"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/pig-cup/4.png":
+        {
+            "question": "What is the main design theme of <sks>?",
+            "options":
+            {
+                "A": "Pig",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/pig-cup/7.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Pig",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/pig-cup/0.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Pig",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "thuytien":
+    {
+        "./yollava-data/test/thuytien/1.png":
+        {
+            "question": "What type of jewelry is <sks> wearing around their neck?",
+            "options":
+            {
+                "A": "Necklace",
+                "B": "Scarf"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/thuytien/9.png":
+        {
+            "question": "What is the primary color of <sks>'s dress?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/thuytien/2.png":
+        {
+            "question": "What type of safety equipment is <sks> wearing?",
+            "options":
+            {
+                "A": "Helmet",
+                "B": "Life jacket"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/thuytien/7.png":
+        {
+            "question": "What pattern is on <sks>'s shirt?",
+            "options":
+            {
+                "A": "Polka dots",
+                "B": "No pattern, it's solid colored"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "shiba-black":
+    {
+        "./yollava-data/test/shiba-black/3.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Dog",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/shiba-black/6.png":
+        {
+            "question": "What type of animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Dog"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/shiba-black/9.png":
+        {
+            "question": "What two colors make up the majority of <sks>'s appearance?",
+            "options":
+            {
+                "A": "Pink and Green",
+                "B": "Black and Cream"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "thao":
+    {
+        "./yollava-data/test/thao/9.png":
+        {
+            "question": "What color is the <sks>'s shirt?",
+            "options":
+            {
+                "A": "Pink",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/thao/8.png":
+        {
+            "question": "What type of garment is <sks> wearing on their head?",
+            "options":
+            {
+                "A": "Baseball Cap",
+                "B": "Hooded Garment"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/thao/0.png":
+        {
+            "question": "What pattern is predominantly featured on <sks>'s pants?",
+            "options":
+            {
+                "A": "Floral",
+                "B": "Elephants"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "mydieu":
+    {
+        "./yollava-data/test/mydieu/3.png":
+        {
+            "question": "What is the primary color of the object <sks> is resting in?",
+            "options":
+            {
+                "A": "Green",
+                "B": "Blue"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/mydieu/1.png":
+        {
+            "question": "What position is <sks> in?",
+            "options":
+            {
+                "A": "Standing",
+                "B": "Sitting"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/mydieu/4.png":
+        {
+            "question": "What type of animal is <sks>?",
+            "options":
+            {
+                "A": "Dog",
+                "B": "Cat"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/mydieu/2.png":
+        {
+            "question": "What is the main color of <sks>'s fur?",
+            "options":
+            {
+                "A": "Orange",
+                "B": "Purple"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/mydieu/0.png":
+        {
+            "question": "What is the position of <sks>'s tail?",
+            "options":
+            {
+                "A": "Curled up",
+                "B": "Stretched out"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "chua-thien-mu":
+    {
+        "./yollava-data/test/chua-thien-mu/1.png":
+        {
+            "question": "How many visible levels does <sks> have?",
+            "options":
+            {
+                "A": "7",
+                "B": "5"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/chua-thien-mu/2.png":
+        {
+            "question": "How many visible tiers does the <sks> have?",
+            "options":
+            {
+                "A": "7",
+                "B": "5"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "marie-cat":
+    {
+        "./yollava-data/test/marie-cat/3.png":
+        {
+            "question": "What color is the bow on <sks>'s head?",
+            "options":
+            {
+                "A": "Pink",
+                "B": "Black"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/marie-cat/1.png":
+        {
+            "question": "What color is the bow on <sks>'s head?",
+            "options":
+            {
+                "A": "Pink",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/marie-cat/9.png":
+        {
+            "question": "What accessory is <sks> wearing on their head?",
+            "options":
+            {
+                "A": "A bow",
+                "B": "A hat"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/marie-cat/2.png":
+        {
+            "question": "What accessory is <sks> wearing?",
+            "options":
+            {
+                "A": "A bow",
+                "B": "A hat"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "brown-duck":
+    {
+        "./yollava-data/test/brown-duck/3.png":
+        {
+            "question": "What kind of animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Duck",
+                "B": "Platypus"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/brown-duck/8.png":
+        {
+            "question": "What is the color of <sks>'s feet?",
+            "options":
+            {
+                "A": "Orange",
+                "B": "Purple"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/brown-duck/7.png":
+        {
+            "question": "What is the color of <sks>'s beak?",
+            "options":
+            {
+                "A": "Green",
+                "B": "Yellow"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/brown-duck/0.png":
+        {
+            "question": "What type of animal is <sks>?",
+            "options":
+            {
+                "A": "Duck",
+                "B": "Crocodile"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "pusheen-cup":
+    {
+        "./yollava-data/test/pusheen-cup/3.png":
+        {
+            "question": "What is the shape of <sks>?",
+            "options":
+            {
+                "A": "Round",
+                "B": "Square"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/pusheen-cup/1.png":
+        {
+            "question": "What is the shape of <sks>'s ears?",
+            "options":
+            {
+                "A": "Round",
+                "B": "Pointed"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/pusheen-cup/4.png":
+        {
+            "question": "What is the main design feature of <sks>?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Whiskers"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/pusheen-cup/5.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Dog"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "thap-cham":
+    {
+        "./yollava-data/test/thap-cham/3.png":
+        {
+            "question": "What is the predominant color of the bricks used in <sks>?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Gray"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/thap-cham/1.png":
+        {
+            "question": "What is the predominant color of the structure where <sks> is standing?",
+            "options":
+            {
+                "A": "Reddish-brown",
+                "B": "Grey"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/thap-cham/4.png":
+        {
+            "question": "What is the primary material visible on the exterior of <sks>?",
+            "options":
+            {
+                "A": "Glass",
+                "B": "Brick"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/thap-cham/2.png":
+        {
+            "question": "What architectural style does <sks> represent?",
+            "options":
+            {
+                "A": "Gothic",
+                "B": "Champa"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "nha-tho-hcm":
+    {
+        "./yollava-data/test/nha-tho-hcm/3.png":
+        {
+            "question": "What is the primary color of <sks>?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/nha-tho-hcm/4.png":
+        {
+            "question": "What architectural feature is at the top of both towers of <sks>?",
+            "options":
+            {
+                "A": "Crosses",
+                "B": "Flags"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/nha-tho-hcm/2.png":
+        {
+            "question": "What is the primary architectural style of <sks>?",
+            "options":
+            {
+                "A": "Gothic",
+                "B": "Modern"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/nha-tho-hcm/0.png":
+        {
+            "question": "How many spires does <sks> have?",
+            "options":
+            {
+                "A": "One",
+                "B": "Two"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "shiba-sleep":
+    {
+        "./yollava-data/test/shiba-sleep/3.png":
+        {
+            "question": "What position is <sks> in on the bed?",
+            "options":
+            {
+                "A": "Standing",
+                "B": "Lying down"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/shiba-sleep/6.png":
+        {
+            "question": "What animal is <sks> designed to resemble?",
+            "options":
+            {
+                "A": "Cat",
+                "B": "Dog"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/shiba-sleep/2.png":
+        {
+            "question": "What position is <sks> in on the couch?",
+            "options":
+            {
+                "A": "Sitting upright",
+                "B": "Lying down"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "elephant":
+    {
+        "./yollava-data/test/elephant/3.png":
+        {
+            "question": "What is <sks> sitting on?",
+            "options":
+            {
+                "A": "A white rocking chair",
+                "B": "A red bench"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/elephant/1.png":
+        {
+            "question": "What type of animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Elephant",
+                "B": "Tiger"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/elephant/6.png":
+        {
+            "question": "What animal does <sks> resemble?",
+            "options":
+            {
+                "A": "Elephant",
+                "B": "Giraffe"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "ciin":
+    {
+        "./yollava-data/test/ciin/3.png":
+        {
+            "question": "What hairstyle is <sks> wearing?",
+            "options":
+            {
+                "A": "Ponytail",
+                "B": "Braided"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/ciin/1.png":
+        {
+            "question": "What type of clothing is <sks> wearing?",
+            "options":
+            {
+                "A": "Sweater",
+                "B": "Raincoat"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/ciin/4.png":
+        {
+            "question": "What is the color of <sks>'s top?",
+            "options":
+            {
+                "A": "White",
+                "B": "Black"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "henry":
+    {
+        "./yollava-data/test/henry/3.png":
+        {
+            "question": "Where is <sks> sitting?",
+            "options":
+            {
+                "A": "On a window sill",
+                "B": "On the floor"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/henry/1.png":
+        {
+            "question": "What pattern does <sks> have on its fur?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Patches"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/henry/4.png":
+        {
+            "question": "What pattern is predominantly visible on <sks>'s fur?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Tuxedo"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/henry/2.png":
+        {
+            "question": "What pattern does <sks> have on its fur?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Patchwork"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "butin":
+    {
+        "./yollava-data/test/butin/3.png":
+        {
+            "question": "Is <sks> visible in the image?",
+            "options":
+            {
+                "A": "No",
+                "B": "Yes"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/butin/4.png":
+        {
+            "question": "What is on top of <sks>'s head?",
+            "options":
+            {
+                "A": "A baseball cap",
+                "B": "A conical hat"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "denisdang":
+    {
+        "./yollava-data/test/denisdang/6.png":
+        {
+            "question": "What is the color of <sks>'s top?",
+            "options":
+            {
+                "A": "Black",
+                "B": "Red"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/denisdang/4.png":
+        {
+            "question": "What pattern is on <sks>'s shirt?",
+            "options":
+            {
+                "A": "Striped",
+                "B": "Polka dots"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/denisdang/8.png":
+        {
+            "question": "What type of clothing is <sks> wearing?",
+            "options":
+            {
+                "A": "Jacket",
+                "B": "Dress"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/denisdang/0.png":
+        {
+            "question": "What accessory is <sks> wearing on their ear?",
+            "options":
+            {
+                "A": "Earring",
+                "B": "Headphone"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/denisdang/5.png":
+        {
+            "question": "What is the primary color of <sks>'s shirt?",
+            "options":
+            {
+                "A": "Brown",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "lamb":
+    {
+        "./yollava-data/test/lamb/1.png":
+        {
+            "question": "What position is <sks> in?",
+            "options":
+            {
+                "A": "Standing",
+                "B": "Lying Down"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/lamb/6.png":
+        {
+            "question": "What is the texture of <sks>'s coat?",
+            "options":
+            {
+                "A": "Curly",
+                "B": "Straight"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/lamb/4.png":
+        {
+            "question": "Where is <sks>?",
+            "options":
+            {
+                "A": "On the floor",
+                "B": "On the table"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/lamb/2.png":
+        {
+            "question": "What color are <sks>'s feet?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/lamb/8.png":
+        {
+            "question": "What type of animal is <sks>?",
+            "options":
+            {
+                "A": "Dog",
+                "B": "Lamb"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/lamb/0.png":
+        {
+            "question": "What is the main color of <sks>'s coat?",
+            "options":
+            {
+                "A": "Black",
+                "B": "White"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "water":
+    {
+        "./yollava-data/test/water/3.png":
+        {
+            "question": "What is the primary color of <sks>'s skin?",
+            "options":
+            {
+                "A": "Blue",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/water/1.png":
+        {
+            "question": "What is the predominant color of <sks>'s shirt?",
+            "options":
+            {
+                "A": "Purple",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/water/6.png":
+        {
+            "question": "What is the color of <sks>'s skin?",
+            "options":
+            {
+                "A": "Blue",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/water/9.png":
+        {
+            "question": "What type of clothing is <sks> wearing?",
+            "options":
+            {
+                "A": "A yellow shirt",
+                "B": "A blue jacket"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/water/8.png":
+        {
+            "question": "What type of accessory is <sks> wearing around their neck?",
+            "options":
+            {
+                "A": "Tie",
+                "B": "Headphones"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/water/7.png":
+        {
+            "question": "What is the primary color of <sks>'s outfit?",
+            "options":
+            {
+                "A": "Purple",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "neurips-cup":
+    {
+        "./yollava-data/test/neurips-cup/3.png":
+        {
+            "question": "What is the primary color of <sks>?",
+            "options":
+            {
+                "A": "Blue",
+                "B": "Red"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/neurips-cup/6.png":
+        {
+            "question": "What is the primary color of <sks>?",
+            "options":
+            {
+                "A": "Blue",
+                "B": "Red"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/neurips-cup/4.png":
+        {
+            "question": "What is written on <sks>?",
+            "options":
+            {
+                "A": "Neural Information Processing Systems",
+                "B": "International Conference on Machine Learning"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "mam":
+    {
+        "./yollava-data/test/mam/3.png":
+        {
+            "question": "What is the color of <sks>'s fur?",
+            "options":
+            {
+                "A": "Gray",
+                "B": "Orange"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/mam/1.png":
+        {
+            "question": "What pattern does <sks> have on its fur?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Spots"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "nha-tho-hanoi":
+    {
+        "./yollava-data/test/nha-tho-hanoi/4.png":
+        {
+            "question": "What is the primary architectural style of <sks>?",
+            "options":
+            {
+                "A": "Gothic",
+                "B": "Modern"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/nha-tho-hanoi/5.png":
+        {
+            "question": "What is the primary color of the building that <sks> is in front of?",
+            "options":
+            {
+                "A": "Gray",
+                "B": "Red"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "phuc-map":
+    {
+        "./yollava-data/test/phuc-map/3.png":
+        {
+            "question": "What color is <sks>'s beard?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Brown"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/phuc-map/6.png":
+        {
+            "question": "What pattern is visible on <sks>'s shorts?",
+            "options":
+            {
+                "A": "Stripes",
+                "B": "Solid"
+            },
+            "correct_answer": "B"
+        },
+        "./yollava-data/test/phuc-map/2.png":
+        {
+            "question": "What is <sks> holding in their hand?",
+            "options":
+            {
+                "A": "A bowl with food",
+                "B": "A book"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/phuc-map/8.png":
+        {
+            "question": "What type of accessory is <sks> wearing on their head?",
+            "options":
+            {
+                "A": "Baseball cap",
+                "B": "Bowler hat"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/phuc-map/0.png":
+        {
+            "question": "What color is the shirt worn by <sks>?",
+            "options":
+            {
+                "A": "Red",
+                "B": "Green"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/phuc-map/5.png":
+        {
+            "question": "What item is <sks> holding in their right hand?",
+            "options":
+            {
+                "A": "A water bottle",
+                "B": "A camera"
+            },
+            "correct_answer": "B"
+        }
+    },
+    "tokyo-keyboard":
+    {
+        "./yollava-data/test/tokyo-keyboard/1.png":
+        {
+            "question": "What is the dominant color of <sks>'s keyboard?",
+            "options":
+            {
+                "A": "Pink",
+                "B": "Black"
+            },
+            "correct_answer": "A"
+        }
+    },
+    "duck-banana":
+    {
+        "./yollava-data/test/duck-banana/3.png":
+        {
+            "question": "What type of hat is <sks> wearing?",
+            "options":
+            {
+                "A": "Santa hat",
+                "B": "Baseball cap"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/duck-banana/6.png":
+        {
+            "question": "What accessory is <sks> wearing on its head?",
+            "options":
+            {
+                "A": "Crown",
+                "B": "Hat"
+            },
+            "correct_answer": "A"
+        },
+        "./yollava-data/test/duck-banana/8.png":
+        {
+            "question": "What type of animal is <sks> designed to resemble?",
+            "options":
+            {
+                "A": "Duck",
+                "B": "Elephant"
+            },
+            "correct_answer": "A"
+        }
+    }
+}

@@ -1,4 +1,4 @@
-project_name: "YoChameleon5"
+project_name: "YoChameleon6"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -13,6 +13,8 @@ sks_name: 'thao'
 prefix_token: 16 # Remember to change this
 exp_name: 'yollava' # Remember to change this
 different_identifier: False
+task_disjoin: False
+
 iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5
@@ -70,6 +72,14 @@ special_tokens:
   PAD_INDEX: 1
   PERSONALITY_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
+
+# --- EVAL CONFIG --- 
+eval:
+  recognition: True
+  recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
+  recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'
+  vqa: True
+  vqa_path_json: './baselines/yollava-visual-qa.json'
 
 # --- TEST CONFIG --- 
 test:

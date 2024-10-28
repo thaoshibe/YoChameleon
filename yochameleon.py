@@ -2,6 +2,8 @@ import os
 import torch
 import wandb
 
+import re
+
 from itertools import cycle
 from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
@@ -55,13 +57,14 @@ class YoChameleonTrainer:
 			#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 			# generation tokens
-			understand_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
+			gen_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
 			# understanding tokens
-			gen_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+self.config.prefix_token+i}>' for i in range(self.config.prefix_token)]
+			understand_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+self.config.prefix_token+i}>' for i in range(self.config.prefix_token)]
 			personalized_tokens = [self.identifier]
-
-			personalized_tokens.extend(understand_prefix_tokens)
+			
 			personalized_tokens.extend(gen_prefix_tokens)
+			personalized_tokens.extend(understand_prefix_tokens)
+			
 
 			# --- This is for the negative identifier, which is not used anymore
 			# if self.config.different_identifier:
@@ -76,7 +79,12 @@ class YoChameleonTrainer:
 			self.understand_prefix_token_ids = self.processor.tokenizer.convert_tokens_to_ids(understand_prefix_tokens)
 			self.understand_prefix_token_ids.append(identifier_token_id)
 			self.generation_prefix_token_ids = self.processor.tokenizer.convert_tokens_to_ids(gen_prefix_tokens)
-			self.generation_prefix_token_ids.append(identifier_token_id)
+			#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+			#          
+			#  THAO: ATTENTION: YOU ARE NOT INCLUDE <SKS> IN THE GENERATION!
+			#
+			#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+			# self.generation_prefix_token_ids.append(identifier_token_id)
 
 			print(f'Personalized tokens: {self.personalized_tokens}')
 			print(f'Personalized token ids: {self.personalized_token_ids}')
@@ -237,7 +245,7 @@ class YoChameleonTrainer:
 	def train(self, dataloader):
 		dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
-			self.wandb.log({"train_dataset_length": len(dataloader.dataset)})
+			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
 		print('Start training... from iteration:', self.iteration)
 		for iteration in tqdm(range(self.iteration, self.config.iteration)):
 			self.optimizer.zero_grad()
@@ -295,7 +303,7 @@ class YoChameleonTrainer:
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
-	def train_epoch(self, dataloader):
+	def train_epoch(self, dataloader, recognition_data_loader_train=None, recognition_data_loader_test=None):
 		# dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
 			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
@@ -353,10 +361,13 @@ class YoChameleonTrainer:
 				self.save_checkpoint(iteration)
 				if self.config.eval_visualization:
 					self.visualize_evaluation()
+				if self.config.eval['recognition']:
+					self.eval_recognition(recognition_data_loader_train, split='train')
+					self.eval_recognition(recognition_data_loader_test, split='test')
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
-	def train_epoch_disjoin(self, dataloader):
+	def train_epoch_disjoin(self, dataloader, recognition_data_loader_train=None, recognition_data_loader_test=None):
 		# dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
 			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
@@ -433,13 +444,14 @@ class YoChameleonTrainer:
 				if self.optimizer_config.grad_clip > 0:
 				    torch.nn.utils.clip_grad_value_(self.model.model.parameters(), clip_value=self.optimizer_config.grad_clip)
 
-
-
 			# Save model checkpoints
 			if iteration % self.config.save_every == 0:
 				self.save_checkpoint(iteration)
 				if self.config.eval_visualization:
 					self.visualize_evaluation()
+				if self.config.eval['recognition']:
+					self.eval_recognition(recognition_data_loader_train, split='train')
+					self.eval_recognition(recognition_data_loader_test, split='test')
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
@@ -513,7 +525,7 @@ class YoChameleonTrainer:
 		self.get_optimizer_and_scheduler(self.config.finetune)
 		
 		if not self.config.no_wandb:
-			self.wandb.log({"finetune_dataset_length": len(dataloader.dataset)})
+			self.wandb.log({"Dataset/Finetune_dataset_length": len(dataloader.dataset)})
 		# dataloader_iter = cycle(dataloader)
 		total_iter = self.iteration + self.config.finetune['finetune_iteration']
 		for iteration in tqdm(range(self.iteration, total_iter)):
@@ -574,44 +586,93 @@ class YoChameleonTrainer:
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
+	@torch.no_grad()
 	def test(self):
 		config_test = Config(self.config.test)
-		with torch.no_grad():
-			index = 0
-			for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
-				prompt_short = config_test.prompt
-				full_prompt = f"{self.sks_prompt} {prompt_short}"
-				inputs = self.processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(self.model.device)
-				generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
-				response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
-				pixel_values = self.model.decode_image_tokens(response_ids[:, 1:-1])
-				pixel_values = self.processor.postprocess_pixel_values(pixel_values)
-				# Save generated images using the helper function
-				save_path = os.path.join(str(config_test.save_dir), self.config.exp_name, str(self.iteration))
-				index, image = save_generated_images(pixel_values, prompt_short, save_path, self.config.sks_name, index)
-
-	def visualize_evaluation(self):
-		with torch.no_grad():
-			print('Generate evaluation images...')
-			prompt = self.sks_prompt + f' A photo of {self.identifier}.'
-			print(prompt)
-			inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
+		index = 0
+		for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
+			prompt_short = config_test.prompt
+			full_prompt = f"{self.sks_prompt} {prompt_short}"
+			inputs = self.processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(self.model.device)
 			generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
 			response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
 			pixel_values = self.model.decode_image_tokens(response_ids[:, 1:-1])
 			pixel_values = self.processor.postprocess_pixel_values(pixel_values)
-			image = to_pil_image(pixel_values[0].detach().cpu())
+			# Save generated images using the helper function
+			save_path = os.path.join(str(config_test.save_dir), self.config.exp_name, str(self.iteration))
+			index, image = save_generated_images(pixel_values, prompt_short, save_path, self.config.sks_name, index)
+	
+	@torch.no_grad()
+	def eval_recognition(self, recognition_data_loader, split='test'):
 
-			print('Generate the text response...')
-			prompt = self.sks_prompt + f' Can you describe {self.identifier} in details?'
-			inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
-			output = self.model.generate(**inputs, max_new_tokens=200)
+		print('\n\n                Recognition Evaluation \n\n')
+
+		pattern = r"<reserved08706>(.*)"
+		ground_truth = []
+		predictions = []
+
+		for batch in tqdm(recognition_data_loader):
+			# batch['inputs'] = batch['inputs'].to(model.device)
+			# reshape tensor to remove batch dimension
+			batch['inputs'] = {k: v.squeeze(1).to(self.model.device) for k, v in batch['inputs'].items()}
+			batch['inputs']['pixel_values'] = batch['inputs']['pixel_values'].to(self.model.dtype)
+
+			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=3)
+			# answers = processor.batch_decode(output, skip_special_tokens=False)
+			# output = self.model.generate(**inputs, max_new_tokens=200)
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
-			
-			if not self.config.no_wandb:
-				self.wandb.log({"Images/Prediction": wandb.Image(image)})
-				import html
-				escaped_string = html.escape(result_with_special_tokens)
-				print(escaped_string)
-				self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
+			# print(result_with_special_tokens)
+			answers = re.findall(pattern, result_with_special_tokens)[0]
+			if ('Yes' in answers) or ('yes' in answers):
+				predictions.append('Yes')
+			elif ('No' in answers) or ('no' in answers):
+				predictions.append('No')
+			else:
+				predictions.append(answers)
+			ground_truth.extend(batch['labels'])
+
+		positive_indices = [i for i, x in enumerate(ground_truth) if x == 'Yes']
+		negative_indices = [i for i, x in enumerate(ground_truth) if x == 'No']
+
+		predict_positive = [predictions[i] for i in positive_indices]
+		predict_negative = [predictions[i] for i in negative_indices]
+		gt_positive = [ground_truth[i] for i in positive_indices]
+		gt_negative = [ground_truth[i] for i in negative_indices]
+		# accuracy:
+		accuracy = sum([1 for i, j in zip(ground_truth, predictions) if i == j]) / len(ground_truth)
+		postive_accuracy = sum([1 for i, j in zip(gt_positive, predict_positive) if i == j]) / len(gt_positive)
+		negative_accuracy = sum([1 for i, j in zip(gt_negative, predict_negative) if i == j]) / len(gt_negative)
+		print(f'Accuracy: {accuracy}')
+		print(f'Positive Accuracy: {postive_accuracy}')
+		print(f'Negative Accuracy: {negative_accuracy}')
+		if not self.config.no_wandb:
+			self.wandb.log({f"Recognition-{split}/Accuracy": accuracy})
+			self.wandb.log({f"Recognition-{split}/Positive_Accuracy": postive_accuracy})
+			self.wandb.log({f"Recognition-{split}/Negative_Accuracy": negative_accuracy})
+			self.wandb.log({f"Recognition-{split}/Weighted_Accurarcy": (postive_accuracy + negative_accuracy) / 2})
+
+	@torch.no_grad()
+	def visualize_evaluation(self):
+		print('Generate evaluation images...')
+		prompt = self.sks_prompt + f' A photo of {self.identifier}.'
+		print(prompt)
+		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
+		generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
+		response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
+		pixel_values = self.model.decode_image_tokens(response_ids[:, 1:-1])
+		pixel_values = self.processor.postprocess_pixel_values(pixel_values)
+		image = to_pil_image(pixel_values[0].detach().cpu())
+
+		print('Generate the text response...')
+		prompt = self.sks_prompt + f' Can you describe {self.identifier} in details?'
+		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
+		output = self.model.generate(**inputs, max_new_tokens=200)
+		result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
+		
+		if not self.config.no_wandb:
+			self.wandb.log({"Images/Prediction": wandb.Image(image)})
+			import html
+			escaped_string = html.escape(result_with_special_tokens)
+			print(escaped_string)
+			self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
 

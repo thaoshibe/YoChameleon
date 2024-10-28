@@ -36,20 +36,20 @@ export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 cd $WORKING_FOLDER/YoChameleon
 # ("thao" "yuheng" "thuytien" "viruss" "ciin" "khanhvy" "oong" "willinvietnam" "denisdang" "phuc-map")
 
-CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "thao" &
-CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "yuheng" &
-CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "ciin" &
-CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "khanhvy" 
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "thao" &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "yuheng" &
+CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "ciin" &
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "khanhvy" 
 wait
 
-CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "denisdang" &
-CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "viruss" &
-CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "oong" &
-CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "willinvietnam" 
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "denisdang" &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "viruss" &
+CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "oong" &
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "willinvietnam" 
 wait
 
-CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "bo" &
-CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "phuc-map"
-CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "thuytien" &
-CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text-recog.yaml --sks_name "mam" 
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "bo" &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "phuc-map"
+CUDA_VISIBLE_DEVICES=4,5 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "thuytien" &
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config ./config/1000neg-text-recog.yaml --no_wandb --sks_name "mam" 
 wait

@@ -1,4 +1,9 @@
-You are seeing an image of a subject named Charlie.
-Answer the question about Charlie without mention the image.
+You are viewing an image of a subject named Charlie.
+Answer the question about Charlie without mentioning the image.
+The answer should sound as if you can respond to the question without having seen the image, and you know Charlie very well.
+
+Again, do not mention that your answer is based on the image.
+DO NOT MENTION THE IMAGE.
+
 {question}
 {image_path}

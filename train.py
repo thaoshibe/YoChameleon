@@ -6,6 +6,7 @@ from tqdm import tqdm
 from utils import Config
 
 from utils import get_dataloader_iter
+from utils import get_eval_dataloader
 from yochameleon import YoChameleonTrainer
 
 def get_args():
@@ -27,8 +28,7 @@ if __name__ == '__main__':
     if args.sks_name is not None:
         config.sks_name = args.sks_name
         config.json_file = [x.replace('SKS_NAME', config.sks_name) for x in config.json_file]
-    if not hasattr(config, 'task_disjoin'):
-        config.task_disjoin = False
+
     # call training loop
     trainer = YoChameleonTrainer(config)
     personalized_prompt = trainer.get_personalized_prompt()
@@ -42,19 +42,42 @@ if __name__ == '__main__':
     trainer.resume_training()
     trainer.configure_model() # this step will set up optimization
 
+    if config.eval['recognition']:
+        recognition_dataloader_train = get_eval_dataloader(
+            config,
+            trainer.processor,
+            image_folder=config.eval['recognition_path_train'],
+            personalized_prompt=personalized_prompt,
+        )
+        recognition_dataloader_test = get_eval_dataloader(
+            config,
+            trainer.processor,
+            image_folder=config.eval['recognition_path_test'],
+            personalized_prompt=personalized_prompt,
+        )
+    else:
+        recognition_dataloader_train = None
+        recognition_dataloader_test = None
+        # trainer.eval_recognition(recognition_dataloader_test, split='test')
     if config.epoch > 0: #If you want to train with epoch... Fine, here you go
         config.iteration = config.epoch
         if config.task_disjoin:
-            print('\n   Hello, this script will train with task disjoin !!!\n')
-            trainer.train_epoch_disjoin(train_dataloader)
+            print('\n\n\n   Hello, this script will train with task disjoin !!!\n\n\n')
+            trainer.train_epoch_disjoin(
+                train_dataloader,
+                recognition_dataloader_train,
+                recognition_dataloader_test)
         else:
-            trainer.train_epoch(train_dataloader)
-
+            trainer.train_epoch(train_dataloader,
+                recognition_dataloader_train,
+                recognition_dataloader_test
+                )
         # -- Thao: Maybe we should move this to the finetuning stage for all
         if config.finetune['finetune']:
             config.finetune['finetune_iteration'] = config.finetune['finetune_epoch']
             positive_only_dataloader = get_dataloader_iter(config, trainer.processor, only_positive=True)
             trainer.finetune_epoch(positive_only_dataloader)
+
     else: # This support train with iteration
         print('Hello, train with iteration')
         trainer.train(train_dataloader)

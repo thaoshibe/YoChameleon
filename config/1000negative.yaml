@@ -13,6 +13,8 @@ sks_name: 'thao'
 prefix_token: 16 # Remember to change this
 exp_name: '1000negative' # Remember to change this
 different_identifier: False
+task_disjoin: False
+
 iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 epoch: 20 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 5

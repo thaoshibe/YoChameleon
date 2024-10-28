@@ -5,21 +5,23 @@
 ### TODO
 - [ ] Training
   - [x] Change to bfloat16?
-  - [ ] Link the retrieval and training together?
+  - [ ] Link the retrieval and training together? -- Low priority
   - [ ] Create augmented data for the model?
-  - [ ] Support: Setting E ("A photo of <sks>") -- Create json file
-  - [ ] Support: Two set of tokens?
-  - [ ] Support: Three set of tokens?
-  - [ ] Support: Train with augmented dataset
+    - [ ] Train with augmented dataset
+  - [x] Support: Setting E ("A photo of <sks>") -- Create json file
+  - [x] Support: Two set of tokens?
 
-- [ ] Evaluation
+- Dataset right now: Missing 100 random images!
+
+- [ ] Evaluation -- High priority now
   - [ ] Recognition evaluation: Yes/No accuracy/ Recall?
   - [ ] Diversity image generation evaluation (CLIP)
   - [ ] Image quality generation: CLIP score/ DINO scores?
   
+- Baselines:
+  - Code baseline
 - [ ] Minor
   - [x] Create a list of <reserved> tokens for the model?
-  - [ ] 
 
 
 ### Getting Started
@@ -28,16 +30,26 @@
 bash install.sh
 ```
 
-### Creating dataset
+### 🛠️ Creating dataset
 
 ```
-# For (1) Retrieving negative examples; (2) Recognition Data; (3) Simple Question Answering; and (4) Positive Generation Only
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #
-# Remember to UNCOMMEND the parts that you wants to run
+#   bash scripts provided in `scripts/create_data` folder
+#   
+#   scripts/create_data
+#   ├── retrieve.sh               # retrieve negative examples
+#   ├── recognition.sh            # recognition data (100 hard neg, 100 easy neg, & positive)
+#   ├── create_soft_positive.sh   # image generation data
+#   ├── simple_conversation.sh    # simple conversation data
+#   └── text_only_data.sh         # call GPT-4o for text-only response data
 #
-bash scripts/create_training_data.sh
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-# For soft-negative ideas
+#
+# Remember to check and fill the relative path in the script before running
+#
+
 bash scripts/create_soft_positive.sh
 
 ```
@@ -258,17 +270,17 @@ done
 ```
 </details>
 
-### Training
+### 🧑‍🏫 Training
 
 ```
 python train.py --config config/basic.yaml
 ```
 
-### Evaluation
+### 📊 Evaluation
 
 Please reference the README.md in the `evaluation` folder for more details.
 
-### Acknowledgements 🤗
+### 🤗 Acknowledgements
 
 This project will not be possible without the following open-source projects:
 - [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://github.com/facebookresearch/chameleon)

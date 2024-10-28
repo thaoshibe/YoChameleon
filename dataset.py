@@ -130,6 +130,57 @@ class PersonalizedDataset(Dataset):
         example['labels'] = labels
         return example
 
+
+class RecognitionData(Dataset):
+    def __init__(
+        self,
+        sks_name,
+        placeholder_token="<reserved16200>",
+        image_folder=None,
+        tokenizer_max_length=1500, 
+        processor: ChameleonProcessor = None,
+        only_positive: bool = False,
+        personalized_prompt: str = None,
+    ):
+        self.processor = processor
+        self.sks_name = sks_name
+        self.placeholder_token = placeholder_token
+        self.max_length = tokenizer_max_length
+        self.personalized_prompt = personalized_prompt
+        self.image_paths = glob.glob(os.path.join(image_folder, "*/*.png"))
+        self.image_paths = [x for x in self.image_paths if 'negative_example' not in x]
+        
+        print(f'Found {len(self.image_paths)} images')
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, i):
+        image_path = self.image_paths[i]
+        #-- This might be useful, as later can be trained for multiple images (interleaved data)
+        # images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
+        # print(f'Loading {image_path}')
+        images = [Image.open(image_path).convert("RGB")]
+        question = f'{self.personalized_prompt} Is {self.placeholder_token} in this photo? Answer "Yes" or "No".<image>'
+        example = self.processor(
+            text=question,
+            images=images,
+            padding="max_length",
+            max_length=self.max_length,
+            )
+        example['inputs'] = {
+            'input_ids': example['input_ids'],
+            'attention_mask': example['attention_mask'],
+            'pixel_values': example['pixel_values'],
+        }
+
+        if f'/{self.sks_name}/' in image_path:
+            example['labels'] = ['Yes']
+        else:
+            example['labels'] = ['No']
+        return example
+
+
 if __name__ == "__main__":
 
     model_id = 'leloy/Anole-7b-v0.1-hf'
