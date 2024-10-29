@@ -80,12 +80,12 @@ class PersonalizedDataset(Dataset):
             if self.task_disjoin:
                 #if task disjoin, then have to add the understanding tokens for image generation
                 if 'negative_example' not in image_paths[0]:
-                    conv[0]['value'] = f'{self.personalized_prompt} A photo of <reserved16200>.'
+                    conv[0]['value'] = f'{self.personalized_prompt} A photo of {self.placeholder_token}.'
 
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>
         full_text = conversations.replace("<sks>", self.placeholder_token)
-
+        
         example = self.processor(
             text=full_text,
             images=images,
@@ -150,7 +150,7 @@ class RecognitionData(Dataset):
         self.image_paths = glob.glob(os.path.join(image_folder, "*/*.png"))
         self.image_paths = [x for x in self.image_paths if 'negative_example' not in x]
         
-        print(f'Found {len(self.image_paths)} images')
+        print(f'Found {len(self.image_paths)} images in {image_folder}')
 
     def __len__(self):
         return len(self.image_paths)
@@ -161,12 +161,12 @@ class RecognitionData(Dataset):
         # images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         # print(f'Loading {image_path}')
         images = [Image.open(image_path).convert("RGB")]
-        question = f'{self.personalized_prompt} Is {self.placeholder_token} in this photo? Answer "Yes" or "No".<image>'
+        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image>'
         example = self.processor(
             text=question,
             images=images,
-            padding="max_length",
-            max_length=self.max_length,
+            # padding="max_length",
+            # max_length=self.max_length,
             )
         example['inputs'] = {
             'input_ids': example['input_ids'],

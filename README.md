@@ -270,11 +270,22 @@ done
 ```
 </details>
 
-### 🧑‍🏫 Training
+### 🧑‍🏫 Train
 
 ```
 python train.py --config config/basic.yaml
 ```
+
+### 🧪 Test
+
+```
+#--- This test will generated "A photo of <sks>" and saved to some directory
+
+python test.py --config config/basic.yaml 
+
+# Flexible test
+```
+
 
 ### 📊 Evaluation
 

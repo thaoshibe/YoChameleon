@@ -13,7 +13,7 @@ NAMES=("bo" "mam" "thuytien" "viruss" "ciin" "khanhvy" "oong" "thao" "willinviet
 
 # Loop through each folder
 for NAME in "${NAMES[@]}"; do
-
+  PROMPT_FILE_PATH="./create_training_data/conversation_data/template-answer/recognition-chameleon.json"
   POSITIVE_IMAGE_FOLDER="/mnt/localssd/code/data/yochameleon-data/train/${NAME}"
   NEGATIVE_IMAGE_FOLDER="/mnt/localssd/code/data/yochameleon-data/train/${NAME}/negative_example"
   RANDOM_NEGATIVE_IMAGE_FOLDER="/mnt/localssd/code/data/yochameleon-data/random_negative_example"
@@ -25,6 +25,7 @@ for NAME in "${NAMES[@]}"; do
   
   # Execute the Python script with the required arguments
   python create_training_data/conversation_data/create_conversation.py \
+    --prompt_file_path "$PROMPT_FILE_PATH" \
     --positive_image_folder "$POSITIVE_IMAGE_FOLDER" \
     --negative_image_folder "$NEGATIVE_IMAGE_FOLDER" \
     --random_negative_image_folder "$RANDOM_NEGATIVE_IMAGE_FOLDER" \

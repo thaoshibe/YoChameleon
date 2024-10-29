@@ -28,10 +28,8 @@ def get_args():
     parser = argparse.ArgumentParser(description='Your Chameleon model')
     # model related
     parser.add_argument('--config', type=str, default='./config/basic.yml')
-    parser.add_argument('--wandb', action='store_true', help='Turn off log to WanDB for debug reason')
     parser.add_argument('--iteration', type=int, default=-100)
     parser.add_argument('--finetune', action='store_true', help='Use fine-tuned model')
-    parser.add_argument('--wandb_id', type=str, default='1eyixddq')
     parser.add_argument('--exp_name', type=str, default=None)
     parser.add_argument('--sks_name', type=str, default=None)
     parser.add_argument('--img_size', type=int, default=256)
@@ -55,17 +53,9 @@ if __name__ == '__main__':
     model = ChameleonForConditionalGeneration.from_pretrained(
         config.model_id, 
         torch_dtype=torch.bfloat16, 
-        low_cpu_mem_usage=True,
-        attn_implementation="flash_attention_2"
+        # low_cpu_mem_usage=True,
+        # attn_implementation="flash_attention_2" #Thao: Don't know why transformers 4.46.1 doesnt support Chameleon with this option
     ).to('cuda')
-
-    # Thao: Goal is to log the results to wandb -- But this is not implemented yet
-    if args.wandb:
-        wandb.init(project=config.project_name,
-            name=config.exp_name,
-            entity="thaoshibe-university-of-wisconsin-madison",
-            config=config_dict,
-            resume="must", id=args.wandb_id)
 
     # Create personalized tokens
     prefix_tokens = [f'<reserved{16201+i}>' for i in range(config.prefix_token)]
@@ -134,6 +124,4 @@ if __name__ == '__main__':
             save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration)+'ft', config.sks_name)
         else:
             save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration), config.sks_name)
-        index, image = save_generated_images(pixel_values, prompt_short, save_path, config.sks_name, index)
-        # if not args.no_wandb:
-        #     wandb.log({"test_generated_images": image}, step=i)
+        index, image = save_generated_images(pixel_values, prompt_short, save_path, config.sks_name, index, image_size=args.img_size)

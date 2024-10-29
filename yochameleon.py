@@ -10,6 +10,7 @@ from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
 from transformers.image_transforms import to_pil_image
 from utils import Config
+from utils import chameleon_trim_answer
 
 def save_generated_images(pixel_values, prompt_short, save_path, sks_name, index):
     """Save generated images to a specified directory."""
@@ -327,7 +328,6 @@ class YoChameleonTrainer:
 						image_tokens = self.model.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
 						batch['input_ids'][i, soi_index:eot_index] = image_tokens
 						# print('image tokens added to input_ids')
-				torch.cuda.empty_cache()
 				batch = {k: v.to(self.model.device) for k, v in batch.items()}
 
 				# Forward pass
@@ -607,7 +607,6 @@ class YoChameleonTrainer:
 
 		print('\n\n                Recognition Evaluation \n\n')
 
-		pattern = r"<reserved08706>(.*)"
 		ground_truth = []
 		predictions = []
 
@@ -618,17 +617,15 @@ class YoChameleonTrainer:
 			batch['inputs']['pixel_values'] = batch['inputs']['pixel_values'].to(self.model.dtype)
 
 			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=3)
-			# answers = processor.batch_decode(output, skip_special_tokens=False)
-			# output = self.model.generate(**inputs, max_new_tokens=200)
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
-			# print(result_with_special_tokens)
-			answers = re.findall(pattern, result_with_special_tokens)[0]
-			if ('Yes' in answers) or ('yes' in answers):
+
+			answer = chameleon_trim_answer(result_with_special_tokens)
+			if ('Yes' in answer) or ('yes' in answer):
 				predictions.append('Yes')
-			elif ('No' in answers) or ('no' in answers):
+			elif ('No' in answer) or ('no' in answer):
 				predictions.append('No')
 			else:
-				predictions.append(answers)
+				predictions.append(answer)
 			ground_truth.extend(batch['labels'])
 
 		positive_indices = [i for i, x in enumerate(ground_truth) if x == 'Yes']
@@ -668,11 +665,11 @@ class YoChameleonTrainer:
 		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
 		output = self.model.generate(**inputs, max_new_tokens=200)
 		result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
-		
+		answer = chameleon_trim_answer(result_with_special_tokens)
 		if not self.config.no_wandb:
 			self.wandb.log({"Images/Prediction": wandb.Image(image)})
 			import html
-			escaped_string = html.escape(result_with_special_tokens)
-			print(escaped_string)
-			self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
+			# escaped_string = html.escape(result_with_special_tokens)
+			print(answer)
+			self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{answer}</p>')})
 

@@ -4,8 +4,17 @@ import torch
 from dataset import PersonalizedDataset
 from dataset import RecognitionData
 
+import re
+
 from torchvision import datasets
 
+def chameleon_trim_answer(long_answer):
+    end_of_turn = '<reserved08706>'
+    pattern = r"<reserved08706>(.*)"
+    short_answer = re.findall(pattern, long_answer)[0] # trim the first end of turn
+    short_answer = short_answer.split(end_of_turn)[0] # trim the second end of turn
+    return short_answer
+    
 def get_dataloader_iter(config, processor, only_positive=False, personalized_prompt=None):
     if not hasattr(config, 'task_disjoin'):
         config.task_disjoin = False
