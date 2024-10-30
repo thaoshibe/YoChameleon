@@ -1,19 +1,25 @@
-project_name: "YoChameleon2"
+project_name: "YoChameleon9"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
 data_root: '/mnt/localssd/code/data/minithao/'
 
-json_file:
-  - './json/64-64.json' # Remember to change this
+json_file: # Remember to change this
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000.json'
 
 sks_name: 'thao'
-prefix_token: 64 # Remember to change this
-exp_name: 'neg-64-64-v3' # Remember to change this
-spacing: 64
+prefix_token: 16 # Remember to change this
+exp_name: '1000disjoinlr0001' # Remember to change this
+different_identifier: False
+task_disjoin: True
 
-iteration: 1001 # remember to CHANGE THIS shibe
-save_every: 100
+seperate_tasks: False # This means, the model will be trained on all tasks (recognition, gen) with same tokens, or seperate
+
+iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+epoch: 30 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+save_every: 5
 
 batch_size: 4
 savedir: '/sensei-fs/users/thaon/ckpt/'
@@ -22,16 +28,16 @@ tokenizer_max_length: 1500
 eval_visualization: True
 
 resume: 
-  resume: False
-  resume_iteration: 150
-  savedir: '/sensei-fs/users/thaon/ckpt/' 
-  exp_name: 'neg-64-64'
-  sks_name: 'thao'
+  resume: No
+  resume_iteration: 15
+  savedir: '/sensei-fs/users/thaon/ckpt/'
+  exp_name: '1000disjoin'
 
 finetune:
-  finetune: True
+  finetune: False
   finetune_iteration: 201 # remember to CHANGE THIS shibe
-  save_every: 50
+  finetune_epoch: 6 # remember to CHANGE THIS shibe
+  save_every: 1
   optimizer:
     type: 'AdamW'
     lr: 0.00001
@@ -48,7 +54,7 @@ finetune:
 
 optimizer:
   type: 'AdamW'
-  lr: 0.0001
+  lr: 0.001
   betas: [0.9, 0.999]
   weight_decay: 1e-4
   eps: 1e-6
@@ -67,6 +73,13 @@ special_tokens:
   PAD_INDEX: 1
   PERSONALITY_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
+# --- EVAL CONFIG --- 
+eval:
+  recognition: True
+  recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
+  recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'
+  vqa: True
+  vqa_path_json: './baselines/yollava-visual-qa.json'
 
 # --- TEST CONFIG --- 
 test:

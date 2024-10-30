@@ -78,9 +78,17 @@ class PersonalizedDataset(Dataset):
 
         else:
             if self.task_disjoin:
+                
                 #if task disjoin, then have to add the understanding tokens for image generation
                 if 'negative_example' not in image_paths[0]:
-                    conv[0]['value'] = f'{self.personalized_prompt} A photo of {self.placeholder_token}.'
+                    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                    #          
+                    #  Attention: THAO, THIS IS A STUPID HACK FOR QUICK CHECK --- REMEMBER TO CHANGE ASAP
+                    #
+                    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                    caption = conv[0]['value'].split('.')[0]
+                    recognition_tokens = [f'<reserved{16+16201+i}>' for i in range(16)]
+                    conv[0]['value'] = f'{caption}{"".join(recognition_prompt)}. A photo of <reserved16200>.'
 
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>
@@ -186,7 +194,7 @@ if __name__ == "__main__":
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
     #--- This is for debug purpose
-    config_file = './config/1000disjoin.yaml'
+    config_file = './config/settingA.yaml'
 
     config_dict = yaml.safe_load(open(config_file, 'r'))
     config = Config(config_dict)
@@ -199,6 +207,7 @@ if __name__ == "__main__":
             tokenizer_max_length=config.tokenizer_max_length,
             END_OF_TURN=config.special_tokens["END_OF_TURN"],
             personalized_prompt=personalized_prompt,
+            task_disjoin=config.task_disjoin,
             )
     for i in range(len(train_dataset)):
         train_dataset.__getitem__(i)

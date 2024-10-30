@@ -1,19 +1,23 @@
-project_name: "YoChameleon2"
+project_name: "YoChameleon9"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
 data_root: '/mnt/localssd/code/data/minithao/'
 
-json_file:
-  - './json/128-16.json' # Remember to change this
+json_file: # Remember to change this
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000.json'
 
 sks_name: 'thao'
-prefix_token: 128 # Remember to change this
-exp_name: 'neg-128-16-v3' # Remember to change this
-spacing: 16
+prefix_token: 16 # Remember to change this
+exp_name: '1000negative' # Remember to change this
+different_identifier: False
+task_disjoin: False
 
-iteration: 1001 # remember to CHANGE THIS shibe
-save_every: 100
+iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+epoch: 30 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+save_every: 5
 
 batch_size: 4
 savedir: '/sensei-fs/users/thaon/ckpt/'
@@ -25,13 +29,14 @@ resume:
   resume: False
   resume_iteration: 150
   savedir: '/sensei-fs/users/thaon/ckpt/' 
-  exp_name: 'neg-128-16'
+  exp_name: 'neg-64-8'
   sks_name: 'thao'
 
 finetune:
-  finetune: True
+  finetune: False
   finetune_iteration: 201 # remember to CHANGE THIS shibe
-  save_every: 50
+  finetune_epoch: 6 # remember to CHANGE THIS shibe
+  save_every: 1
   optimizer:
     type: 'AdamW'
     lr: 0.00001
@@ -68,6 +73,12 @@ special_tokens:
   PERSONALITY_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
 
+eval:
+  recognition: True
+  recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
+  recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'
+  vqa: True
+  vqa_path_json: './baselines/yollava-visual-qa.json'
 # --- TEST CONFIG --- 
 test:
   prompt: "A photo of <reserved16200>."

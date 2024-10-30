@@ -2,14 +2,51 @@
 
 <img src="./images/yochameleon.png" alt="YoChameleon" width="400">
 
-### TODO
+### 📝 write, write, write, Shibe
+
+[this is your overleaf link](https://www.overleaf.com/project/67100832e7abc0d8115cece0) [https://www.overleaf.com/project/67100832e7abc0d8115cece0](https://www.overleaf.com/project/67100832e7abc0d8115cece0)
+
+** 11/15/2024: 14 days left **
+- [ ] Introduction
+  - [ ] 🖼️ Teaser `figure`
+- [ ] Related Work
+  - [ ] Personalizing LMMs (?) -- Or seprate them into two subsections?
+  - [ ] Prefix Tuning
+  - [ ] Negative Mining
+- [ ] Method/Approach -- Thao: This is not sure right now; Please think about this later
+  - [ ] 🖼️ Model Architecture `figure`
+  - [ ] Can text-understanding data generate image?
+  - [ ] Can image-generation data generate text?
+  - [ ] How to combine both?
+- [ ] Experiments
+  - [ ] Baselines -- 📊 `table`
+    - [ ] Chameleon/ Anole: Image/ Text Prompting
+    - [ ] GPT-4o: Image/ Text Prompting
+    - [ ] Emu3: Image/ Text Prompting -- Cannot included here right?
+    - [ ] 🖼️ Qualitative `figure`
+- [ ] Abalation Study --- 🖼️ Qualitative Figure `figure`
+  - [ ] Text-only data
+  - [ ] Image-generation only data 
+    - [ ] Positive only
+    - [ ] Positive + Augmentation
+    - [ ] Positive + Random Negative (Gradually add)
+    - [ ] Positive + Hard Negative (Gradually add)
+  - [ ] ???
+  - [ ] ???
+- [ ] Conclusion
+
+** 11/22/2024: 21 days left **
+- [ ] Extension to Emu3?
+- [ ] Extension to Textual Inversion?
+- [ ] Forgetting Evaluation
+  - [ ] 
+
+### 🔰 TODO
+
 - [ ] Training
   - [x] Change to bfloat16?
-  - [ ] Link the retrieval and training together? -- Low priority
   - [ ] Create augmented data for the model?
     - [ ] Train with augmented dataset
-  - [x] Support: Setting E ("A photo of <sks>") -- Create json file
-  - [x] Support: Two set of tokens?
 
 - Dataset right now: Missing 100 random images!
 
@@ -20,11 +57,8 @@
   
 - Baselines:
   - Code baseline
-- [ ] Minor
-  - [x] Create a list of <reserved> tokens for the model?
 
-
-### Getting Started
+### 🚀 Getting Started
 
 ```
 bash install.sh
@@ -298,5 +332,7 @@ This project will not be possible without the following open-source projects:
 - [Anole: An Open, Autoregressive and Native Multimodal Models for Interleaved Image-Text Generation](https://gair-nlp.github.io/anole/)
 - and amazing HuggingFace's community: [Chamleon on HuggingFace](https://huggingface.co/docs/transformers/en/model_doc/chameleon), [Anole on HuggingFace](https://github.com/huggingface/transformers/pull/32013)
 
-Thank you!
+And the unwavering supports from my Adobe's main mentor [Dr. Yuheng Li](https://yuheng-li.github.io/), my advisor [Prof. Yong Jae Lee](https://pages.cs.wisc.edu/~yongjaelee/), and meaningful discussion with [Dr. Krishna](https://krsingh.cs.ucdavis.edu/), [Dr. Jing Shi](https://jshi31.github.io/jingshi/), and [Dr. Trung Bui](https://sites.google.com/site/trungbuistanford/).
+Special thanks to my fellow mentee [Sicheng Mo](https://sichengmo.github.io/) -- Without him, I would not have the "cute peer-pressured" to finish this project on time.
 
+Thank you (.❛ ᴗ ❛.).

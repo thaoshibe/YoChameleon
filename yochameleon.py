@@ -669,7 +669,7 @@ class YoChameleonTrainer:
 		if not self.config.no_wandb:
 			self.wandb.log({"Images/Prediction": wandb.Image(image)})
 			import html
-			# escaped_string = html.escape(result_with_special_tokens)
+			escaped_string = html.escape(result_with_special_tokens)
 			print(answer)
-			self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{answer}</p>')})
+			self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
 
