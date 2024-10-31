@@ -88,7 +88,7 @@ class PersonalizedDataset(Dataset):
                     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                     caption = conv[0]['value'].split('.')[0]
                     recognition_tokens = [f'<reserved{16+16201+i}>' for i in range(16)]
-                    conv[0]['value'] = f'{caption}{"".join(recognition_prompt)}. A photo of <reserved16200>.'
+                    conv[0]['value'] = f'{caption}{"".join(recognition_tokens)}. A photo of <reserved16200>.'
 
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>

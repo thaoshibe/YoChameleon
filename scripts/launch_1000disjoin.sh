@@ -15,31 +15,35 @@ export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
 CONFIG_FILE="./config/settingA.yaml"
 
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
+# Setting up code that you might not need to worry about...
 
-if [ ! -d "/home/user/" ]; then
-  sudo mkdir /home/user/
-fi
+# if [ ! -d "/home/user/" ]; then
+#   sudo mkdir /home/user/
+# fi
 
-if [ ! -d "/home/$USER" ]; then
-  sudo mkdir /home/$USER
-fi
+# if [ ! -d "/home/$USER" ]; then
+#   sudo mkdir /home/$USER
+# fi
 
-sudo chmod 777 -R /home/
+# sudo chmod 777 -R /home/
 
-echo "Launching training script"
-mkdir -p $WORKING_FOLDER
-cd $WORKING_FOLDER
-cp -r $CODE_FOLDER $WORKING_FOLDER
+# echo "Launching training script"
+# mkdir -p $WORKING_FOLDER
+# cd $WORKING_FOLDER
+# cp -r $CODE_FOLDER $WORKING_FOLDER
 
-cd $WORKING_FOLDER/YoChameleon
-bash scripts/install.sh
+# cd $WORKING_FOLDER/YoChameleon
+# bash scripts/install.sh
 
-mkdir -p $WORKING_FOLDER/data
-cd $WORKING_FOLDER/data
-cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
-unzip $WORKING_FOLDER/data/yochameleon-data.zip
+# mkdir -p $WORKING_FOLDER/data
+# cd $WORKING_FOLDER/data
+# cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
+# unzip $WORKING_FOLDER/data/yochameleon-data.zip
 
-cd $WORKING_FOLDER/YoChameleon
+# cd $WORKING_FOLDER/YoChameleon
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
 
 CUDA_VISIBLE_DEVICES=0,1 python train.py --config $CONFIG_FILE --sks_name "thao" &
 CUDA_VISIBLE_DEVICES=2,3 python train.py --config $CONFIG_FILE --sks_name "yuheng" &
