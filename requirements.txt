@@ -1,6 +1,5 @@
 absl-py==1.4.0
 accelerate==1.0.1
-adobeone @ file:///sensei-fs/users/sniklaus/piat/models/adobeone-0.0.3-py2.py3-none-any.whl#sha256=805ffbb275fe76ed8c1e8e0a800ccd1169f0609463444df32fbf3c366f1f16c8
 aiobotocore==2.7.0
 aiohttp==3.8.5
 aioitertools==0.11.0
@@ -184,7 +183,6 @@ parso==0.8.3
 pathlib==1.0.1
 pathtools==0.1.2
 pexpect==4.9.0
-piat==2024.10.17
 Pillow==10.0.0
 Pillow-SIMD==9.0.0.post1
 platformdirs==3.10.0

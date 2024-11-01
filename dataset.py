@@ -72,23 +72,29 @@ class PersonalizedDataset(Dataset):
         images = [self.flip_transform(image) for image in images]
 
         conv = self.data[i]['conversations']
+
+        understanding_tokens = [f'<reserved{16+16201+i}>' for i in range(16)]
+        generation_prompt = [f'<reserved{16201+i}>' for i in range(16)]
+        understanding_prompt = "".join(understanding_tokens)
+        generation_prompt = "".join(generation_prompt)
+
         # Manually added personalized prompt for text-only generation and image understanding
         if conv[-1]['value'] != "<image>":
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
-
+            conv[1]['value'] = f'{understanding_prompt} {conv[1]["value"]}'
         else:
-            if self.task_disjoin:
+            # if self.task_disjoin:
+            #if task disjoin, then have to add the understanding tokens for image generation OF the positive images only
+            if 'negative_example' not in image_paths[0]:
+                conv[1]['value'] = f'{generation_prompt} {conv[1]["value"]}'
+                #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                #          
+                #  Attention: THAO, THIS IS A STUPID HACK FOR QUICK CHECK --- REMEMBER TO CHANGE ASAP
+                #
+                #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                caption = conv[0]['value'].split('.')[0]
                 
-                #if task disjoin, then have to add the understanding tokens for image generation
-                if 'negative_example' not in image_paths[0]:
-                    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                    #          
-                    #  Attention: THAO, THIS IS A STUPID HACK FOR QUICK CHECK --- REMEMBER TO CHANGE ASAP
-                    #
-                    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                    caption = conv[0]['value'].split('.')[0]
-                    recognition_tokens = [f'<reserved{16+16201+i}>' for i in range(16)]
-                    conv[0]['value'] = f'{caption}{"".join(recognition_tokens)}. A photo of <reserved16200>.'
+                conv[0]['value'] = f'{caption}{understanding_prompt}. A photo of <reserved16200>.'
 
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>
@@ -194,7 +200,7 @@ if __name__ == "__main__":
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
     #--- This is for debug purpose
-    config_file = './config/settingA.yaml'
+    config_file = './config/settingA-frozen.yaml'
 
     config_dict = yaml.safe_load(open(config_file, 'r'))
     config = Config(config_dict)

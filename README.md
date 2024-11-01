@@ -61,6 +61,14 @@
 ### 🚀 Getting Started
 
 ```
+# Clone the repository
+git clone https://github.com/thaoshibe/YoChameleon.git
+cd YoChameleon
+
+# Install via pip
+pip install -r requirements.txt
+
+# Or run the bash script
 bash install.sh
 ```
 
@@ -307,17 +315,40 @@ done
 ### 🧑‍🏫 Train
 
 ```
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#
+#   ATTENTION: PLEASE CHECK/EDIT THE CONFIG FILE BEFORE RUNNING (IF NEEDED)
+#
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 python train.py --config config/basic.yaml
+```
+
+If do you NOT want to use the `wandb` for logging (e.g., for debugging), you can turn off by
+
+```
+python train.py --config config/basic.yaml --no_wandb
+```
+
+Or multiple concept training bash script are given in `scripts` folder
+
+```
+bash train.sh
 ```
 
 ### 🧪 Test
 
 ```
-#--- This test will generated "A photo of <sks>" and saved to some directory
-
+# This test will generated "A photo of <sks>" and saved to some directory
 python test.py --config config/basic.yaml 
+# A bash script is also provided
+bash scripts/test.sh
 
-# Flexible test
+# Or you can test in a flexible mode
+#
+#       THAO: THIS IS TODO
+#
+python test_flexible.py --config config/basic.yaml --prompt "A photo of a cat"... 
 ```
 
 

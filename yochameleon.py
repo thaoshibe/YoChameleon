@@ -191,36 +191,76 @@ class YoChameleonTrainer:
 			torch.save(self.model.lm_head.weight.data[self.personalized_token_ids], save_path_lmhead)
 			print('Saved lm_head at: ', save_path_lmhead)
 
+	def load_prefix(self, config_resume, exp_name, resume_token_ids):
+		lm_head_path = os.path.join(config_resume.savedir, exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-lmhead.pt")
+		embedding_path = os.path.join(config_resume.savedir, exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-token.pt")
+		# Load language model head
+		lm_head = torch.load(lm_head_path, map_location='cuda').to(self.model.lm_head.weight.data.device)
+		lm_head = lm_head.to(self.model.dtype)
+		self.model.lm_head.weight.data[resume_token_ids] = lm_head
+
+		# Load input embeddings
+		embeddings = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
+		self.model.get_input_embeddings().weight.data[resume_token_ids] = embeddings
+
+		print('\n\n\n           ATTENTION -- PLEASE YOU CHECK IF THE RESUME IS CORRECT!\n\n\n')
+		print(f'\n\n\n Resume tokens ids: {resume_token_ids} \n From: {exp_name} at epochs {config_resume.resume_iteration}\n\n\n')
+
+	def load_prefix_mixture(self, config_resume, resume_token_ids):
+		# import
+		
+		gen_lm_head_path = os.path.join(config_resume.savedir, config_resume.gen_exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-lmhead.pt")
+		gen_embedding_path = os.path.join(config_resume.savedir, config_resume.gen_exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-token.pt")
+		gen_lm_head = torch.load(gen_lm_head_path, map_location='cuda').to(self.model.lm_head.weight.data.device)
+		gen_lm_head = gen_lm_head.to(self.model.dtype)
+		gen_embeddings = torch.load(gen_embedding_path).to(self.model.device).to(self.model.dtype)
+
+		understand_lm_head_path = os.path.join(config_resume.savedir, config_resume.understand_exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-lmhead.pt")
+		understand_embedding_path = os.path.join(config_resume.savedir, config_resume.understand_exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-token.pt")
+		understand_lm_head = torch.load(understand_lm_head_path, map_location='cuda').to(self.model.lm_head.weight.data.device)
+		understand_lm_head = understand_lm_head.to(self.model.dtype)
+		understand_embeddings = torch.load(understand_embedding_path).to(self.model.device).to(self.model.dtype)
+
+		#--- Load the understand tokens
+		self.model.lm_head.weight.data[self.personalized_token_ids] = understand_lm_head
+		self.model.get_input_embeddings().weight.data[self.personalized_token_ids] = understand_embeddings
+		# --- Load the generation tokens
+		#
+		#     Thao: Because for generation tokens, we skip <sks> token, then append generation tokens...
+		#           Remind: The prompt format is: <sks> is <generation tokens><understanding tokens>.
+		# ----
+		self.model.lm_head.weight.data[self.generation_prefix_token_ids] = gen_lm_head[1:len(self.generation_prefix_token_ids)+1]
+		self.model.get_input_embeddings().weight.data[self.generation_prefix_token_ids] = gen_embeddings[1:len(self.generation_prefix_token_ids)+1]
+		print('\n\n\n           ATTENTION -- PLEASE YOU CHECK IF THE RESUME IS CORRECT!\n\n\n')
+		print(f'\n\n\n Resume tokens ids: {resume_token_ids} \n')
+		print(f'        Understanding from... : {config_resume.understand_exp_name} at epochs {config_resume.resume_iteration}')
+		print(f'        Generation from... : {config_resume.gen_exp_name} at epochs {config_resume.resume_iteration}\n\n\n')
+
 	def resume_training(self):
-		if self.config.resume['resume']:
-			print('Resuming training... from iteration:', self.config.resume['resume_iteration'])
-			config_resume = Config(self.config.resume)
-			# embedding_path = f'{config_resume.savedir}/{config_resume.exp_name}/{self.config.sks_name}/{config_resume.resume_iteration}-token.pt'
-			try:
-				lm_head_path = os.path.join(config_resume.savedir, config_resume.exp_name, self.config.sks_name, str(config_resume.resume_iteration) + '-lmhead.pt')
-				lm_head = torch.load(lm_head_path, map_location='cuda').to(self.model.lm_head.weight.data.device)
-				lm_head = lm_head.to(self.model.dtype)
-
-				# For sequential learning -- This idea is not supported anymore
-				# if config_resume.sequential_learning:
-				# 	self.model.lm_head.weight.data[self.personalized_token_ids[:-config_resume.spacing]] = lm_head
-				# 	self.model.get_input_embeddings().weight.data[self.personalized_token_ids[:-config_resume.spacing]] = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
-				# 	self.personalized_token_ids = self.personalized_token_ids[:-config_resume.spacing]
-				# else:
-
-				self.model.lm_head.weight.data[self.personalized_token_ids] = lm_head
-				embedding_path = os.path.join(config_resume.savedir, config_resume.exp_name, self.config.sks_name, str(config_resume.resume_iteration) + '-token.pt')
-
-				self.model.get_input_embeddings().weight.data[self.personalized_token_ids] = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
-				print('Resumed token embeddings from:', lm_head_path, embedding_path)
-			except:
-				model_path = os.path.join(config_resume.savedir, config_resume.exp_name, self.config.sks_name, str(config_resume.resume_iteration) + '-model.pt')
-				state_dict = torch.load(model_path)
-				self.model.model.load_state_dict(state_dict)
-				print('Resumed model from:', model_path)
-			self.iteration = config_resume.resume_iteration
-		else:
-			print('Starting training from scratch...')
+		try:
+			if self.config.resume['resume']:
+				print('Resuming training... from iteration:', self.config.resume['resume_iteration'])
+				config_resume = Config(self.config.resume)
+				# embedding_path = f'{config_resume.savedir}/{config_resume.exp_name}/{self.config.sks_name}/{config_resume.resume_iteration}-token.pt'
+				try:
+					if self.config.task_disjoin:
+						self.load_prefix_mixture(config_resume, self.personalized_tokens)
+					else: # no task disjoin -- just load from the saved personalized tokens
+						self.load_prefix(config_resume, config.resume.exp_name, self.personalized_token_ids)
+				except Exception as e:
+					print(e)
+					model_path = os.path.join(config_resume.savedir, config_resume.exp_name, self.config.sks_name, str(config_resume.resume_iteration) + '-model.pt')
+					state_dict = torch.load(model_path)
+					self.model.model.load_state_dict(state_dict)
+					print(f'\n\n\n           Resumed model from {model_path} \n\n\n')
+				self.iteration = config_resume.resume_iteration
+			else:
+				print('Starting training from scratch...')
+		except Exception as e:
+			print(e)
+			print('\n\n\n       The config said I should load from the resume, but I could not find the resume config')
+			print('       Also, check the above error... \n\n\n')
+			exit()
 
 	def configure_model(self):
 		if self.config.whole_model:
@@ -310,6 +350,14 @@ class YoChameleonTrainer:
 			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
 
 		for iteration in tqdm(range(self.config.iteration)):
+			# Save model checkpoints
+			if iteration % self.config.save_every == 0:
+				self.save_checkpoint(iteration)
+				if self.config.eval_visualization:
+					self.visualize_evaluation()
+				if self.config.eval['recognition']:
+					self.eval_recognition(recognition_data_loader_train, split='train')
+					self.eval_recognition(recognition_data_loader_test, split='test')
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -356,14 +404,14 @@ class YoChameleonTrainer:
 				# Log loss to W&B
 				if not self.config.no_wandb:
 				    self.wandb.log({"loss": loss.item()})
-			# Save model checkpoints
-			if iteration % self.config.save_every == 0:
-				self.save_checkpoint(iteration)
-				if self.config.eval_visualization:
-					self.visualize_evaluation()
-				if self.config.eval['recognition']:
-					self.eval_recognition(recognition_data_loader_train, split='train')
-					self.eval_recognition(recognition_data_loader_test, split='test')
+			# # Save model checkpoints
+			# if iteration % self.config.save_every == 0:
+			# 	self.save_checkpoint(iteration)
+			# 	if self.config.eval_visualization:
+			# 		self.visualize_evaluation()
+			# 	if self.config.eval['recognition']:
+			# 		self.eval_recognition(recognition_data_loader_train, split='train')
+			# 		self.eval_recognition(recognition_data_loader_test, split='test')
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
@@ -373,6 +421,14 @@ class YoChameleonTrainer:
 			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
 
 		for iteration in tqdm(range(self.config.iteration)):
+			# Save model checkpoints
+			if iteration % self.config.save_every == 0:
+				self.save_checkpoint(iteration)
+				if self.config.eval_visualization:
+					self.visualize_evaluation()
+				if self.config.eval['recognition']:
+					self.eval_recognition(recognition_data_loader_train, split='train')
+					self.eval_recognition(recognition_data_loader_test, split='test')
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -445,13 +501,13 @@ class YoChameleonTrainer:
 				    torch.nn.utils.clip_grad_value_(self.model.model.parameters(), clip_value=self.optimizer_config.grad_clip)
 
 			# Save model checkpoints
-			if iteration % self.config.save_every == 0:
-				self.save_checkpoint(iteration)
-				if self.config.eval_visualization:
-					self.visualize_evaluation()
-				if self.config.eval['recognition']:
-					self.eval_recognition(recognition_data_loader_train, split='train')
-					self.eval_recognition(recognition_data_loader_test, split='test')
+			# if iteration % self.config.save_every == 0:
+			# 	self.save_checkpoint(iteration)
+			# 	if self.config.eval_visualization:
+			# 		self.visualize_evaluation()
+			# 	if self.config.eval['recognition']:
+			# 		self.eval_recognition(recognition_data_loader_train, split='train')
+			# 		self.eval_recognition(recognition_data_loader_test, split='test')
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 

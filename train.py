@@ -63,12 +63,14 @@ if __name__ == '__main__':
         config.iteration = config.epoch
         if config.task_disjoin:
             print('\n\n\n   Hello, this script will train with task disjoin !!!\n\n\n')
-            trainer.train_epoch_disjoin(
+            # trainer.train_epoch_disjoin(
+            trainer.train_epoch(
                 train_dataloader,
                 recognition_dataloader_train,
                 recognition_dataloader_test)
         else:
-            trainer.train_epoch(train_dataloader,
+            trainer.train_epoch(
+                train_dataloader,
                 recognition_dataloader_train,
                 recognition_dataloader_test
                 )

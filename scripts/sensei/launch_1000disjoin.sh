@@ -13,7 +13,7 @@ export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 #                                                               #
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
 
-CONFIG_FILE="./config/settingA.yaml"
+CONFIG_FILE="./config/settingA-frozen.yaml"
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
 # Setting up code that you might not need to worry about...
