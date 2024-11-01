@@ -1,4 +1,4 @@
-project_name: "YoChameleon10"
+project_name: "YoChameleon-1101"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -11,9 +11,9 @@ json_file: # Remember to change this
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: 'A' # Remember to change this
+exp_name: 'together' # Remember to change this
 different_identifier: False
-task_disjoin: True
+task_disjoin: False
 
 seperate_tasks: False # This means, the model will be trained on all tasks (recognition, gen) with same tokens, or seperate
 
@@ -74,9 +74,16 @@ finetune:
 
 # --- EVAL CONFIG --- 
 eval:
-  recognition: True
+  clip_sim: True
+  number_fake_images: 1
+  recognition: False
   recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
   recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'
+  ############
+  #
+  # NOT YET IMPLEMETED
+  #
+  ##########
   vqa: True
   vqa_path_json: './baselines/yollava-visual-qa.json'
 

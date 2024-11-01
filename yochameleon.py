@@ -4,6 +4,10 @@ import wandb
 
 import re
 
+import numpy as np
+
+from PIL import Image
+from evaluation.clip_image_similarity import CLIPEvaluator
 from itertools import cycle
 from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
@@ -29,12 +33,13 @@ class YoChameleonTrainer:
 		self.prepare_personalized_tokens()
 		self.get_optimizer_and_scheduler(config) # get optimizer and scheduler for pretraining
 		self.setup_logger()
-		
+		self.sks_name = config.sks_name
 		self.sks_prompt = f"{self.personalized_tokens[0]} is {''.join(self.personalized_tokens[1:])}."
 		self.orig_embeds_params = self.model.get_input_embeddings().weight.data.clone()
 		self.orig_lm_params = self.model.lm_head.weight.data.clone()
 		self.index_no_updates = None
 		self.iteration = 0
+		self.clip_evaluator = CLIPEvaluator()
 
 	def get_personalized_prompt(self):
 		return self.sks_prompt
@@ -348,16 +353,21 @@ class YoChameleonTrainer:
 		# dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
 			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
-
+		if self.config.eval['clip_sim']:
+			real_images_path = [x for x in sorted(recognition_data_loader_train.image_paths) if self.sks_name in x]
+			real_images = [Image.open(x).convert("RGB") for x in real_images_path]
 		for iteration in tqdm(range(self.config.iteration)):
 			# Save model checkpoints
 			if iteration % self.config.save_every == 0:
 				self.save_checkpoint(iteration)
-				if self.config.eval_visualization:
-					self.visualize_evaluation()
+				# if self.config.eval_visualization:
+				# 	self.visualize_evaluation()
 				if self.config.eval['recognition']:
 					self.eval_recognition(recognition_data_loader_train, split='train')
 					self.eval_recognition(recognition_data_loader_test, split='test')
+				if self.config.eval['clip_sim']:
+					self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
+			
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -429,6 +439,8 @@ class YoChameleonTrainer:
 				if self.config.eval['recognition']:
 					self.eval_recognition(recognition_data_loader_train, split='train')
 					self.eval_recognition(recognition_data_loader_test, split='test')
+				if self.config.eval['clip_sim']:
+					self.eval_clip_similarity(real_images, number_fake_images=10)
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -511,7 +523,6 @@ class YoChameleonTrainer:
 			torch.cuda.empty_cache()
 		self.iteration = iteration
 
-	
 	def finetune(self, dataloader):
 		# this code is similar to train, but it is used for finetuning
 		self.get_optimizer_and_scheduler(self.config.finetune)
@@ -660,9 +671,7 @@ class YoChameleonTrainer:
 	
 	@torch.no_grad()
 	def eval_recognition(self, recognition_data_loader, split='test'):
-
 		print('\n\n                Recognition Evaluation \n\n')
-
 		ground_truth = []
 		predictions = []
 
@@ -703,6 +712,23 @@ class YoChameleonTrainer:
 			self.wandb.log({f"Recognition-{split}/Positive_Accuracy": postive_accuracy})
 			self.wandb.log({f"Recognition-{split}/Negative_Accuracy": negative_accuracy})
 			self.wandb.log({f"Recognition-{split}/Weighted_Accurarcy": (postive_accuracy + negative_accuracy) / 2})
+
+	@torch.no_grad()
+	def eval_clip_similarity(self, real_images, number_fake_images=10):
+		print('\n\n                CLIP Similarity Evaluation \n\n')
+		prompt = self.sks_prompt + f' A photo of {self.identifier}.'
+		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
+		fake_images = []
+		for index in tqdm(range(number_fake_images)):
+			generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
+			response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
+			pixel_values = self.model.decode_image_tokens(response_ids[:, 1:-1])
+			pixel_values = self.processor.postprocess_pixel_values(pixel_values)
+			image = to_pil_image(pixel_values[0].detach().cpu())
+			fake_images.append(image)
+		clip_score = self.clip_evaluator.compute_similarity(real_images, fake_images)
+		if not self.config.no_wandb:
+			self.wandb.log({"CLIP_Similarity": np.mean(clip_score)})
 
 	@torch.no_grad()
 	def visualize_evaluation(self):

@@ -81,25 +81,25 @@ class PersonalizedDataset(Dataset):
         # Manually added personalized prompt for text-only generation and image understanding
         if conv[-1]['value'] != "<image>":
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
-            conv[1]['value'] = f'{understanding_prompt} {conv[1]["value"]}'
+            if self.task_disjoin:
+                conv[1]['value'] = f'{understanding_prompt} {conv[1]["value"]}'
         else:
-            # if self.task_disjoin:
-            #if task disjoin, then have to add the understanding tokens for image generation OF the positive images only
-            if 'negative_example' not in image_paths[0]:
-                conv[1]['value'] = f'{generation_prompt} {conv[1]["value"]}'
-                #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                #          
-                #  Attention: THAO, THIS IS A STUPID HACK FOR QUICK CHECK --- REMEMBER TO CHANGE ASAP
-                #
-                #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                caption = conv[0]['value'].split('.')[0]
-                
-                conv[0]['value'] = f'{caption}{understanding_prompt}. A photo of <reserved16200>.'
+            if self.task_disjoin:
+                #if task disjoin, then have to add the understanding tokens for image generation OF the positive images only
+                if 'negative_example' not in image_paths[0]:
+                    conv[1]['value'] = f'{generation_prompt} {conv[1]["value"]}'
+                    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                    #          
+                    #  Attention: THAO, THIS IS A STUPID HACK FOR QUICK CHECK --- REMEMBER TO CHANGE ASAP
+                    #
+                    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                    caption = conv[0]['value'].split('.')[0]
+                    conv[0]['value'] = f'{caption}{understanding_prompt}. A photo of <reserved16200>.'
 
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>
         full_text = conversations.replace("<sks>", self.placeholder_token)
-        
+        # print(full_text)
         example = self.processor(
             text=full_text,
             images=images,

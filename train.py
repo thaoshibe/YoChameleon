@@ -5,9 +5,12 @@ from PIL import Image
 from tqdm import tqdm
 from utils import Config
 
+import warnings
+
 from utils import get_dataloader_iter
 from utils import get_eval_dataloader
 from yochameleon import YoChameleonTrainer
+warnings.filterwarnings("ignore")
 
 def get_args():
     parser = argparse.ArgumentParser(description='Your Chameleon model')
@@ -42,23 +45,19 @@ if __name__ == '__main__':
     trainer.resume_training()
     trainer.configure_model() # this step will set up optimization
 
-    if config.eval['recognition']:
-        recognition_dataloader_train = get_eval_dataloader(
-            config,
-            trainer.processor,
-            image_folder=config.eval['recognition_path_train'],
-            personalized_prompt=personalized_prompt,
-        )
-        recognition_dataloader_test = get_eval_dataloader(
-            config,
-            trainer.processor,
-            image_folder=config.eval['recognition_path_test'],
-            personalized_prompt=personalized_prompt,
-        )
-    else:
-        recognition_dataloader_train = None
-        recognition_dataloader_test = None
-        # trainer.eval_recognition(recognition_dataloader_test, split='test')
+    recognition_dataloader_train = get_eval_dataloader(
+        config,
+        trainer.processor,
+        image_folder=config.eval['recognition_path_train'],
+        personalized_prompt=personalized_prompt,
+    )
+    recognition_dataloader_test = get_eval_dataloader(
+        config,
+        trainer.processor,
+        image_folder=config.eval['recognition_path_test'],
+        personalized_prompt=personalized_prompt,
+    )
+
     if config.epoch > 0: #If you want to train with epoch... Fine, here you go
         config.iteration = config.epoch
         if config.task_disjoin:
