@@ -1,6 +1,6 @@
 #!/bin/bash
 WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
-SCRIPT_DIR="/sensei-fs/users/thaon/code/YoChameleon/scripts"
+SCRIPT_DIR="/sensei-fs/users/thaon/code/YoChameleon/scripts/sensei"
 
 # ============ 1. Experiment setup. ============
 # To support automatic job submission.
@@ -38,6 +38,4 @@ runai submit --large-shm \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000disjoin.sh;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
-    # --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_1000neg_text_recog.sh;"'
+    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./launch_gen.sh;"'

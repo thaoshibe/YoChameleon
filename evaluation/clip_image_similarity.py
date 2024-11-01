@@ -4,6 +4,7 @@ import os
 import torch
 
 from PIL import Image
+from torch.nn import CosineSimilarity
 from tqdm import tqdm
 from transformers import CLIPImageProcessor
 from transformers import CLIPModel
@@ -11,7 +12,7 @@ from transformers import CLIPTokenizer
 
 def get_args():
     parser = argparse.ArgumentParser(description="Face verification using InsightFace")
-    parser.add_argument("--fake_folder", type=str, default="/mnt/localssd/code/data/yochameleon-data/train/thao",
+    parser.add_argument("--fake_folder", type=str, default="/mnt/localssd/code/data/yochameleon-data/train/bo",
                         help="Path to the folder containing fake images")
     parser.add_argument("--real_folder", type=str, default="/mnt/localssd/code/data/yochameleon-data/train/thao",
                         help="Path to the folder containing real images")
@@ -20,18 +21,18 @@ def get_args():
     return parser.parse_args()
 
 class CLIPEvaluator:
-    def __init__(self, model_id="openai/clip-vit-base-patch32"):
+    def __init__(self, model_id="openai/clip-vit-large-patch14"):
         self.model = CLIPModel.from_pretrained(model_id)
         self.preprocessor = CLIPImageProcessor.from_pretrained(model_id)
-        print(f'\n  Hello, this is CLIPEvaluator, model_id: {model_id}\n')
+        print(f'\n             Hello, this is CLIPEvaluator, model_id: {model_id}\n')
 
     def load_image(selfm, image_path):
         image = Image.open(image_path)
         return image
 
     def preprocess(self, image):
-        image_pt = self.preprocessor(images=image, return_tensors="pt")["pixel_values"]
-        return image_pt
+        image_ft = self.preprocessor(images=image, return_tensors="pt")["pixel_values"]
+        return image_ft
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
     #
@@ -41,9 +42,8 @@ class CLIPEvaluator:
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
     @torch.no_grad
     def get_image_features(self, image_ft):
-        # image_ft = [self.model.get_image_features(image) for image in tqdm(image_ft)]
-        image_ft = self.model.get_image_features(image_ft)
-        return image_ft
+        # image_ft = self.model.get_image_features(image_ft) for image in tqdm(image_ft)]
+        return self.model.get_image_features(image_ft)
 
     def compute_similarity(self, real_images, fake_images, average=True):
         # --- Check if given list are images or paths
@@ -65,6 +65,7 @@ class CLIPEvaluator:
             fake_images_ft = self.preprocess(fake_image)
             fake_images_ft = self.get_image_features(fake_images_ft)
             similarity_score = torch.nn.functional.cosine_similarity(real_images_ft, fake_images_ft).item()
+            # similarity_score = CosineSimilarity(real_images_ft, fake_images_ft)
             clip_scores.append(similarity_score)
         return clip_scores
 

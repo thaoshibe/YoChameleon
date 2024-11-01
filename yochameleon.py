@@ -40,6 +40,8 @@ class YoChameleonTrainer:
 		self.index_no_updates = None
 		self.iteration = 0
 		self.clip_evaluator = CLIPEvaluator()
+		self.weighted_acc = 0.0
+		self.mean_clip = 0.0
 
 	def get_personalized_prompt(self):
 		return self.sks_prompt
@@ -178,7 +180,9 @@ class YoChameleonTrainer:
 		# return optimizer, scheduler, optimizer_config, scheduler_config
 
 	def save_checkpoint(self, iteration, finetune=False):
-		iteration=iteration+1 # increment iteration to save the correct iteration as python starts from 0
+		# if type(iteration) == int:
+		# 	iteration=iteration+1 # increment iteration to save the correct iteration as python starts from 0
+		
 		if finetune:
 			save_path_token = os.path.join(self.save_location, f'{iteration}-token-ft.pt')
 			save_path_lmhead = os.path.join(self.save_location, f'{iteration}-lmhead-ft.pt')
@@ -195,6 +199,7 @@ class YoChameleonTrainer:
 		else:
 			torch.save(self.model.lm_head.weight.data[self.personalized_token_ids], save_path_lmhead)
 			print('Saved lm_head at: ', save_path_lmhead)
+
 
 	def load_prefix(self, config_resume, exp_name, resume_token_ids):
 		lm_head_path = os.path.join(config_resume.savedir, exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-lmhead.pt")
@@ -356,18 +361,18 @@ class YoChameleonTrainer:
 		if self.config.eval['clip_sim']:
 			real_images_path = [x for x in sorted(recognition_data_loader_train.image_paths) if self.sks_name in x]
 			real_images = [Image.open(x).convert("RGB") for x in real_images_path]
-		for iteration in tqdm(range(self.config.iteration)):
+		for iteration in tqdm(range(self.config.iteration+1)):
 			# Save model checkpoints
 			if iteration % self.config.save_every == 0:
 				self.save_checkpoint(iteration)
-				# if self.config.eval_visualization:
-				# 	self.visualize_evaluation()
+				if self.config.eval_visualization:
+					self.visualize_evaluation()
 				if self.config.eval['recognition']:
 					self.eval_recognition(recognition_data_loader_train, split='train')
 					self.eval_recognition(recognition_data_loader_test, split='test')
 				if self.config.eval['clip_sim']:
 					self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
-			
+
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -423,7 +428,7 @@ class YoChameleonTrainer:
 			# 		self.eval_recognition(recognition_data_loader_train, split='train')
 			# 		self.eval_recognition(recognition_data_loader_test, split='test')
 			torch.cuda.empty_cache()
-		self.iteration = iteration
+			self.iteration = iteration
 
 	def train_epoch_disjoin(self, dataloader, recognition_data_loader_train=None, recognition_data_loader_test=None):
 		# dataloader_iter = cycle(dataloader)
@@ -521,7 +526,7 @@ class YoChameleonTrainer:
 			# 		self.eval_recognition(recognition_data_loader_train, split='train')
 			# 		self.eval_recognition(recognition_data_loader_test, split='test')
 			torch.cuda.empty_cache()
-		self.iteration = iteration
+			self.iteration = iteration
 
 	def finetune(self, dataloader):
 		# this code is similar to train, but it is used for finetuning
@@ -707,11 +712,17 @@ class YoChameleonTrainer:
 		print(f'Accuracy: {accuracy}')
 		print(f'Positive Accuracy: {postive_accuracy}')
 		print(f'Negative Accuracy: {negative_accuracy}')
+		weighted_acc = (postive_accuracy + negative_accuracy) / 2
+		if split == 'train':
+			if self.weighted_acc <= weighted_acc:
+				self.weighted_acc = weighted_acc
+				self.save_checkpoint('best-recog')
 		if not self.config.no_wandb:
-			self.wandb.log({f"Recognition-{split}/Accuracy": accuracy})
-			self.wandb.log({f"Recognition-{split}/Positive_Accuracy": postive_accuracy})
-			self.wandb.log({f"Recognition-{split}/Negative_Accuracy": negative_accuracy})
-			self.wandb.log({f"Recognition-{split}/Weighted_Accurarcy": (postive_accuracy + negative_accuracy) / 2})
+			self.wandb.log({f"Recognition/accuracy-{split}": accuracy}, step=self.iteration)
+			self.wandb.log({f"Recognition/positive_accuracy-{split}": postive_accuracy}, step=self.iteration)
+			self.wandb.log({f"Recognition/negative_accuracy-{split}": negative_accuracy})
+			self.wandb.log({f"Metrics/weighted_accurarcy_{split}": weighted_acc}, step=self.iteration)
+		return weighted_acc
 
 	@torch.no_grad()
 	def eval_clip_similarity(self, real_images, number_fake_images=10):
@@ -727,8 +738,13 @@ class YoChameleonTrainer:
 			image = to_pil_image(pixel_values[0].detach().cpu())
 			fake_images.append(image)
 		clip_score = self.clip_evaluator.compute_similarity(real_images, fake_images)
+		mean_clip = np.mean(clip_score)
+		if self.mean_clip <= mean_clip:
+			self.save_checkpoint('best-gen')
+			self.mean_clip = mean_clip
+
 		if not self.config.no_wandb:
-			self.wandb.log({"CLIP_Similarity": np.mean(clip_score)})
+			self.wandb.log({"Metrics/clip": mean_clip}, step=self.iteration)
 
 	@torch.no_grad()
 	def visualize_evaluation(self):

@@ -18,30 +18,30 @@ CONFIG_FILE="./config/settingA-frozen.yaml"
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
 # Setting up code that you might not need to worry about...
 
-# if [ ! -d "/home/user/" ]; then
-#   sudo mkdir /home/user/
-# fi
+if [ ! -d "/home/user/" ]; then
+  sudo mkdir /home/user/
+fi
 
-# if [ ! -d "/home/$USER" ]; then
-#   sudo mkdir /home/$USER
-# fi
+if [ ! -d "/home/$USER" ]; then
+  sudo mkdir /home/$USER
+fi
 
-# sudo chmod 777 -R /home/
+sudo chmod 777 -R /home/
 
-# echo "Launching training script"
-# mkdir -p $WORKING_FOLDER
-# cd $WORKING_FOLDER
-# cp -r $CODE_FOLDER $WORKING_FOLDER
+echo "Launching training script"
+mkdir -p $WORKING_FOLDER
+cd $WORKING_FOLDER
+cp -r $CODE_FOLDER $WORKING_FOLDER
 
-# cd $WORKING_FOLDER/YoChameleon
-# bash scripts/install.sh
+cd $WORKING_FOLDER/YoChameleon
+bash scripts/install.sh
 
-# mkdir -p $WORKING_FOLDER/data
-# cd $WORKING_FOLDER/data
-# cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
-# unzip $WORKING_FOLDER/data/yochameleon-data.zip
+mkdir -p $WORKING_FOLDER/data
+cd $WORKING_FOLDER/data
+cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
+unzip $WORKING_FOLDER/data/yochameleon-data.zip
 
-# cd $WORKING_FOLDER/YoChameleon
+cd $WORKING_FOLDER/YoChameleon
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
 

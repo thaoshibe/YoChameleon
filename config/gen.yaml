@@ -6,12 +6,12 @@ data_root: '/mnt/localssd/code/data/minithao/'
 
 json_file: # Remember to change this
   # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
-  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
+  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: 'debug' # Remember to change this
+exp_name: 'gen' # Remember to change this
 different_identifier: False
 task_disjoin: False
 
@@ -29,7 +29,7 @@ eval_visualization: True
 
 optimizer:
   type: 'AdamW'
-  lr: 0.001
+  lr: 0.0001
   betas: [0.9, 0.999]
   weight_decay: 1e-4
   eps: 1e-6
@@ -48,6 +48,7 @@ special_tokens:
   PAD_INDEX: 1
   PERSONALITY_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
+
 resume: 
   resume: No
   resume_iteration: 15
