@@ -1,4 +1,4 @@
-project_name: "YoChameleon-1101"
+project_name: "YoChameleon12"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -75,7 +75,7 @@ finetune:
 # --- EVAL CONFIG --- 
 eval:
   clip_sim: True
-  number_fake_images: 5
+  number_fake_images: 1
   recognition: True
   recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
   recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'

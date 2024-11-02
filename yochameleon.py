@@ -142,8 +142,15 @@ class YoChameleonTrainer:
 				name=self.config.exp_name + '-' + self.config.sks_name,
 				entity=self.config.entity,
 				config=self.config)
+			self.wandb.define_metric("eval")
+			# Set all other metrics to use "eval" as the step metric
+			self.wandb.define_metric("Recognition/*", step_metric="eval")
+			self.wandb.define_metric("Metrics/*", step_metric="eval")
+			self.wandb.define_metric("Image", step_metric="eval")
+			self.wandb.define_metric("Text", step_metric="eval")
+
 		else:
-		    self.wandb = None
+			self.wandb = None
 
 	def get_optimizer_and_scheduler(self, config):
 		try:
@@ -366,12 +373,16 @@ class YoChameleonTrainer:
 			if iteration % self.config.save_every == 0:
 				self.save_checkpoint(iteration)
 				if self.config.eval_visualization:
-					self.visualize_evaluation()
+					visual_dict = self.visualize_evaluation()
 				if self.config.eval['recognition']:
-					self.eval_recognition(recognition_data_loader_train, split='train')
-					self.eval_recognition(recognition_data_loader_test, split='test')
+					train_recog = self.eval_recognition(recognition_data_loader_train, split='train')
+					test_recog = self.eval_recognition(recognition_data_loader_test, split='test')
 				if self.config.eval['clip_sim']:
-					self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
+					clip_sim = self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
+				if not self.config.no_wandb:
+					#combine results
+					log_dict = {**train_recog, **test_recog, **clip_sim, **visual_dict, **{"eval": iteration}}
+					self.wandb.log(log_dict)
 
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
@@ -707,22 +718,30 @@ class YoChameleonTrainer:
 		gt_negative = [ground_truth[i] for i in negative_indices]
 		# accuracy:
 		accuracy = sum([1 for i, j in zip(ground_truth, predictions) if i == j]) / len(ground_truth)
-		postive_accuracy = sum([1 for i, j in zip(gt_positive, predict_positive) if i == j]) / len(gt_positive)
+		positive_accuracy = sum([1 for i, j in zip(gt_positive, predict_positive) if i == j]) / len(gt_positive)
 		negative_accuracy = sum([1 for i, j in zip(gt_negative, predict_negative) if i == j]) / len(gt_negative)
 		print(f'Accuracy: {accuracy}')
-		print(f'Positive Accuracy: {postive_accuracy}')
+		print(f'Positive Accuracy: {positive_accuracy}')
 		print(f'Negative Accuracy: {negative_accuracy}')
-		weighted_acc = (postive_accuracy + negative_accuracy) / 2
+		weighted_acc = (positive_accuracy + negative_accuracy) / 2
 		if split == 'train':
 			if self.weighted_acc <= weighted_acc:
 				self.weighted_acc = weighted_acc
 				self.save_checkpoint('best-recog')
-		if not self.config.no_wandb:
-			self.wandb.log({f"Recognition/accuracy-{split}": accuracy}, step=self.iteration)
-			self.wandb.log({f"Recognition/positive_accuracy-{split}": postive_accuracy}, step=self.iteration)
-			self.wandb.log({f"Recognition/negative_accuracy-{split}": negative_accuracy})
-			self.wandb.log({f"Metrics/weighted_accurarcy_{split}": weighted_acc}, step=self.iteration)
-		return weighted_acc
+		# if not self.config.no_wandb:
+		# 	self.wandb.log({
+		# 		f"Recognition/accuracy-{split}": accuracy,
+		# 		f"Recognition/positive_accuracy-{split}": positive_accuracy,
+		# 		f"Recognition/negative_accuracy-{split}": negative_accuracy,
+		# 		f"Metrics/weighted_accuracy_{split}": weighted_acc
+		# 		})
+		recog_dict = {
+			f"Recognition/{split}_accuracy": accuracy,
+			f"Recognition/{split}_positive_accuracy": positive_accuracy,
+			f"Recognition/{split}_negative_accuracy": negative_accuracy,
+			f"Metrics/{split}_weighted_accuracy": weighted_acc
+		}
+		return recog_dict
 
 	@torch.no_grad()
 	def eval_clip_similarity(self, real_images, number_fake_images=10):
@@ -742,9 +761,9 @@ class YoChameleonTrainer:
 		if self.mean_clip <= mean_clip:
 			self.save_checkpoint('best-gen')
 			self.mean_clip = mean_clip
-
-		if not self.config.no_wandb:
-			self.wandb.log({"Metrics/clip": mean_clip}, step=self.iteration)
+		return {'Metrics/CLIP': mean_clip}
+		# if not self.config.no_wandb:
+		# 	self.wandb.log({"Metrics/clip": mean_clip})
 
 	@torch.no_grad()
 	def visualize_evaluation(self):
@@ -764,10 +783,15 @@ class YoChameleonTrainer:
 		output = self.model.generate(**inputs, max_new_tokens=200)
 		result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
 		answer = chameleon_trim_answer(result_with_special_tokens)
-		if not self.config.no_wandb:
-			self.wandb.log({"Images/Prediction": wandb.Image(image)})
-			import html
-			escaped_string = html.escape(result_with_special_tokens)
-			print(answer)
-			self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
+		# if not self.config.no_wandb:
+		# self.wandb.log({"Images/Prediction": wandb.Image(image)})
+		import html
+		escaped_string = html.escape(result_with_special_tokens)
+		print(answer)
+		visual_dict = {
+			"Image": wandb.Image(image),
+			"Text": wandb.Html(f'<p>{escaped_string}</p>')
+			}
+		return visual_dict
+			# self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
 
