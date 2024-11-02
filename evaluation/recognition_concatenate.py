@@ -83,6 +83,7 @@ def get_args():
     parser.add_argument('--iteration', type=str, default=None)
     parser.add_argument('--finetune', action='store_true', help='Use fine-tuned model')
     parser.add_argument('--exp_name', type=str, default=None)
+    parser.add_argument('--exp_name_2', type=str, default=None)
     parser.add_argument('--sks_name', type=str, default=None)
     parser.add_argument('--img_size', type=int, default=256)
     parser.add_argument('--batch_size', type=int, default=32)
@@ -119,19 +120,28 @@ if __name__ == '__main__':
     personalized_prompt = f"{personalized_tokens[0]} is {''.join(personalized_tokens[1:])}."
     personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
 
-    model.resize_token_embeddings(len(processor.tokenizer))
+    second_prefix_tokens = [f'<reserved{16201+config.prefix_token+i}>' for i in range(config.prefix_token)]
+    second_personalized_tokens = [f'<reserved16300>'] + second_prefix_tokens
+    second_personalized_prompt = f"{second_personalized_tokens[0]} is {''.join(second_personalized_tokens[1:])}."
+    second_personalized_token_ids = processor.tokenizer.convert_tokens_to_ids(second_personalized_tokens)
+    # model.resize_token_embeddings(len(processor.tokenizer))
 
     try:
-        lm_head_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-lmhead.pt')
+        lm_head_path = os.path.join(config.savedir, args.exp_name, config.sks_name, f'{config_test.iteration}-lmhead.pt')
+        embedding_path = os.path.join(config.savedir, args.exp_name, config.sks_name, f"{config_test.iteration}-token.pt")
+
+        lm_head_path_2 = os.path.join(config.savedir, args.exp_name_2, config.sks_name, f'{config_test.iteration}-lmhead.pt')
+        embedding_path_2 = os.path.join(config.savedir, args.exp_name_2, config.sks_name, f"{config_test.iteration}-token.pt")
+
         lm_head = torch.load(lm_head_path, map_location='cuda')
         model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
-        embedding_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f"{config_test.iteration}-token.pt")
         model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
-    except:
-        model_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-model.pt')
-        print(model_path)
-        state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
-        model.model.load_state_dict(state_dict)
+        
+        lm_head = torch.load(lm_head_path_2, map_location='cuda')
+        model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
+        model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path_2).to(model.device).to(model.dtype)
+    except Exception as e:
+        print(f"Failed to load checkpoint, error: {e}")
 
     recognition_data = RecognitionData(
         config.sks_name,
@@ -139,7 +149,7 @@ if __name__ == '__main__':
         image_folder=config.eval['recognition_path_test'],
         tokenizer_max_length=1500, 
         processor = processor,
-        personalized_prompt = personalized_prompt,
+        personalized_prompt = f"{personalized_prompt} {second_personalized_prompt}",
     )
     recognition_data_loader = torch.utils.data.DataLoader(recognition_data, batch_size=args.batch_size, shuffle=False)
 

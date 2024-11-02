@@ -42,6 +42,7 @@ if __name__ == '__main__':
         trainer.processor,
         personalized_prompt=personalized_prompt
         )
+
     trainer.resume_training()
     trainer.configure_model() # this step will set up optimization
 
@@ -57,7 +58,7 @@ if __name__ == '__main__':
         image_folder=config.eval['recognition_path_test'],
         personalized_prompt=personalized_prompt,
     )
-
+    
     if config.epoch > 0: #If you want to train with epoch... Fine, here you go
         config.iteration = config.epoch
         if config.task_disjoin:

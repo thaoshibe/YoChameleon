@@ -72,15 +72,6 @@ class YoChameleonTrainer:
 			
 			personalized_tokens.extend(gen_prefix_tokens)
 			personalized_tokens.extend(understand_prefix_tokens)
-			
-
-			# --- This is for the negative identifier, which is not used anymore
-			# if self.config.different_identifier:
-			# 	# -1 for the identifier, then -1 for the first neagtive identifier
-			# 	negative_identifier = [f'<reserved{self.latent_tokens_start_index-1-i}>' for i in range(1, self.config.prefix_token)]
-			# 	personalized_tokens.extend(negative_identifier)
-			# 	print(negative_identifier)
-			# 	print(len(negative_identifier))
 
 			self.personalized_tokens = personalized_tokens
 			self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
@@ -99,7 +90,37 @@ class YoChameleonTrainer:
 			print(f'Understand prefix token ids: {self.understand_prefix_token_ids}')
 			print(f'Gen prefix token ids: {self.generation_prefix_token_ids}')
 			print(f'There are {len(self.personalized_tokens)} personalized tokens')
+		elif self.config.task_api:
+			print('')
+			print('')
+			print('            Task API is enabled!')
+			print('')
+			print('')
 
+			self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
+			self.identifier = self.config.special_tokens["PERSONALITY_TOKEN"]
+			identifier_token_id = self.processor.tokenizer.convert_tokens_to_ids(self.identifier)
+			#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+			#          
+			#  Attention: If follow this setting, prompt is: <sks> is <understanding tokens><generation tokens>
+			#
+			#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+			# generation tokens
+			gen_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
+			# understanding tokens
+			understand_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+self.config.prefix_token+i}>' for i in range(self.config.prefix_token)]
+			personalized_tokens = [self.identifier]
+			
+			personalized_tokens.extend(gen_prefix_tokens)
+			personalized_tokens.extend(understand_prefix_tokens)
+
+			self.personalized_tokens = personalized_tokens
+			self.personalized_token_ids = self.processor.tokenizer.convert_tokens_to_ids(personalized_tokens)
+
+			print(f'Personalized tokens: {self.personalized_tokens}')
+			print(f'Personalized token ids: {self.personalized_token_ids}')
+			print(f'There are {len(self.personalized_tokens)} personalized tokens')
 		#--- This is train the SAME set of latent tokens for all the tasks
 		else:
 			self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
@@ -370,20 +391,26 @@ class YoChameleonTrainer:
 			real_images = [Image.open(x).convert("RGB") for x in real_images_path]
 		for iteration in tqdm(range(self.config.iteration+1)):
 			# Save model checkpoints
+			eval_list = []
 			if iteration % self.config.save_every == 0:
 				self.save_checkpoint(iteration)
 				if self.config.eval_visualization:
 					visual_dict = self.visualize_evaluation()
+					eval_list.append(visual_dict)
 				if self.config.eval['recognition']:
 					train_recog = self.eval_recognition(recognition_data_loader_train, split='train')
 					test_recog = self.eval_recognition(recognition_data_loader_test, split='test')
+					eval_list.append(train_recog)
+					eval_list.append(test_recog)
 				if self.config.eval['clip_sim']:
 					clip_sim = self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
+					eval_list.append(clip_sim)
 				if not self.config.no_wandb:
 					#combine results
-					log_dict = {**train_recog, **test_recog, **clip_sim, **visual_dict, **{"eval": iteration}}
+					log_dict = {**{"eval": iteration}}
+					for item in eval_list:
+						log_dict.update(item)
 					self.wandb.log(log_dict)
-
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -445,18 +472,25 @@ class YoChameleonTrainer:
 		# dataloader_iter = cycle(dataloader)
 		if not self.config.no_wandb:
 			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
-
-		for iteration in tqdm(range(self.config.iteration)):
+		if self.config.eval['clip_sim']:
+			real_images_path = [x for x in sorted(recognition_data_loader_train.image_paths) if self.sks_name in x]
+			real_images = [Image.open(x).convert("RGB") for x in real_images_path]
+		for iteration in tqdm(range(self.config.iteration+1)):
 			# Save model checkpoints
 			if iteration % self.config.save_every == 0:
 				self.save_checkpoint(iteration)
 				if self.config.eval_visualization:
-					self.visualize_evaluation()
+					visual_dict = self.visualize_evaluation()
 				if self.config.eval['recognition']:
-					self.eval_recognition(recognition_data_loader_train, split='train')
-					self.eval_recognition(recognition_data_loader_test, split='test')
+					train_recog = self.eval_recognition(recognition_data_loader_train, split='train')
+					test_recog = self.eval_recognition(recognition_data_loader_test, split='test')
 				if self.config.eval['clip_sim']:
-					self.eval_clip_similarity(real_images, number_fake_images=10)
+					clip_sim = self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
+				if not self.config.no_wandb:
+					#combine results
+					log_dict = {**train_recog, **test_recog, **clip_sim, **visual_dict, **{"eval": iteration}}
+					self.wandb.log(log_dict)
+
 			for batch in tqdm(dataloader):
 				self.optimizer.zero_grad()
 				batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -697,7 +731,7 @@ class YoChameleonTrainer:
 			batch['inputs'] = {k: v.squeeze(1).to(self.model.device) for k, v in batch['inputs'].items()}
 			batch['inputs']['pixel_values'] = batch['inputs']['pixel_values'].to(self.model.dtype)
 
-			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=3)
+			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=200)
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
 
 			answer = chameleon_trim_answer(result_with_special_tokens)

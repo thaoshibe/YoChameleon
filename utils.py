@@ -8,6 +8,8 @@ import sys
 
 from PIL import Image
 from dataset import PersonalizedDataset
+from dataset import PersonalizedDataset_API
+from dataset import PersonalizedDataset_Disjoin
 from dataset import RecognitionData
 from torchvision import datasets
 from tqdm import tqdm
@@ -69,8 +71,6 @@ def chameleon_trim_answer(long_answer):
     return short_answer
     
 def get_dataloader_iter(config, processor, only_positive=False, personalized_prompt=None):
-    if not hasattr(config, 'task_disjoin'):
-        config.task_disjoin = False
     if only_positive:
         train_dataset = PersonalizedDataset(
                 json_file=config.json_file,
@@ -83,7 +83,9 @@ def get_dataloader_iter(config, processor, only_positive=False, personalized_pro
                 task_disjoin=config.task_disjoin
             )
     else:
-        train_dataset = PersonalizedDataset(
+        if config.task_disjoin:
+            print('\n\n\n Using PersonalizedDataset_Disjoin \n\n\n')
+            train_dataset = PersonalizedDataset_Disjoin(
                 json_file=config.json_file,
                 processor=processor,
                 placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
@@ -92,7 +94,26 @@ def get_dataloader_iter(config, processor, only_positive=False, personalized_pro
                 personalized_prompt=personalized_prompt,
                 task_disjoin=config.task_disjoin
             )
-        
+        elif config.task_api:
+            print('\n\n\n Using PersonalizedDataset_API \n\n\n')
+            train_dataset = PersonalizedDataset_API(
+                json_file=config.json_file,
+                processor=processor,
+                tokenizer_max_length=config.tokenizer_max_length,
+                END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                personalized_prompt=personalized_prompt,
+                task_disjoin=config.task_disjoin,
+                )
+        else:
+            train_dataset = PersonalizedDataset(
+                    json_file=config.json_file,
+                    processor=processor,
+                    placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
+                    tokenizer_max_length=config.tokenizer_max_length,
+                    END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                    personalized_prompt=personalized_prompt,
+                    task_disjoin=config.task_disjoin
+                )
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
     )

@@ -100,6 +100,11 @@ echo "All evaluations completed!"
 python evaluation/recognition.py --config ./config/recog.yaml --sks_name "thao" --iteration 6
 ```
 
+```
+# If you want to test with concatenate prompt
+python evaluation/recognition_concatenate.py --config ./config/recog.yaml --sks_name "thao" --iteration "20" --exp_name "gen" --exp_name_2 "recog"
+```
+
 ## Forgetting evaluation
 
 ### POPE
