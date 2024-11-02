@@ -91,6 +91,7 @@ if __name__ == '__main__':
         print(model_path)
         state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
         model.model.load_state_dict(state_dict)
+        
     # Define prompt and inputs
     # prompt = f"{sks_prompt}\nCan you describe <reserved16300>? Answer in detail."
     # inputs = processor(prompt, return_tensors="pt").to(model.device)

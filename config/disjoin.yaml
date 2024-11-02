@@ -1,4 +1,4 @@
-project_name: "YoChameleon11"
+project_name: "YoChameleon-Exploration"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -11,14 +11,14 @@ json_file: # Remember to change this
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: 'ifelse' # Remember to change this
+exp_name: 'debug' # Remember to change this
 different_identifier: False
-task_disjoin: True
+task_disjoin: False
 
 seperate_tasks: False # This means, the model will be trained on all tasks (recognition, gen) with same tokens, or seperate
 
 iteration: 1001 # remember to CHANGE THIS shibe; Currently it will use epochs for training
-epoch: 60 # remember to CHANGE THIS shibe; Currently it will use epochs for training
+epoch: 30 # remember to CHANGE THIS shibe; Currently it will use epochs for training
 save_every: 1
 
 batch_size: 4
@@ -29,7 +29,7 @@ eval_visualization: True
 
 optimizer:
   type: 'AdamW'
-  lr: 0.000001
+  lr: 0.001
   betas: [0.9, 0.999]
   weight_decay: 1e-4
   eps: 1e-6
@@ -48,14 +48,11 @@ special_tokens:
   PAD_INDEX: 1
   PERSONALITY_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
-
 resume: 
-  resume: True
+  resume: No
   resume_iteration: 15
   savedir: '/sensei-fs/users/thaon/ckpt/'
-  exp_name: 'A-gen' # if task_disjoin
-  gen_exp_name: 'A-gen'
-  understand_exp_name: 'A-recog'
+  exp_name: '1000disjoin'
 
 finetune:
   finetune: False
@@ -77,9 +74,16 @@ finetune:
 
 # --- EVAL CONFIG --- 
 eval:
+  clip_sim: True
+  number_fake_images: 1
   recognition: True
   recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
   recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'
+  ############
+  #
+  # NOT YET IMPLEMETED
+  #
+  ##########
   vqa: True
   vqa_path_json: './baselines/yollava-visual-qa.json'
 

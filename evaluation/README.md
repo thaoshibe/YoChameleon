@@ -94,6 +94,12 @@ echo "All evaluations completed!"
 ```
 </details>
 
+### Recognition Accuracy
+
+```
+python evaluation/recognition.py --config ./config/recog.yaml --sks_name "thao" --iteration 6
+```
+
 ## Forgetting evaluation
 
 ### POPE
