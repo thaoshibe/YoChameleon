@@ -45,20 +45,24 @@ if __name__ == '__main__':
 
     trainer.resume_training()
     trainer.configure_model() # this step will set up optimization
-
+    if config.self_prompting:
+        understanding_prompt = trainer.get_understanding_prompt()
+    else:
+        understanding_prompt = None
     recognition_dataloader_train = get_eval_dataloader(
         config,
         trainer.processor,
         image_folder=config.eval['recognition_path_train'],
         personalized_prompt=personalized_prompt,
+        understanding_prompt=understanding_prompt
     )
     recognition_dataloader_test = get_eval_dataloader(
         config,
         trainer.processor,
         image_folder=config.eval['recognition_path_test'],
         personalized_prompt=personalized_prompt,
+        understanding_prompt=understanding_prompt
     )
-    
     if config.epoch > 0: #If you want to train with epoch... Fine, here you go
         config.iteration = config.epoch
         if config.task_disjoin:

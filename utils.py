@@ -8,11 +8,120 @@ import sys
 
 from PIL import Image
 from dataset import PersonalizedDataset
-from dataset import PersonalizedDataset_API
 from dataset import PersonalizedDataset_Disjoin
+from dataset import PersonalizedDataset_SelfPrompting
 from dataset import RecognitionData
+from dataset import RecognitionData_SelfPrompting
 from torchvision import datasets
 from tqdm import tqdm
+
+def chameleon_trim_answer(long_answer):
+    end_of_turn = '<reserved08706>'
+    pattern = r"<reserved08706>(.*)"
+    short_answer = re.findall(pattern, long_answer)[0] # trim the first end of turn
+    short_answer = short_answer.split(end_of_turn)[0] # trim the second end of turn
+    return short_answer
+    
+def get_dataloader_iter(config, processor, only_positive=False, personalized_prompt=None):
+    if only_positive:
+        train_dataset = PersonalizedDataset(
+                json_file=config.json_file,
+                processor=processor,
+                placeholder_token=config.special_tokens["SKS_TOKEN"],
+                tokenizer_max_length=config.tokenizer_max_length,
+                END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                only_positive=True,
+                personalized_prompt=personalized_prompt,
+                task_disjoin=config.task_disjoin
+            )
+    else:
+        if config.task_disjoin:
+            print('\n\n\n Using PersonalizedDataset_Disjoin \n\n\n')
+            train_dataset = PersonalizedDataset_Disjoin(
+                json_file=config.json_file,
+                processor=processor,
+                placeholder_token=config.special_tokens["SKS_TOKEN"],
+                tokenizer_max_length=config.tokenizer_max_length,
+                END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                personalized_prompt=personalized_prompt,
+                task_disjoin=config.task_disjoin
+            )
+        elif config.self_prompting:
+            print('\n\n\n Using PersonalizedDataset_SelfPrompting \n\n\n')
+            train_dataset = PersonalizedDataset_SelfPrompting(
+                config=config,
+                processor=processor,
+                personalized_prompt=personalized_prompt,
+                )
+        else:
+            train_dataset = PersonalizedDataset(
+                    json_file=config.json_file,
+                    processor=processor,
+                    placeholder_token=config.special_tokens["SKS_TOKEN"],
+                    tokenizer_max_length=config.tokenizer_max_length,
+                    END_OF_TURN=config.special_tokens["END_OF_TURN"],
+                    personalized_prompt=personalized_prompt,
+                    task_disjoin=config.task_disjoin
+                )
+    train_dataloader = torch.utils.data.DataLoader(
+        train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
+    )
+    # dataloader_iter = cycle(train_dataloader)
+    return train_dataloader
+
+def get_eval_dataloader(config, processor, image_folder, personalized_prompt=None, understanding_prompt=None):
+    if config.self_prompting:
+        eval_dataset = RecognitionData_SelfPrompting(
+            sks_name=config.sks_name,
+            image_folder=image_folder,
+            placeholder_token=config.special_tokens["SKS_TOKEN"],
+            tokenizer_max_length=config.tokenizer_max_length,
+            processor=processor,
+            personalized_prompt=personalized_prompt,
+            understanding_prompt=understanding_prompt,
+        )
+        eval_dataloader = torch.utils.data.DataLoader(
+            eval_dataset, batch_size=config.batch_size, shuffle=False, num_workers=1,
+        )
+    else:
+        eval_dataset = RecognitionData(
+            sks_name=config.sks_name,
+            image_folder=image_folder,
+            placeholder_token=config.special_tokens["SKS_TOKEN"],
+            tokenizer_max_length=config.tokenizer_max_length,
+            processor=processor,
+            personalized_prompt=personalized_prompt,
+        )
+        eval_dataloader = torch.utils.data.DataLoader(
+            eval_dataset, batch_size=config.batch_size, shuffle=False, num_workers=1,
+        )
+    return eval_dataset
+
+class Config:
+    def __init__(self, config_dict):
+        for key, value in config_dict.items():
+            setattr(self, key, value)
+
+def collate_fn(batch):
+    inputs = [item['input'] for item in batch]
+    images = [item['image'] for item in batch]
+    img_gen_bools = [item['image_generation'] for item in batch]
+    # question = [f'{questions[i]}{answers[i]}' for i in range(len(questions))]
+    example = processor(inputs, images, padding=True)
+    example['labels'] = example['input_ids'].clone()
+
+    # Find the index of the first occurrence of END_OF_TURN in each sequence
+    batch_size, seq_len = example['labels'].shape
+    eot_mask = example['labels'] == END_OF_TURN
+    eot_indices = torch.argmax(eot_mask.int(), dim=1)
+
+    # Create a mask for the positions to be replaced with -100
+    mask = torch.arange(seq_len).expand(batch_size, seq_len) < eot_indices.unsqueeze(1)
+
+    # Apply the mask to the labels
+    example['labels'][mask] = -100
+    example['img_gen_bools'] = img_gen_bools
+    return example
 
 # class CLIPEvaluator:
 #     def __init__(self, model_id="openai/clip-vit-base-patch32"):
@@ -62,100 +171,3 @@ from tqdm import tqdm
 #             similarity_score = torch.nn.functional.cosine_similarity(real_images_ft, fake_images_ft).item()
 #             clip_scores.append(similarity_score)
 #         return clip_scores
-
-def chameleon_trim_answer(long_answer):
-    end_of_turn = '<reserved08706>'
-    pattern = r"<reserved08706>(.*)"
-    short_answer = re.findall(pattern, long_answer)[0] # trim the first end of turn
-    short_answer = short_answer.split(end_of_turn)[0] # trim the second end of turn
-    return short_answer
-    
-def get_dataloader_iter(config, processor, only_positive=False, personalized_prompt=None):
-    if only_positive:
-        train_dataset = PersonalizedDataset(
-                json_file=config.json_file,
-                processor=processor,
-                placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
-                tokenizer_max_length=config.tokenizer_max_length,
-                END_OF_TURN=config.special_tokens["END_OF_TURN"],
-                only_positive=True,
-                personalized_prompt=personalized_prompt,
-                task_disjoin=config.task_disjoin
-            )
-    else:
-        if config.task_disjoin:
-            print('\n\n\n Using PersonalizedDataset_Disjoin \n\n\n')
-            train_dataset = PersonalizedDataset_Disjoin(
-                json_file=config.json_file,
-                processor=processor,
-                placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
-                tokenizer_max_length=config.tokenizer_max_length,
-                END_OF_TURN=config.special_tokens["END_OF_TURN"],
-                personalized_prompt=personalized_prompt,
-                task_disjoin=config.task_disjoin
-            )
-        elif config.task_api:
-            print('\n\n\n Using PersonalizedDataset_API \n\n\n')
-            train_dataset = PersonalizedDataset_API(
-                json_file=config.json_file,
-                processor=processor,
-                tokenizer_max_length=config.tokenizer_max_length,
-                END_OF_TURN=config.special_tokens["END_OF_TURN"],
-                personalized_prompt=personalized_prompt,
-                task_disjoin=config.task_disjoin,
-                )
-        else:
-            train_dataset = PersonalizedDataset(
-                    json_file=config.json_file,
-                    processor=processor,
-                    placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
-                    tokenizer_max_length=config.tokenizer_max_length,
-                    END_OF_TURN=config.special_tokens["END_OF_TURN"],
-                    personalized_prompt=personalized_prompt,
-                    task_disjoin=config.task_disjoin
-                )
-    train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,
-    )
-    # dataloader_iter = cycle(train_dataloader)
-    return train_dataloader
-
-def get_eval_dataloader(config, processor, image_folder, personalized_prompt=None):
-    eval_dataset = RecognitionData(
-        sks_name=config.sks_name,
-        image_folder=image_folder,
-        placeholder_token=config.special_tokens["PERSONALITY_TOKEN"],
-        tokenizer_max_length=config.tokenizer_max_length,
-        processor=processor,
-        personalized_prompt=personalized_prompt,
-    )
-    eval_dataloader = torch.utils.data.DataLoader(
-        eval_dataset, batch_size=config.batch_size, shuffle=False, num_workers=1,
-    )
-    return eval_dataset
-
-class Config:
-    def __init__(self, config_dict):
-        for key, value in config_dict.items():
-            setattr(self, key, value)
-
-def collate_fn(batch):
-    inputs = [item['input'] for item in batch]
-    images = [item['image'] for item in batch]
-    img_gen_bools = [item['image_generation'] for item in batch]
-    # question = [f'{questions[i]}{answers[i]}' for i in range(len(questions))]
-    example = processor(inputs, images, padding=True)
-    example['labels'] = example['input_ids'].clone()
-
-    # Find the index of the first occurrence of END_OF_TURN in each sequence
-    batch_size, seq_len = example['labels'].shape
-    eot_mask = example['labels'] == END_OF_TURN
-    eot_indices = torch.argmax(eot_mask.int(), dim=1)
-
-    # Create a mask for the positions to be replaced with -100
-    mask = torch.arange(seq_len).expand(batch_size, seq_len) < eot_indices.unsqueeze(1)
-
-    # Apply the mask to the labels
-    example['labels'][mask] = -100
-    example['img_gen_bools'] = img_gen_bools
-    return example

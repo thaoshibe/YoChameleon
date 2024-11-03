@@ -70,7 +70,7 @@ special_tokens:
   END_OF_IMAGE_INDEX: 8196
   END_OF_TURN: 8710
   PAD_INDEX: 1
-  PERSONALITY_TOKEN: '<reserved16200>'
+  SKS_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
 
 # --- TEST CONFIG --- 

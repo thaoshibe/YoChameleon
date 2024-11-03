@@ -1,4 +1,4 @@
-project_name: "YoChameleon-Exploration"
+project_name: "YoChameleon12"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -46,7 +46,7 @@ special_tokens:
   END_OF_IMAGE_INDEX: 8196
   END_OF_TURN: 8710
   PAD_INDEX: 1
-  PERSONALITY_TOKEN: '<reserved16200>'
+  SKS_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
 resume: 
   resume: No

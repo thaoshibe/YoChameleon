@@ -42,7 +42,7 @@ if __name__ == '__main__':
     config_dict = yaml.safe_load(open(args.config, 'r'))
     config = Config(config_dict)
 
-    sks_token = config.special_tokens['PERSONALITY_TOKEN']
+    sks_token = config.special_tokens['SKS_TOKEN']
 
     # Initialize processor and model
     processor = ChameleonProcessor.from_pretrained(config.model_id)

@@ -14,7 +14,7 @@ prefix_token: 16 # Remember to change this
 exp_name: 'api' # Remember to change this
 different_identifier: False
 task_disjoin: False
-task_api: True
+self_prompting: True
 
 seperate_tasks: False # This means, the model will be trained on all tasks (recognition, gen) with same tokens, or seperate
 
@@ -23,7 +23,7 @@ epoch: 30 # remember to CHANGE THIS shibe; Currently it will use epochs for trai
 save_every: 2
 
 batch_size: 4
-savedir: '/sensei-fs/users/thaon/ckpt/'
+savedir: '/sensei-fs/users/thaon/ckpt-1103/'
 whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
@@ -49,10 +49,11 @@ special_tokens:
   PAD_INDEX: 1
   SKS_TOKEN: '<reserved16200>'
   LATENT_TOKEN_START: 16201
+
 resume: 
   resume: No
   resume_iteration: 15
-  savedir: '/sensei-fs/users/thaon/ckpt/'
+  savedir: '/sensei-fs/users/thaon/ckpt-1103/'
   exp_name: '1000disjoin'
 
 finetune:

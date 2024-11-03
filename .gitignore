@@ -10,3 +10,4 @@ __pycache__/
 
 /viewer
 sftp-config.json
+scripts/sensei

@@ -124,9 +124,8 @@ class PersonalizedDataset(Dataset):
         example['labels'] = labels
         return example
 
-
-
 class PersonalizedDataset_Disjoin(Dataset):
+    # Update 11/03/2024: This idea is not supported anymore...
     def __init__(
         self,
         json_file=None,
@@ -205,38 +204,46 @@ class PersonalizedDataset_Disjoin(Dataset):
         example['labels'] = labels
         return example
 
-class PersonalizedDataset_API(Dataset):
+class PersonalizedDataset_SelfPrompting(Dataset):
     def __init__(
         self,
-        json_file=None,
-        placeholder_token="<reserved16200>",
-        center_crop=False,
-        repeat=10,
-        tokenizer_max_length=2048, 
+        config,
         processor: ChameleonProcessor = None,
-        END_OF_TURN: int = 8710,
         personalized_prompt: str = None,
-        task_disjoin: bool = False,
     ):
+        self.config = config
         self.processor = processor
-        self.placeholder_token = placeholder_token
-        self.max_length = tokenizer_max_length
+
+        self.sks_token = self.config.special_tokens['SKS_TOKEN']
         self.personalized_prompt = personalized_prompt
-        self.END_OF_TURN = END_OF_TURN
+        self.END_OF_TURN = self.config.special_tokens['END_OF_TURN']
+
+        latent_token_start = self.config.special_tokens['LATENT_TOKEN_START']
+        num_latent_tokens = self.config.prefix_token
+
+        understanding_tokens = [f'<reserved{latent_token_start+num_latent_tokens+i}>' for i in range(self.config.prefix_token)]
+        generation_tokens = [f'<reserved{latent_token_start+i}>' for i in range(self.config.prefix_token)]
+
+        self.understanding_prompt = "".join(understanding_tokens)
+        self.generation_prompt = "".join(generation_tokens)
+
         self.chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
-        self.task_disjoin = task_disjoin
+        self.max_length = self.config.tokenizer_max_length
+
         data = []
         try:
-            for file in json_file:
-                print(f"Loading {file}")
+            for file in self.config.json_file:
+                print(f"        Loading {file}")
                 with open(file) as f:
                     info = json.load(f)
                     data.extend(info)
         except Exception as e:
             print(e)
-            print('Could you please check the json file path?')
+            print('\n\nCould you please check the json file path?')
+
         self.data = data
         self.flip_transform = transforms.RandomHorizontalFlip()
+        print('The personalized prompt is: ', self.personalized_prompt)
 
     def __len__(self):
         return len(self.data)
@@ -248,22 +255,17 @@ class PersonalizedDataset_API(Dataset):
 
         conv = self.data[i]['conversations']
 
-        understanding_tokens = [f'<reserved{16+16201+i}>' for i in range(16)]
-        generation_tokens = [f'<reserved{16201+i}>' for i in range(16)]
-        understanding_prompt = "".join(understanding_tokens)
-        generation_prompt = "".join(generation_tokens)
-
-        # Manually added personalized prompt for text-only generation and image understanding
         if conv[-1]['value'] != "<image>":
+            # If the task is understanding, then add understanding prompt
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
-            conv[1]['value'] = f'<sks> is {understanding_prompt}. {conv[1]["value"]}'
+            conv[1]['value'] = f'<sks> is {self.understanding_prompt}\n{conv[1]["value"]}'
         else:
             caption = conv[0]['value'].split('.')[0]
-            conv[0]['value'] = f'{caption}{understanding_prompt}. A photo of <reserved16200>.'
-            conv[1]['value'] = f'{caption}. A photo of <reserved16200>.'
+            conv[0]['value'] = f'{caption}{self.understanding_prompt}. A photo of {self.sks_token}.'
+            conv[1]['value'] = f'{caption}\n<image>'
 
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
-        full_text = conversations.replace("<sks>", self.placeholder_token)
+        full_text = conversations.replace("<sks>", self.sks_token)
 
         example = self.processor(
             text=full_text,
@@ -336,13 +338,64 @@ class RecognitionData(Dataset):
             example['labels'] = ['No']
         return example
 
+class RecognitionData_SelfPrompting(Dataset):
+    def __init__(
+        self,
+        sks_name,
+        placeholder_token="<reserved16200>",
+        image_folder=None,
+        tokenizer_max_length=1500, 
+        processor: ChameleonProcessor = None,
+        only_positive: bool = False,
+        personalized_prompt: str = None,
+        understanding_prompt: str = None,
+    ):
+        self.processor = processor
+        self.sks_name = sks_name
+        self.placeholder_token = placeholder_token
+        self.max_length = tokenizer_max_length
+        self.personalized_prompt = personalized_prompt
+        self.image_paths = glob.glob(os.path.join(image_folder, "*/*.png"))
+        self.image_paths = [x for x in self.image_paths if 'negative_example' not in x]
+        self.understanding_prompt = understanding_prompt
+        print(f'Found {len(self.image_paths)} images in {image_folder}')
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, i):
+        image_path = self.image_paths[i]
+        #-- This might be useful, as later can be trained for multiple images (interleaved data)
+        # images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
+        # print(f'Loading {image_path}')
+        images = [Image.open(image_path).convert("RGB")]
+        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image><reserved08706>{self.placeholder_token} is {self.understanding_prompt}. '
+
+        example = self.processor(
+            text=question,
+            images=images,
+            # padding="max_length",
+            # max_length=self.max_length,
+            )
+        example['inputs'] = {
+            'input_ids': example['input_ids'],
+            'attention_mask': example['attention_mask'],
+            'pixel_values': example['pixel_values'],
+        }
+
+        if f'/{self.sks_name}/' in image_path:
+            example['labels'] = ['Yes']
+        else:
+            example['labels'] = ['No']
+        return example
+
 
 if __name__ == "__main__":
 
     model_id = 'leloy/Anole-7b-v0.1-hf'
     processor = ChameleonProcessor.from_pretrained(model_id)
     #--- This is for debug purpose
-    config_file = './config/api.yaml'
+    config_file = './config/selfprompting.yaml'
 
     config_dict = yaml.safe_load(open(config_file, 'r'))
     config = Config(config_dict)
@@ -361,14 +414,10 @@ if __name__ == "__main__":
             personalized_prompt=personalized_prompt,
             task_disjoin=config.task_disjoin,
             )
-    elif config.task_api:
-        train_dataset = PersonalizedDataset_API(
-            json_file=config.json_file,
+    elif config.self_prompting:
+        train_dataset = PersonalizedDataset_SelfPrompting(
+            config,
             processor=processor,
-            tokenizer_max_length=config.tokenizer_max_length,
-            END_OF_TURN=config.special_tokens["END_OF_TURN"],
-            personalized_prompt=personalized_prompt,
-            task_disjoin=config.task_disjoin,
             )
     else:
         train_dataset = PersonalizedDataset(
