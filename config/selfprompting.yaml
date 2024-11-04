@@ -1,4 +1,4 @@
-project_name: "YoChameleon-Exploration"
+project_name: "YoChameleon-SelfPrompting"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -11,7 +11,7 @@ json_file: # Remember to change this
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: 'api' # Remember to change this
+exp_name: 'selfprompt' # Remember to change this
 different_identifier: False
 task_disjoin: False
 self_prompting: True
@@ -77,7 +77,7 @@ finetune:
 # --- EVAL CONFIG --- 
 eval:
   clip_sim: True
-  number_fake_images: 1
+  number_fake_images: 5
   recognition: True
   recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
   recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'

@@ -442,7 +442,7 @@ class YoChameleonTrainer:
 	def eval_clip_similarity(self, real_images, number_fake_images=10):
 		print('\n\n                CLIP Similarity Evaluation \n\n')
 		if self.config.self_prompting:
-			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.identifier} is {self.generation_prompt}'
+			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.generation_prompt}'
 		else:
 			prompt = self.sks_prompt + f' A photo of {self.identifier}.<reserved08706>'
 		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
@@ -466,7 +466,10 @@ class YoChameleonTrainer:
 	@torch.no_grad()
 	def visualize_evaluation(self):
 		print('Generate evaluation images...')
-		prompt = self.sks_prompt + f' A photo of {self.identifier}.'
+		if self.config.self_prompting:
+			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.generation_prompt}'
+		else:
+			prompt = self.sks_prompt + f' A photo of {self.identifier}.'
 		print(prompt)
 		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
 		generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
