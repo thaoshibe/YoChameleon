@@ -226,8 +226,6 @@ class PersonalizedDataset_SelfPrompting(Dataset):
 
         self.understanding_prompt = "".join(understanding_tokens)
         self.generation_prompt = "".join(generation_tokens)
-
-        self.chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
         self.max_length = self.config.tokenizer_max_length
 
         data = []
@@ -249,22 +247,23 @@ class PersonalizedDataset_SelfPrompting(Dataset):
         return len(self.data)
 
     def __getitem__(self, i):
+        chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
         image_paths = self.data[i]['image']
         images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         images = [self.flip_transform(image) for image in images]
 
-        conv = self.data[i]['conversations']
-
+        conv = [{"from": message["from"], "value": message["value"]} for message in self.data[i]['conversations']]
+        # print(image_paths, conv)
         if conv[-1]['value'] != "<image>":
             # If the task is understanding, then add understanding prompt
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
-            conv[1]['value'] = f'{self.understanding_prompt}{conv[1]["value"]}'
+            conv[1]['value'] = f'<sks> is {self.understanding_prompt}. {conv[1]["value"]}'
         else:
             caption = conv[0]['value'].split('.')[0]
             conv[0]['value'] = f'{caption}{self.understanding_prompt}. A photo of {self.sks_token}.'
             conv[1]['value'] = f'{caption}<image>'
 
-        conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
+        conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
         full_text = conversations.replace("<sks>", self.sks_token)
 
         example = self.processor(
@@ -369,7 +368,7 @@ class RecognitionData_SelfPrompting(Dataset):
         # images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         # print(f'Loading {image_path}')
         images = [Image.open(image_path).convert("RGB")]
-        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image><reserved08706>{self.understanding_prompt}'
+        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image><reserved08706>{self.placeholder_token} is {self.understanding_prompt}. '
 
         example = self.processor(
             text=question,

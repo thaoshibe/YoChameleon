@@ -42,7 +42,7 @@ if __name__ == '__main__':
         trainer.processor,
         personalized_prompt=personalized_prompt
         )
-
+    breakpoint()
     trainer.resume_training()
     trainer.configure_model() # this step will set up optimization
     if config.self_prompting:
@@ -77,6 +77,7 @@ if __name__ == '__main__':
                 recognition_dataloader_train,
                 recognition_dataloader_test
                 )
+
         # -- Thao: Maybe we should move this to the finetuning stage for all
         if config.finetune['finetune']:
             config.finetune['finetune_iteration'] = config.finetune['finetune_epoch']
