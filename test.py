@@ -87,15 +87,30 @@ if __name__ == '__main__':
         state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
         model.model.load_state_dict(state_dict)
         print(model_path)
-        
-    # Define prompt and inputs
-    # prompt = f"{sks_prompt}\nCan you describe <reserved16300>? Answer in detail."
-    # inputs = processor(prompt, return_tensors="pt").to(model.device)
 
-    # # Generate and process output
-    # output = model.generate(**inputs, max_new_tokens=200)
-    # result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
-    
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    #
+    #         Text-Only response
+    #
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    prompt = f"{sks_prompt} Can you describe <reserved16200>? Answer in detail."
+    inputs = processor(prompt, return_tensors="pt").to(model.device)
+    output = model.generate(**inputs, max_new_tokens=200)
+    result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
+
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    #
+    #         VQA response
+    #
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    image = Image.open('../data/yochameleon-data/test/thao/0.png')
+    prompt = f"{sks_prompt} Can you see <reserved16200> in this photo?<image><reserved08706><reserved16200> is <reserved16217><reserved16218><reserved16219><reserved16220><reserved16221><reserved16222><reserved16223><reserved16224><reserved16225><reserved16226><reserved16227><reserved16228><reserved16229><reserved16230><reserved16231><reserved16232>."
+
+    inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
+    inputs['pixel_values'] = inputs['pixel_values'].to(model.dtype)
+    output = model.generate(**inputs, max_new_tokens=200)
+    result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
+    breakpoint()
     # # Save the results
     # output_dir = os.path.join(config_test.save_dir, config.exp_name)
     # os.makedirs(output_dir, exist_ok=True)
@@ -110,7 +125,6 @@ if __name__ == '__main__':
         full_prompt = f"{sks_prompt} {prompt_short}. <reserved08706><reserved16200> is <reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
         # full_prompt = f"{prompt_short}"
         inputs = processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(model.device)
-        breakpoint()
         generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
         response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
         pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])

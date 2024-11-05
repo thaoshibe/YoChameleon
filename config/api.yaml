@@ -14,7 +14,7 @@ prefix_token: 16 # Remember to change this
 exp_name: 'api' # Remember to change this
 different_identifier: False
 task_disjoin: False
-task_api: True
+self_prompting: True
 
 seperate_tasks: False # This means, the model will be trained on all tasks (recognition, gen) with same tokens, or seperate
 

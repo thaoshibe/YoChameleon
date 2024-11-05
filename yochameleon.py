@@ -6,6 +6,8 @@ import re
 
 import numpy as np
 
+import html
+
 from PIL import Image
 from evaluation.clip_image_similarity import CLIPEvaluator
 from itertools import cycle
@@ -317,7 +319,6 @@ class YoChameleonTrainer:
 					self.avg_metric = avg_score
 					self.save_checkpoint('best')
 				if not self.config.no_wandb:
-					#combine results
 					log_dict = {**{"eval": iteration}}
 					for item in eval_list:
 						log_dict.update(item)
@@ -399,10 +400,10 @@ class YoChameleonTrainer:
 			batch['inputs'] = {k: v.squeeze(1).to(self.model.device) for k, v in batch['inputs'].items()}
 			batch['inputs']['pixel_values'] = batch['inputs']['pixel_values'].to(self.model.dtype)
 
-			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=3)
+			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=10)
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
-
 			answer = chameleon_trim_answer(result_with_special_tokens)
+			# breakpoint()
 			if ('Yes' in answer) or ('yes' in answer):
 				predictions.append('Yes')
 			elif ('No' in answer) or ('no' in answer):
@@ -418,7 +419,7 @@ class YoChameleonTrainer:
 		predict_negative = [predictions[i] for i in negative_indices]
 		gt_positive = [ground_truth[i] for i in positive_indices]
 		gt_negative = [ground_truth[i] for i in negative_indices]
-		# accuracy:
+
 		accuracy = sum([1 for i, j in zip(ground_truth, predictions) if i == j]) / len(ground_truth)
 		positive_accuracy = sum([1 for i, j in zip(gt_positive, predict_positive) if i == j]) / len(gt_positive)
 		negative_accuracy = sum([1 for i, j in zip(gt_negative, predict_negative) if i == j]) / len(gt_negative)
@@ -430,11 +431,13 @@ class YoChameleonTrainer:
 			if self.weighted_acc <= weighted_acc:
 				self.weighted_acc = weighted_acc
 				self.save_checkpoint('best-recog')
+		answer = html.escape(answer)
 		recog_dict = {
 			f"Recognition/{split}_accuracy": accuracy,
 			f"Recognition/{split}_positive_accuracy": positive_accuracy,
 			f"Recognition/{split}_negative_accuracy": negative_accuracy,
-			f"Metrics/{split}_weighted_accuracy": weighted_acc
+			f"Metrics/{split}_weighted_accuracy": weighted_acc,
+			"Text/Recognition": wandb.Html(f'<p>{answer}</p>')
 		}
 		return recog_dict
 
@@ -442,7 +445,7 @@ class YoChameleonTrainer:
 	def eval_clip_similarity(self, real_images, number_fake_images=10):
 		print('\n\n                CLIP Similarity Evaluation \n\n')
 		if self.config.self_prompting:
-			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.generation_prompt}'
+			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.identifier} is {self.generation_prompt}'
 		else:
 			prompt = self.sks_prompt + f' A photo of {self.identifier}.<reserved08706>'
 		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
@@ -467,7 +470,7 @@ class YoChameleonTrainer:
 	def visualize_evaluation(self):
 		print('Generate evaluation images...')
 		if self.config.self_prompting:
-			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.generation_prompt}'
+			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.identifier} is {self.generation_prompt}'
 		else:
 			prompt = self.sks_prompt + f' A photo of {self.identifier}.'
 		print(prompt)
@@ -484,12 +487,11 @@ class YoChameleonTrainer:
 		output = self.model.generate(**inputs, max_new_tokens=200)
 		result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
 		answer = chameleon_trim_answer(result_with_special_tokens)
-		import html
 		escaped_string = html.escape(result_with_special_tokens)
 		print(answer)
 		visual_dict = {
 			"Image": wandb.Image(image),
-			"Text": wandb.Html(f'<p>{escaped_string}</p>')
+			"Text/Describe": wandb.Html(f'<p>{escaped_string}</p>')
 			}
 		return visual_dict
 			# self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})

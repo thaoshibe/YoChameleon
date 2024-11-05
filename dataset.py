@@ -318,7 +318,7 @@ class RecognitionData(Dataset):
         # images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         # print(f'Loading {image_path}')
         images = [Image.open(image_path).convert("RGB")]
-        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image>'
+        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image><reserved08706>'
         example = self.processor(
             text=question,
             images=images,

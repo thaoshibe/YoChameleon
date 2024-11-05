@@ -1,4 +1,4 @@
-project_name: "YoChameleon-04nov2024"
+project_name: "YoChameleon04112024"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -7,11 +7,11 @@ data_root: '/mnt/localssd/code/data/minithao/'
 json_file: # Remember to change this
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: 'selfprompt' # Remember to change this
+exp_name: 'recog' # Remember to change this
 different_identifier: False
 task_disjoin: False
 self_prompting: True
@@ -23,7 +23,7 @@ epoch: 30 # remember to CHANGE THIS shibe; Currently it will use epochs for trai
 save_every: 2
 
 batch_size: 4
-savedir: '/sensei-fs/users/thaon/ckpt-1103/'
+savedir: '/sensei-fs/users/thaon/ckpt-04112024/'
 whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
@@ -77,7 +77,7 @@ finetune:
 # --- EVAL CONFIG --- 
 eval:
   clip_sim: True
-  number_fake_images: 1
+  number_fake_images: 5
   recognition: True
   recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
   recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'
