@@ -7,11 +7,11 @@ data_root: '/mnt/localssd/code/data/minithao/'
 json_file: # Remember to change this
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
   - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
+  # - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000E.json'
 
 sks_name: 'thao'
 prefix_token: 16 # Remember to change this
-exp_name: 'sf2' # Remember to change this
+exp_name: 'sp-recogonly' # Remember to change this
 different_identifier: False
 task_disjoin: False
 self_prompting: True
@@ -77,7 +77,7 @@ finetune:
 # --- EVAL CONFIG --- 
 eval:
   clip_sim: True
-  number_fake_images: 1
+  number_fake_images: 5
   recognition: True
   recognition_path_train: '/mnt/localssd/code/data/yochameleon-data/train'
   recognition_path_test: '/mnt/localssd/code/data/yochameleon-data/test'

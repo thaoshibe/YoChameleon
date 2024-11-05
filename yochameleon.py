@@ -400,7 +400,7 @@ class YoChameleonTrainer:
 			batch['inputs'] = {k: v.squeeze(1).to(self.model.device) for k, v in batch['inputs'].items()}
 			batch['inputs']['pixel_values'] = batch['inputs']['pixel_values'].to(self.model.dtype)
 
-			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=10)
+			output = self.model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=30)
 			result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
 			answer = chameleon_trim_answer(result_with_special_tokens)
 			# breakpoint()
@@ -445,7 +445,7 @@ class YoChameleonTrainer:
 	def eval_clip_similarity(self, real_images, number_fake_images=10):
 		print('\n\n                CLIP Similarity Evaluation \n\n')
 		if self.config.self_prompting:
-			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.identifier} is {self.generation_prompt}'
+			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.generation_prompt}'
 		else:
 			prompt = self.sks_prompt + f' A photo of {self.identifier}.<reserved08706>'
 		inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
@@ -470,7 +470,7 @@ class YoChameleonTrainer:
 	def visualize_evaluation(self):
 		print('Generate evaluation images...')
 		if self.config.self_prompting:
-			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.identifier} is {self.generation_prompt}'
+			prompt = f'{self.sks_prompt} A photo of {self.identifier}.<reserved08706>{self.generation_prompt}'
 		else:
 			prompt = self.sks_prompt + f' A photo of {self.identifier}.'
 		print(prompt)

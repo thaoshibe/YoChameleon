@@ -257,11 +257,28 @@ class PersonalizedDataset_SelfPrompting(Dataset):
         if conv[-1]['value'] != "<image>":
             # If the task is understanding, then add understanding prompt
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
-            conv[1]['value'] = f'<sks> is {self.understanding_prompt}. {conv[1]["value"]}'
+            #
+            #       This will include <sks> in the answer
+            #
+            # conv[1]['value'] = f'<sks> is {self.understanding_prompt}. {conv[1]["value"]}'
+
+            #
+            #       This will NOT include <sks> in the answer
+            #
+            conv[1]['value'] = f'{self.understanding_prompt}{conv[1]["value"]}'
         else:
             caption = conv[0]['value'].split('.')[0]
             conv[0]['value'] = f'{caption}{self.understanding_prompt}. A photo of {self.sks_token}.'
-            conv[1]['value'] = f'{caption}<image>'
+            #
+            #       This will include <sks> in the answer
+            #
+            # conv[1]['value'] = f'{caption}<image>'
+
+            #
+            #       This will NOT include <sks> in the answer
+            #
+            caption = caption.replace(f'{self.sks_token} is ', '')
+            
 
         conversations = self.processor.apply_chat_template(conv, chat_template=chat_template)
         full_text = conversations.replace("<sks>", self.sks_token)
@@ -368,7 +385,7 @@ class RecognitionData_SelfPrompting(Dataset):
         # images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         # print(f'Loading {image_path}')
         images = [Image.open(image_path).convert("RGB")]
-        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image><reserved08706>{self.placeholder_token} is {self.understanding_prompt}. '
+        question = f'{self.personalized_prompt} Is {self.placeholder_token} in this photo?<image>'
 
         example = self.processor(
             text=question,
