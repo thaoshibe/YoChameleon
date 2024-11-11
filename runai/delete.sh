@@ -5,7 +5,22 @@ PROJECT="ilo-train-p4de"
 # PROJECT="ilo-noquota-p4de"
 
 # List of job names to delete
-jobs=("api-1104-1130" "thao1105-9am" "thao1106-10am" "api2-1103-2335" "api3-1103-2334" "positive-only-1102-1004" "recog-1101-1751" "recog-1102-1355" "together-1101-1753" "together-1102-1018" "recog-1101-2337" "together-1101-2338")
+jobs=(
+    "thao1114-9am"
+    "thao1112-11pm"
+    "thao1111-2pm"
+    "sf3-1105-1611"
+    "sf2-1105-1609"
+    "sf2-1105-1347"
+    "sf3-1105-1205"
+    "sf2-1105-1204"
+    "sfrecog-1105-0745"
+    "api3-1104-2359"
+    "selfprompting-recog-1104-2357"
+    "api3-1104-1937"
+    "api3-1104-1924"
+    "thao1109-10am"
+)
 
 # Loop through each job and delete it
 for job in "${jobs[@]}"

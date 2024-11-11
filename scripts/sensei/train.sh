@@ -2,13 +2,7 @@ USER="$(whoami)"
 echo "USER"
 echo $USER
 
-DATA_ZIP_FILE="/sensei-fs/users/$USER/data/yochameleon-data.zip"
-CODE_FOLDER="/sensei-fs/users/$USER/code/YoChameleon"
-cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
-unzip $WORKING_FOLDER/data/yochameleon-data.zip
-
 NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup")
-WORKING_FOLDER="/mnt/localssd/code"
 
 export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
@@ -37,6 +31,11 @@ echo "Launching training script"
 mkdir -p $WORKING_FOLDER
 cd $WORKING_FOLDER
 cp -r $CODE_FOLDER $WORKING_FOLDER
+
+DATA_ZIP_FILE="/sensei-fs/users/$USER/data/yochameleon-data.zip"
+CODE_FOLDER="/sensei-fs/users/$USER/code/YoChameleon"
+cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
+unzip $WORKING_FOLDER/data/yochameleon-data.zip
 
 cd $WORKING_FOLDER/YoChameleon
 bash scripts/install.sh

@@ -12,6 +12,7 @@ NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup")
 # NAMES=("willinvietnam" "denisdang" "lamb" "phuc-map")
 # NAMES=("thap-but" "yellow-duck" "dragon" "mam")
 # NAMES=("pig-cup" "thap-cham" "yuheng", "thuytien")
+WORKING_FOLDER="/mnt/localssd/code"
 
 export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 

@@ -39,4 +39,4 @@ runai submit --large-shm \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./'${TRAIN_SCRIPT}';"'
+    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./'${TRAIN_SCRIPT}' > /sensei-fs/users/thaon/log.txt;"'
