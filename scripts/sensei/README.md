@@ -23,6 +23,7 @@ git pull origin main
 
 3. Change the config file [savedir: '/sensei-fs/users/thaon/ckpt/'](https://github.com/thaoshibe/YoChameleon/blob/main/config/selfprompting.yaml#L26) to the folder that you want
 
+4. Edit the [submit_train_job_yuhli.sh](https://github.com/thaoshibe/YoChameleon/blob/main/runai/submit_train_job_yuhli.sh) with your info.
 
 #### Now, you can run the code from your local
 
