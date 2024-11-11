@@ -5,11 +5,14 @@ SCRIPT_DIR="/sensei-fs/users/thaon/code/YoChameleon/scripts/sensei"
 # ============ 1. Experiment setup. ============
 # To support automatic job submission.
 if [ -z "$1" ]; then
-    # If no job name is in argument, use the following one.
+    # If no job name is provided, use the following one.
     JOB_NAME="shibe"
+    TRAIN_SCRIPT="train.sh"   # Default training script
 else
     JOB_NAME=$1
+    TRAIN_SCRIPT="${1}.sh"   # Use the argument to select the training script
 fi
+
 # Get current date in mm-dd format.
 CURRENT_DATE=$(date +"%m%d-%H%M")
 echo $CURRENT_DATE
@@ -36,4 +39,4 @@ runai submit --large-shm \
     -l research_jack_id=$RESEARCH_JACK_ID \
     -l activity_type=focused_research \
     -e WANDB_API_KEY=$WANDB_API_KEY \
-    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./train.sh;"'
+    --command -- bash -c '"cd '${SCRIPT_DIR}'; umask 007; bash ./'${TRAIN_SCRIPT}';"'

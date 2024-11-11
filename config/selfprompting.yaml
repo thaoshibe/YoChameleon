@@ -1,4 +1,4 @@
-project_name: "YoChameleonDebug"
+project_name: "YoChameleon2878"
 entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
@@ -23,7 +23,7 @@ epoch: 30 # remember to CHANGE THIS shibe; Currently it will use epochs for trai
 save_every: 2
 
 batch_size: 4
-savedir: '/sensei-fs/users/thaon/ckpt-04112024/'
+savedir: '/sensei-fs/users/thaon/ckpt/'
 whole_model: False
 tokenizer_max_length: 1500
 eval_visualization: True
@@ -53,7 +53,7 @@ special_tokens:
 resume: 
   resume: No
   resume_iteration: 15
-  savedir: '/sensei-fs/users/thaon/ckpt-1103/'
+  savedir: '/sensei-fs/users/thaon/ckpt/'
   exp_name: '1000disjoin'
 
 finetune:

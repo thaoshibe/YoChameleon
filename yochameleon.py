@@ -318,8 +318,13 @@ class YoChameleonTrainer:
 				if self.avg_metric <= avg_score:
 					self.avg_metric = avg_score
 					self.save_checkpoint('best')
+
 				if not self.config.no_wandb:
-					log_dict = {**{"eval": iteration}}
+					log_dict = {"eval": iteration,
+					"Best/avg_metric": avg_score/2,
+					"Best/clip": self.mean_clip,
+					"Best/recognition": self.weighted_acc
+					}
 					for item in eval_list:
 						log_dict.update(item)
 					self.wandb.log(log_dict)

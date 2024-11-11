@@ -1,13 +1,5 @@
 cd create_training_data/retrieve_negative
 # List of names or folders to process
-# NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup" "thuytien"
-#        "brown-duck" "dug" "mydieu" "shiba-black" "tokyo-keyboard"
-#        "butin" "elephant" "neurips-cup" "shiba-gray" "toodles-galore"
-#        "cat-cup" "fire" "nha-tho-hanoi" "shiba-sleep" "viruss"
-#        "chua-thien-mu" "henry" "nha-tho-hcm" "shiba-yellow" "water"
-#        "ciin" "khanhvy" "oong" "thao" "willinvietnam"
-#        "denisdang" "lamb" "phuc-map" "thap-but" "yellow-duck"
-#        "dragon" "mam" "pig-cup" "thap-cham" "yuheng")
 
 NAMES=("bo" "mam" "thuytien" "viruss" "ciin" "khanhvy" "oong" "thao" "willinvietnam" "denisdang" "phuc-map" "yuheng")
 
