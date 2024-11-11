@@ -10,7 +10,7 @@ cd create_training_data/retrieve_negative
 #        "dragon" "mam" "pig-cup" "thap-cham" "yuheng")
 
 NAMES=("bo" "mam" "thuytien" "viruss" "ciin" "khanhvy" "oong" "thao" "willinvietnam" "denisdang" "phuc-map" "yuheng")
-# NAMES=("bo")
+
 # Loop through each folder
 for NAME in "${NAMES[@]}"; do
   # Define the positive image folder based on the name

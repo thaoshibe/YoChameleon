@@ -74,12 +74,14 @@ if __name__ == '__main__':
         else:
             lm_head_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-lmhead.pt')
             lm_head = torch.load(lm_head_path, map_location='cuda')
-        model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
+        model.lm_head.weight.data[personalized_token_ids[:1]] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)[:1]
+        # model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
         # Update token embeddings
         if args.finetune:
             embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token-ft.pt'
         else:
             embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token.pt'
+        
         model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
 
     except:
@@ -93,24 +95,25 @@ if __name__ == '__main__':
     #         Text-Only response
     #
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    
     prompt = f"{sks_prompt} Can you describe <reserved16200>? Answer in detail."
     inputs = processor(prompt, return_tensors="pt").to(model.device)
     output = model.generate(**inputs, max_new_tokens=200)
     result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
-
+    print(result_with_special_tokens)
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     #
     #         VQA response
     #
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     image = Image.open('../data/yochameleon-data/test/thao/0.png')
-    prompt = f"{sks_prompt} Can you see <reserved16200> in this photo?<image><reserved08706><reserved16200> is <reserved16217><reserved16218><reserved16219><reserved16220><reserved16221><reserved16222><reserved16223><reserved16224><reserved16225><reserved16226><reserved16227><reserved16228><reserved16229><reserved16230><reserved16231><reserved16232>."
+    prompt = f"{sks_prompt} Can you see <reserved16200> in this photo?<image><reserved08706><reserved16217><reserved16218><reserved16219><reserved16220><reserved16221><reserved16222><reserved16223><reserved16224><reserved16225><reserved16226><reserved16227><reserved16228><reserved16229><reserved16230><reserved16231><reserved16232>."
 
     inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
     inputs['pixel_values'] = inputs['pixel_values'].to(model.dtype)
     output = model.generate(**inputs, max_new_tokens=200)
     result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
-    breakpoint()
+    print(result_with_special_tokens)
     # # Save the results
     # output_dir = os.path.join(config_test.save_dir, config.exp_name)
     # os.makedirs(output_dir, exist_ok=True)
@@ -122,8 +125,7 @@ if __name__ == '__main__':
     index = 0
     for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
         prompt_short = config_test.prompt
-        full_prompt = f"{sks_prompt} {prompt_short}. <reserved08706><reserved16200> is <reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
-        # full_prompt = f"{prompt_short}"
+        full_prompt = f"{sks_prompt} {prompt_short}. <reserved08706><reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
         inputs = processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(model.device)
         generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
         response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
@@ -135,4 +137,5 @@ if __name__ == '__main__':
             save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration)+'ft', config.sks_name)
         else:
             save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration), config.sks_name)
-        index, image = save_generated_images(pixel_values, prompt_short, save_path, config.sks_name, index, img_size=args.img_size)
+
+        index, image = save_generated_images(pixel_values, prompt_short, './generated_images', config.sks_name, index, img_size=args.img_size)

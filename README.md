@@ -4,63 +4,6 @@
 
 ⭑.ᐟ *Hello, this is [Yo'LLaVA](https://thaoshibe.github.io/YoLLaVA/) meets [Chameleon](https://arxiv.org/abs/2405.09818)!* ⭑.ᐟ
 ㅤ
-
-### 📝 write, write, write, Shibe
-
-[this is your overleaf link](https://www.overleaf.com/project/67100832e7abc0d8115cece0) [https://www.overleaf.com/project/67100832e7abc0d8115cece0](https://www.overleaf.com/project/67100832e7abc0d8115cece0)
-
-** 11/14/2024: 11 days left **
-- [ ] Introduction
-  - [ ] 🖼️ Teaser `figure`
-- [ ] Related Work
-  - [ ] Personalizing LMMs (?) -- Or seprate them into two subsections?
-  - [ ] Prefix Tuning
-  - [ ] Negative Mining
-- [ ] Method/Approach -- Thao: This is not sure right now; Please think about this later
-  - [ ] 🖼️ Model Architecture `figure`
-  - [ ] Can text-understanding data generate image?
-  - [ ] Can image-generation data generate text?
-  - [ ] How to combine both?
-- [ ] Experiments
-  - [ ] Baselines -- 📊 `table`
-    - [ ] Chameleon/ Anole: Image/ Text Prompting
-    - [ ] GPT-4o: Image/ Text Prompting
-    - [ ] Emu3: Image/ Text Prompting -- Cannot included here right?
-    - [ ] 🖼️ Qualitative `figure`
-- [ ] Abalation Study --- 🖼️ Qualitative Figure `figure`
-  - [ ] Text-only data
-  - [ ] Image-generation only data 
-    - [ ] Positive only
-    - [ ] Positive + Augmentation
-    - [ ] Positive + Random Negative (Gradually add)
-    - [ ] Positive + Hard Negative (Gradually add)
-  - [ ] ???
-  - [ ] ???
-- [ ] Conclusion
-
-** 11/22/2024: 21 days left **
-- [ ] Extension to Emu3?
-- [ ] Extension to Textual Inversion?
-- [ ] Forgetting Evaluation
-  - [ ] 
-
-### 🔰 TODO
-
-- [ ] Training
-  - [x] Finalize current training script (self-prompting idea)
-  - [x] Change to bfloat16?
-  - [ ] Create augmented data for the model?
-    - [ ] Train with augmented dataset
-
-- Dataset right now: Missing 100 random images!
-
-- [ ] Evaluation -- High priority now
-  - [ ] Diversity image generation evaluation (CLIP)
-  - [ ] Image quality generation: CLIP score/ DINO scores?
-  
-- Baselines:
-  - Code baseline
-
 ### 🚀 Getting Started
 
 ```
@@ -86,7 +29,6 @@ bash install.sh
 #   ├── retrieve.sh               # retrieve negative examples
 #   ├── recognition.sh            # recognition data (100 hard neg, 100 easy neg, & positive)
 #   ├── create_soft_positive.sh   # image generation data
-#   ├── simple_conversation.sh    # simple conversation data
 #   └── text_only_data.sh         # call GPT-4o for text-only response data
 #
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -367,7 +309,11 @@ This project will not be possible without the following open-source projects:
 - and amazing HuggingFace's community: [Chamleon on HuggingFace](https://huggingface.co/docs/transformers/en/model_doc/chameleon), [Anole on HuggingFace](https://github.com/huggingface/transformers/pull/32013)
 
 And the unwavering supports from my Adobe's main mentor [Dr. Yuheng Li](https://yuheng-li.github.io/), my advisor [Prof. Yong Jae Lee](https://pages.cs.wisc.edu/~yongjaelee/), and meaningful discussion with [Dr. Krishna](https://krsingh.cs.ucdavis.edu/), [Dr. Jing Shi](https://jshi31.github.io/jingshi/), and [Dr. Trung Bui](https://sites.google.com/site/trungbuistanford/).
-Special thanks to my fellow mentee [Sicheng Mo](https://sichengmo.github.io/) -- Without him, I would not have the "cute peer-pressured" to finish this project on time.                                                                                                                    
+
+Thanks my fellow mentee [Eslam Abdelrahman](https://scholar.google.com/citations?user=0OEerycAAAAJ&hl=en) for discussion about Vision-Langauge Model's latent space (and the core code for visualization).
+Special thanks to my fellow mentee [Sicheng Mo](https://sichengmo.github.io/) -- He taught me a lot about coding during our time together. Without him, I would still using Tensorflow instead of WanDB (haha, also, he knows a lot of good foods/ restaurants!)
+
+
 
   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⠀⠀⠀⢀⡤⠤⠤⣄⠀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
   ⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⠤⢴⣴⠒⠉⠹⣴⣏⠀⠀⠀⡀⠈⢇⠀⠀⣼⠀⠀⠀⠘⣶⠇⠀⢨⢃⡾⠓⠲⢤⠀⠀⠀⠀⠀⠀
@@ -385,4 +331,4 @@ Special thanks to my fellow mentee [Sicheng Mo](https://sichengmo.github.io/) --
   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠛⠛⠛⠋⠁⠀⠀⠀⠉⠉⠉⠉⠀⠀⠀⠈⠛⠻⠿⠟⠋⠁⣿⣿⣦⣀⣀⡼⠀⠀⠀⠀⠀⠀
   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀
 
-Finally, I've wrapped up this project -- I'll go home, hug my pets, and chill now ☕, hehe (.❛ ᴗ ❛.)
+*Finally, I've wrapped up this project -- I'll go home, hug my pets, and chill now ☕, hehe (.❛ ᴗ ❛.)*

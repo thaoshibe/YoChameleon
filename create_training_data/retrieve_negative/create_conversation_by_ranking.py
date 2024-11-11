@@ -5,7 +5,6 @@ import math
 import os
 
 from tqdm import tqdm
-from utils import Config
 
 def get_args():
 	"""Parse command-line arguments."""
