@@ -1,3 +1,12 @@
+USER="$(whoami)"
+echo "USER"
+echo $USER
+
+DATA_ZIP_FILE="/sensei-fs/users/$USER/data/yochameleon-data.zip"
+CODE_FOLDER="/sensei-fs/users/$USER/code/YoChameleon"
+cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
+unzip $WORKING_FOLDER/data/yochameleon-data.zip
+
 NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup")
 # NAMES=("brown-duck" "dug" "mydieu" "shiba-black")
 # NAMES=("tokyo-keyboard" "butin" "elephant" "neurips-cup")
@@ -9,10 +18,6 @@ NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup")
 # NAMES=("thap-but" "yellow-duck" "dragon" "mam")
 # NAMES=("pig-cup" "thap-cham" "yuheng", "thuytien")
 
-WORKING_FOLDER="/mnt/localssd/code"
-
-DATA_ZIP_FILE="/sensei-fs/users/thaon/data/yochameleon-data.zip"
-CODE_FOLDER="/sensei-fs/users/thaon/code/YoChameleon"
 export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
 ### @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
