@@ -6,20 +6,16 @@ PROJECT="ilo-train-p4de"
 
 # List of job names to delete
 jobs=(
-    "thao1114-9am"
-    "thao1112-11pm"
-    "thao1111-2pm"
-    "sf3-1105-1611"
-    "sf2-1105-1609"
-    "sf2-1105-1347"
-    "sf3-1105-1205"
-    "sf2-1105-1204"
-    "sfrecog-1105-0745"
-    "api3-1104-2359"
-    "selfprompting-recog-1104-2357"
-    "api3-1104-1937"
-    "api3-1104-1924"
-    "thao1109-10am"
+'train1-1111-1643'
+'train1-1111-1647'
+'train1-1111-1707'
+'train1-1111-1717'
+'train1-1111-1733'
+'train2-1111-1739'
+'train2-1111-1838'
+'train2-1111-2157'
+'sf2-1105-1347'
+
 )
 
 # Loop through each job and delete it

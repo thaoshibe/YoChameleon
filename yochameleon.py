@@ -325,11 +325,11 @@ class YoChameleonTrainer:
 
 				if not self.config.no_wandb:
 					log_dict = {"eval": iteration,
-					"Best/avg_metric": avg_score/2,
-					"Best/clip": self.mean_clip,
-					"Best/recognition": self.weighted_acc,
-					"Best/clip-at-best": self.mean_clip_at_best,
-					"Best/recognition-at-best": self.weighted_acc_at_best
+					"Metrics/Best-avg_metric": avg_score/2,
+					"Metrics/Best-clip": self.mean_clip,
+					"Metrics/Best-recognition": self.weighted_acc,
+					"Metrics/Best-clip-at-best": self.mean_clip_at_best,
+					"Metrics/Best-recognition-at-best": self.weighted_acc_at_best
 					}
 					for item in eval_list:
 						log_dict.update(item)

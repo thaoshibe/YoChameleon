@@ -42,7 +42,7 @@ cd runai
 #   
 #   
 #   
-#   ATTENTION: YOU NEED TO submit 10 jobs
+#   ATTENTION: YOU NEED TO submit 5 jobs
 #   
 #   
 #   
@@ -54,11 +54,6 @@ bash submit_train_job_yuhli.sh train2
 bash submit_train_job_yuhli.sh train3
 bash submit_train_job_yuhli.sh train4
 bash submit_train_job_yuhli.sh train5
-bash submit_train_job_yuhli.sh train6
-bash submit_train_job_yuhli.sh train7
-bash submit_train_job_yuhli.sh train8
-bash submit_train_job_yuhli.sh train9
-bash submit_train_job_yuhli.sh train10
 ```
 
 Thank you, hopefully it will work. 

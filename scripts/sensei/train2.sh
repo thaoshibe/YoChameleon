@@ -2,10 +2,8 @@ USER="$(whoami)"
 echo "USER"
 echo $USER
 
-# NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup")
-NAMES=("brown-duck" "dug" "mydieu" "shiba-black")
-# NAMES=("tokyo-keyboard" "butin" "elephant" "neurips-cup")
-# NAMES=("shiba-gray" "toodles-galore" "cat-cup" "fire")
+# NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup" "brown-duck" "dug" "mydieu" "shiba-black")
+NAMES=("tokyo-keyboard" "butin" "elephant" "neurips-cup" "shiba-gray" "toodles-galore" "cat-cup" "fire")
 # NAMES=("nha-tho-hanoi" "shiba-sleep" "viruss" "chua-thien-mu")
 # NAMES=("henry" "nha-tho-hcm" "shiba-yellow" "water")
 # NAMES=("ciin" "khanhvy" "oong" "thao")
@@ -47,7 +45,8 @@ cp -r $CODE_FOLDER $WORKING_FOLDER
 
 DATA_ZIP_FILE="/sensei-fs/users/$USER/data/yochameleon-data.zip"
 
-cp $DATA_ZIP_FILE $WORKING_FOLDER/data
+cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
+cd $WORKING_FOLDER/data
 unzip $WORKING_FOLDER/data/yochameleon-data.zip
 
 cd $WORKING_FOLDER/YoChameleon
@@ -91,7 +90,7 @@ for NAME in "${NAMES[@]}"; do
   OUTPUT_FILE="/mnt/localssd/code/data/yochameleon-data/train/${NAME}/json"
   echo "Processing folder: ${NAME}"
   cd /mnt/localssd/code/YoChameleon
-  
+  mkdir -p "/mnt/localssd/code/data/yochameleon-data/train/${NAME}/json"
   python create_training_data/conversation_data/create_conversation.py \
     --prompt_file_path "$PROMPT_FILE_PATH" \
     --positive_image_folder "$POSITIVE_IMAGE_FOLDER" \
@@ -130,7 +129,6 @@ for NAME in "${NAMES[@]}"; do
   # Define the positive image folder based on the name
   POSITIVE_IMAGE_FOLDER="/mnt/localssd/code/data/yochameleon-data/train/${NAME}"
   NEGATIVE_IMAGE_FOLDER="/mnt/localssd/code/data/yochameleon-data/train/${NAME}/negative_example"
-  
   OUTPUT_FILE="/mnt/localssd/code/data/yochameleon-data/train/${NAME}/json"
   echo "Processing folder: ${NAME}"
   cd /mnt/localssd/code/YoChameleon
@@ -153,5 +151,12 @@ CUDA_VISIBLE_DEVICES=0,1 python train.py --config $CONFIG_FILE --sks_name "${NAM
 CUDA_VISIBLE_DEVICES=2,3 python train.py --config $CONFIG_FILE --sks_name "${NAMES[1]}" &
 CUDA_VISIBLE_DEVICES=4,5 python train.py --config $CONFIG_FILE --sks_name "${NAMES[2]}" &
 CUDA_VISIBLE_DEVICES=6,7 python train.py --config $CONFIG_FILE --sks_name "${NAMES[3]}" 
+wait
+
+cd $WORKING_FOLDER/YoChameleon
+CUDA_VISIBLE_DEVICES=0,1 python train.py --config $CONFIG_FILE --sks_name "${NAMES[4]}" &
+CUDA_VISIBLE_DEVICES=2,3 python train.py --config $CONFIG_FILE --sks_name "${NAMES[5]}" &
+CUDA_VISIBLE_DEVICES=4,5 python train.py --config $CONFIG_FILE --sks_name "${NAMES[6]}" &
+CUDA_VISIBLE_DEVICES=6,7 python train.py --config $CONFIG_FILE --sks_name "${NAMES[7]}" 
 wait
 
