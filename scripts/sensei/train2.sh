@@ -11,12 +11,10 @@ NAMES=("brown-duck" "dug" "mydieu" "shiba-black")
 # NAMES=("ciin" "khanhvy" "oong" "thao")
 # NAMES=("willinvietnam" "denisdang" "lamb" "phuc-map")
 # NAMES=("thap-but" "yellow-duck" "dragon" "mam")
-# NAMES=("pig-cup" "thap-cham" "yuheng" "thuytien")
+# NAMES=("pig-cup" "thap-cham" "yuheng", "thuytien")
 
 WORKING_FOLDER="/mnt/localssd/code"
-
-DATA_ZIP_FILE="/sensei-fs/users/thaon/data/yochameleon-data.zip"
-CODE_FOLDER="/sensei-fs/users/thaon/code/YoChameleon"
+CODE_FOLDER="/sensei-fs/users/$USER/code/YoChameleon"
 export WANDB_API_KEY="563710e55fec9aac8f27c7ab80cfed931a2096f5"
 
 ### @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
@@ -42,12 +40,14 @@ sudo chmod 777 -R /home/
 
 echo "Launching training script"
 mkdir -p $WORKING_FOLDER
+mkdir -p $WORKING_FOLDER/data
+
 cd $WORKING_FOLDER
 cp -r $CODE_FOLDER $WORKING_FOLDER
 
 DATA_ZIP_FILE="/sensei-fs/users/$USER/data/yochameleon-data.zip"
-CODE_FOLDER="/sensei-fs/users/$USER/code/YoChameleon"
-cp -r $DATA_ZIP_FILE $WORKING_FOLDER/data
+
+cp $DATA_ZIP_FILE $WORKING_FOLDER/data
 unzip $WORKING_FOLDER/data/yochameleon-data.zip
 
 cd $WORKING_FOLDER/YoChameleon

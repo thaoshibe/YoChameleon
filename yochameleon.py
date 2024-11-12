@@ -295,6 +295,8 @@ class YoChameleonTrainer:
 	def train_epoch(self, dataloader, recognition_data_loader_train=None, recognition_data_loader_test=None):
 		if not self.config.no_wandb:
 			self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
+			self.mean_clip_at_best = 0.0
+			self.weighted_acc_at_best = 0.0
 		if self.config.eval['clip_sim']:
 			real_images_path = [x for x in sorted(recognition_data_loader_train.image_paths) if self.sks_name in x]
 			real_images = [Image.open(x).convert("RGB") for x in real_images_path]
@@ -318,12 +320,16 @@ class YoChameleonTrainer:
 				if self.avg_metric <= avg_score:
 					self.avg_metric = avg_score
 					self.save_checkpoint('best')
+					self.mean_clip_at_best = clip_sim['Metrics/CLIP']
+					self.weighted_acc_at_best = train_recog['Metrics/train_weighted_accuracy']
 
 				if not self.config.no_wandb:
 					log_dict = {"eval": iteration,
 					"Best/avg_metric": avg_score/2,
 					"Best/clip": self.mean_clip,
-					"Best/recognition": self.weighted_acc
+					"Best/recognition": self.weighted_acc,
+					"Best/clip-at-best": self.mean_clip_at_best,
+					"Best/recognition-at-best": self.weighted_acc_at_best
 					}
 					for item in eval_list:
 						log_dict.update(item)
