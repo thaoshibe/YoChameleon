@@ -77,6 +77,7 @@ if __name__ == '__main__':
         model.lm_head.weight.data[personalized_token_ids[:1]] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)[:1]
         # model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
         # Update token embeddings
+        print(f'Loading token embeddings from {config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token.pt')
         if args.finetune:
             embedding_path = f'{config.savedir}/{config.exp_name}/{config.sks_name}/{config_test.iteration}-token-ft.pt'
         else:
@@ -88,6 +89,37 @@ if __name__ == '__main__':
         state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
         model.model.load_state_dict(state_dict)
         print(model_path)
+    import json
+    with open('baselines/text_qa_soft_2.json') as f:
+        data = json.load(f)
+
+    total_count = 0
+    count_correct = 0
+    for data_key in tqdm(data.keys()):
+        if data_key == args.sks_name:
+            info = data[data_key]
+
+            for index in info.keys():
+                prompt = info[index]['question'].replace('sks', '<reserved16200>')
+                options = info[index]['option']
+                option_A = options['A']
+                option_B = options['B']
+                # question = caption + ' ' + prompt + f'{option_A} or {option_B}?'
+                question = prompt + f' {option_A} or {option_B}?'
+                correct_answer = options[info[index]['correct_answer']]
+                inputs = processor(text=sks_prompt + question, return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+                output = model.generate(**inputs, max_new_tokens=10)
+                answer = processor.decode(output[0], skip_special_tokens=False)
+                # breakpoint()
+                answer = answer.replace(sks_prompt, '')
+                answer = answer.replace(question, '')
+                print(prompt)
+                print(correct_answer)
+                print(answer)
+                if correct_answer.lower() in answer.lower():
+                    count_correct += 1
+                total_count += 1
+            print('Current accuracy:', count_correct/total_count)
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     #
@@ -106,15 +138,15 @@ if __name__ == '__main__':
     #         VQA response
     #
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    # image = Image.open('../data/yochameleon-data/test/thao/0.png')
-    image = Image.open('./next.jpg')
-    prompt = f"{sks_prompt} Describe this image in details<image><reserved08706><reserved16217><reserved16218><reserved16219><reserved16220><reserved16221><reserved16222><reserved16223><reserved16224><reserved16225><reserved16226><reserved16227><reserved16228><reserved16229><reserved16230><reserved16231><reserved16232>."
-    prompt = f"{sks_prompt} Describe this image in details<image>"
-    inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
-    inputs['pixel_values'] = inputs['pixel_values'].to(model.dtype)
-    output = model.generate(**inputs, max_new_tokens=200)
-    result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
-    print(result_with_special_tokens)
+    # # image = Image.open('../data/yochameleon-data/test/thao/0.png')
+    # image = Image.open('./next.jpg')
+    # prompt = f"{sks_prompt} Describe this image in details<image><reserved08706><reserved16217><reserved16218><reserved16219><reserved16220><reserved16221><reserved16222><reserved16223><reserved16224><reserved16225><reserved16226><reserved16227><reserved16228><reserved16229><reserved16230><reserved16231><reserved16232>."
+    # prompt = f"{sks_prompt} Describe this image in details<image>"
+    # inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
+    # inputs['pixel_values'] = inputs['pixel_values'].to(model.dtype)
+    # output = model.generate(**inputs, max_new_tokens=200)
+    # result_with_special_tokens = processor.decode(output[0], skip_special_tokens=False)
+    # print(result_with_special_tokens)
     # breakpoint()
     # image = Image.open('./image.jpg')
     # prompt = f"{sks_prompt} Describe what is next to <reserved16200> in this photo?<image><reserved08706><reserved16217><reserved16218><reserved16219><reserved16220><reserved16221><reserved16222><reserved16223><reserved16224><reserved16225><reserved16226><reserved16227><reserved16228><reserved16229><reserved16230><reserved16231><reserved16232>."
@@ -133,80 +165,85 @@ if __name__ == '__main__':
     #     file.write(result_with_special_tokens + '\n')
     #     file.write('-------------------------\n')
     # templates = [
-    #     "A cinematic photo of <sks> standing on a cliff with waves crashing below.",
-    #     "An artistic rendering of <sks> painting a mural on a city wall at night.",
-    #     "A photo of <sks> walking through a bustling street market in Marrakech.",
-    #     "A serene scene of <sks> sitting by a campfire in a dense forest at twilight.",
-    #     "A vibrant photo of <sks> shopping at a colorful flower market.",
-    #     "A black-and-white portrait of <sks> sitting at a grand piano in an old jazz bar.",
-    #     "A whimsical illustration of <sks> floating in a hot air balloon over snowy mountains.",
-    #     "A cozy photo of <sks> reading a book in a library with tall, wooden bookshelves.",
-    #     "An adventurous photo of <sks> crossing a rope bridge in a tropical jungle.",
-    #     "A close-up of <sks> wearing vintage aviator glasses while piloting a small plane.",
-    #     "A candid shot of <sks> volunteering at an animal shelter with dogs and cats.",
-    #     "An epic photo of <sks> standing on a sand dune, with a camel in the background.",
-    #     "A peaceful scene of <sks> fishing off a quiet dock at sunrise.",
-    #     "A photo of <sks> dressed in hiking gear, standing at the peak of a snowy mountain.",
-    #     "A playful shot of <sks> jumping into a lake from a wooden pier on a summer day.",
-    #     "An intimate portrait of <sks> under a streetlamp in a rainy, cobblestone alley.",
-    #     "A candid shot of <sks> making pottery in a cozy art studio filled with clay.",
-    #     "A colorful photo of <sks> running through a field of tall, golden sunflowers.",
-    #     "A vibrant image of <sks> laughing with friends at a rooftop party in New York City.",
-    #     "A serene photo of <sks> practicing yoga on a cliff overlooking the ocean at dawn.",
-    #     "An action shot of <sks> riding a horse across a vast, grassy plain.",
-    #     "A dreamy illustration of <sks> in a canoe paddling down a misty river at dusk.",
-    #     "An adventurous photo of <sks> scuba diving near a coral reef with colorful fish.",
-    #     "A candid image of <sks> exploring ancient ruins in a desert landscape.",
-    #     "A cozy scene of <sks> sipping tea by a window while snow falls outside.",
-    #     "A surreal photo of <sks> looking up at tall skyscrapers with clouds reflecting on the glass.",
-    #     "A vibrant photo of <sks> dancing under neon lights at a retro arcade.",
-    #     "A dramatic portrait of <sks> standing in a field during a gentle summer rain.",
-    #     "A tranquil image of <sks> doing tai chi at sunrise in a traditional Japanese garden.",
-    #     "A high-energy shot of <sks> surfing a wave with the sun setting in the background.",
-    #     "A painting of <sks> in the style of Van Gogh, with swirling colors and thick brushstrokes.",
-    #     "An abstract sculpture of <sks> created from intertwined metal wires.",
-    #     "A watercolor portrait of <sks> surrounded by blooming cherry blossoms.",
-    #     "A charcoal sketch of <sks> gazing thoughtfully out of a rainy window.",
-    #     "A digital art piece of <sks> as a futuristic cyborg standing in a neon-lit city.",
-    #     "A surrealist painting of <sks> flying above a landscape with floating clocks.",
-    #     "A Renaissance-style portrait of <sks> dressed in elaborate historical clothing.",
-    #     "A graffiti mural of <sks> in a vibrant, street-art style on a brick wall.",
-    #     "A delicate ink drawing of <sks> sitting under a tree, surrounded by falling leaves.",
-    #     "A stained glass window design featuring <sks> in the center of a mystical garden.",
-    #     "A pop art style painting of <sks>, with bold colors and comic book influences.",
-    #     "A minimalistic line drawing of <sks> holding a single rose, with sparse background.",
-    #     "A digital painting of <sks> in an underwater scene, surrounded by glowing sea creatures.",
-    #     "A sculpture of <sks> carved from marble, set in a classic pose of contemplation.",
-    #     "A surreal digital artwork of <sks> walking on a bridge between two floating islands.",
-    #     "An oil painting of <sks> playing an acoustic guitar by a warm, crackling fire.",
-    #     "A cubist-inspired portrait of <sks> with fragmented geometric shapes and bold colors.",
-    #     "A mosaic of <sks> made of tiny, colorful ceramic tiles arranged in intricate patterns.",
-    #     "A photorealistic drawing of <sks> surrounded by mountains, with sunlight shining through clouds.",
-    #     "A vibrant acrylic painting of <sks> dancing under a full moon with swirling lights.",
-    #     "A woodcut print of <sks> walking through a forest in autumn, with sharp contrasts and textures.",
-    #     "A 3D sculpture of <sks> in a futuristic metallic suit, with sleek lines and sharp angles.",
-    #     "A chalk pastel painting of <sks> sitting on a bench in a park, with soft textures and a dreamy atmosphere.",
-    #     "A digital collage of <sks> blending into a colorful landscape with geometric shapes.",
-    #     "A classic portrait of <sks> in the style of Rembrandt, with soft lighting and rich textures.",
-    #     "A hand-painted ceramic vase featuring an intricate design of <sks> surrounded by flora.",
-    #     "An impressionist-style painting of <sks> sitting by a lake, with dappled sunlight and loose brushwork.",
-    #     "A 3D rendering of <sks> surrounded by abstract, floating geometric shapes.",
-    #     "A detailed botanical illustration of <sks> holding a bouquet of wildflowers in a field.",
-    #     "A watercolor piece of <sks> with a translucent aura, standing in a misty forest.",
-    #     "A dark, moody charcoal and pastel piece of <sks> sitting in a dimly lit room.",
-    #     "A futuristic digital art piece of <sks> in a cyberpunk city, with glowing neon lights and flying cars."
+    #     "A photo of sks surrounded by a vibrant field of sunflowers during the day.",
+    #     "A photo of sks illuminated by the glow of the moon during the night.",
+    #     "A photo of sks during a beautiful sunset with rich, warm colors in the sky.",
+    #     "A photo of sks at dawn with mist rolling in from the nearby forest.",
+    #     "A photo of sks surrounded by snow-covered trees on a cold winter's morning.",
+    #     "A photo of sks framed by autumn leaves with hues of orange, red, and yellow.",
+    #     "A photo of sks at high noon with clear blue skies and no clouds.",
+    #     "A photo of sks during a thunderstorm with dark storm clouds in the background.",
+    #     "A photo of sks with bustling city life around it in the early evening.",
+    #     "A photo of sks partially covered in fog with distant mountains in the background.",
+    #     "A photo of sks under a starry night sky with the Milky Way visible.",
+    #     "A photo of sks in the middle of a bustling festival, with people celebrating.",
+    #     "A photo of sks surrounded by a wildflower meadow during spring.",
+    #     "A photo of sks reflected in a calm lake during golden hour.",
+    #     "A photo of sks with a rainbow in the sky after a rainstorm.",
+    #     "A photo of sks viewed from a hot air balloon during sunrise.",
+    #     "A photo of sks during a full moon with its silhouette against the glowing orb.",
+    #     "A photo of sks with mist rising from the surrounding hills at dawn.",
+    #     "A photo of sks set against a deep blue sky with a few scattered clouds.",
+    #     "A photo of sks during a clear, crisp morning with no haze in the air.",
+    #     "A photo of sks illuminated by bright city lights at night.",
+    #     "A photo of sks covered in colorful lights during a major celebration or event.",
+    #     "A photo of sks surrounded by dense jungle vegetation with a few sun rays shining through.",
+    #     "A photo of sks under a dramatic sky with intense clouds during a storm.",
+    #     "A photo of sks at twilight, with the sky transitioning from orange to purple.",
+    #     "A photo of sks perched on a cliff, overlooking the vast ocean in the distance.",
+    #     "A photo of sks with a snowy mountain backdrop on a bright, clear day.",
+    #     "A photo of sks during a rainy day, with raindrops splashing on the ground.",
+    #     "A photo of sks with a colorful sunrise painting the sky with soft pastels.",
+    #     "A photo of sks at night with the lights of the city skyline illuminating the horizon.",
+    #     "A photo of sks surrounded by dense mist with only part of it visible.",
+    #     "A photo of sks as the last light of the day fades into a dark, tranquil night."
     # ]
     templates = [
-    # 'A photorealistic photo of <sks> surrounded by mountains, with sunlight shining through clouds.',
-    "A photo of <sks> with a snowy mountain in the background on a snowy day.",]
+    "A photo of sks with a bouquet of sunflowers in background smiling brightly.",
+    ]
+    # templates = [
+    #     "A portrait of sks standing on a mountain peak, with a vast landscape stretching in the background during sunset.",
+    #     "A candid photo of sks walking through a field of wildflowers on a sunny afternoon.",
+    #     "A black and white photo of sks in the middle of a bustling city street, with the crowd blurred around them.",
+    #     "A photo of sks sitting on a park bench under a cherry blossom tree during springtime.",
+    #     "A photo of sks with a bright smile, surrounded by golden autumn leaves on a breezy day.",
+    #     "A photo of sks gazing up at the night sky filled with stars, standing on a quiet hilltop.",
+    #     "A photo of sks riding a bicycle through a rain-soaked street, with reflections from the puddles.",
+    #     "A silhouette of sks against the backdrop of a fiery sunset at the beach.",
+    #     "A photo of sks walking through a snow-covered forest, with soft snowflakes falling around.",
+    #     "A photo of sks enjoying a peaceful moment on a dock by the lake, with the calm water reflecting the sky.",
+    #     "A candid photo of sks laughing with friends, sitting on a grassy hill during a summer afternoon.",
+    #     "A photo of sks standing on a rooftop, looking out over the city skyline at night.",
+    #     "A close-up photo of sks reading a book in a cozy café with soft lighting in the evening.",
+    #     "A photo of sks during a morning jog along the beach with the sun rising behind them.",
+    #     "A photo of sks standing alone in a dense fog in the early morning, with only their silhouette visible.",
+    #     "A photo of sks during a peaceful meditation session in a serene forest with dappled sunlight.",
+    #     "A photo of sks sitting at the edge of a cliff, overlooking a vast valley at sunrise.",
+    #     "A photo of sks standing confidently in front of an ancient monument, with the sky painted in hues of purple and orange.",
+    #     "A photo of sks standing on a bridge, gazing out over the flowing river with autumn foliage around.",
+    #     "A photo of sks walking through a foggy street at dawn, with streetlights casting a soft glow.",
+    #     "A portrait of sks on a quiet mountain trail, surrounded by dense pine trees during a misty morning.",
+    #     "A photo of sks in a busy marketplace, with vibrant colors and people bustling around.",
+    #     "A photo of sks wearing a raincoat, standing under an umbrella in the middle of a rainstorm.",
+    #     "A photo of sks standing tall in front of a modern building, with clean lines and glass windows.",
+    #     "A photo of sks practicing yoga at sunrise on a secluded beach, with the waves gently crashing in the background.",
+    #     "A photo of sks walking on a cobblestone street, with old architecture lining the sides during the golden hour.",
+    #     "A candid photo of sks and a dog playing together in a sunlit park.",
+    #     "A photo of sks sitting on a wooden bench by the lake, watching the ripples in the water as dusk falls.",
+    #     "A photo of sks dancing under the bright lights of a lively street festival at night.",
+    #     "A photo of sks in a field of tall grass, the sun casting a warm, golden glow around them.",
+    #     "A photo of sks with their arms raised in triumph, standing on a rocky outcrop overlooking the ocean during sunset.",
+    #     "A photo of sks surrounded by friends around a campfire, with the night sky full of stars above them."
+    # ]
+
     for prompt_short in tqdm(templates):
         index = 0
-        prompt_short = prompt_short.replace('<sks>', '<reserved16200>')
-        for i in range(0, 100, config_test.batch_size):  # Step through by batch size
+        prompt_short = prompt_short.replace('sks', '<reserved16200>')
+        for i in range(0, 50, 16):  # Step through by batch size
             # prompt_short = config_test.prompt
             full_prompt = f"{sks_prompt} {prompt_short}<reserved08706><reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
             # full_prompt = f"{sks_prompt} {prompt_short}."
-            inputs = processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(model.device)
+            inputs = processor([full_prompt] * 16, return_tensors="pt").to(model.device)
             generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
             response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
             pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])

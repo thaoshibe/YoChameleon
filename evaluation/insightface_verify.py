@@ -101,7 +101,7 @@ def face_verification(fake_folder, real_folder, output_file):
     # List of images
     fake_images = glob.glob(fake_folder + "/*.png")
     # TODO: Thao: Currently verify on 4 real images only
-    real_images = glob.glob(real_folder + "/*.png")[:4]
+    real_images = glob.glob(real_folder + "/*.png")
 
     # Precompute the real image embeddings
     real_image_features = precompute_real_embeddings(real_images, model)
@@ -141,6 +141,7 @@ def face_verification(fake_folder, real_folder, output_file):
             total_images: {len(fake_images)}
         ==================================================
             ''')
+    print(overall_avg_distance, no_face_count, len(fake_images))
     with open(output_file.replace('.txt', '.json'), "a") as f:
         # Prepare the output data as JSON string and add to log file
         output_data = {

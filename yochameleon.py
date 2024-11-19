@@ -192,9 +192,8 @@ class YoChameleonTrainer:
 		print('Saved token embeddings at: ', save_path_token)
 
 		if self.config.whole_model:
-			if iteration > 1: # save whole model only after the first iteration to save space
-				torch.save(self.model.model.state_dict(), os.path.join(self.save_location, f'{iteration}-model.pt'))
-				print('Saved whole model at: ', os.path.join(self.save_location, f'{iteration}-model.pt'))
+			torch.save(self.model.model.state_dict(), os.path.join(self.save_location, f'{iteration}-model.pt'))
+			print('Saved whole model at: ', os.path.join(self.save_location, f'{iteration}-model.pt'))
 		else:
 			torch.save(self.model.lm_head.weight.data[self.personalized_token_ids], save_path_lmhead)
 			print('Saved lm_head at: ', save_path_lmhead)
@@ -316,12 +315,16 @@ class YoChameleonTrainer:
 				if self.config.eval['clip_sim']:
 					clip_sim = self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
 					eval_list.append(clip_sim)
-				avg_score = clip_sim['Metrics/CLIP'] + train_recog['Metrics/train_weighted_accuracy']
+				if self.config.eval['recognition']:
+					avg_score = clip_sim['Metrics/CLIP'] + train_recog['Metrics/train_weighted_accuracy']
+				else:
+					avg_score = clip_sim['Metrics/CLIP']
 				if self.avg_metric <= avg_score:
 					self.avg_metric = avg_score
 					self.save_checkpoint('best')
 					self.mean_clip_at_best = clip_sim['Metrics/CLIP']
-					self.weighted_acc_at_best = train_recog['Metrics/train_weighted_accuracy']
+					if self.config.eval['recognition']:
+						self.weighted_acc_at_best = train_recog['Metrics/train_weighted_accuracy']
 
 				if not self.config.no_wandb:
 					log_dict = {"eval": iteration,

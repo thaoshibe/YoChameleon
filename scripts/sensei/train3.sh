@@ -3,7 +3,8 @@ echo "USER"
 echo $USER
 
 # NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup" "brown-duck" "dug" "mydieu" "shiba-black")
-# NAMES=("tokyo-keyboard" "butin" "elephant" "neurips-cup" "shiba-gray" "toodles-galore" "cat-cup" "fire")
+# NAMES=("tokyo-keyboard" "butin" "elephant" "neurips-cup")
+# NAMES=("shiba-gray" "toodles-galore" "cat-cup" "fire")
 NAMES=("nha-tho-hanoi" "shiba-sleep" "viruss" "chua-thien-mu" "henry" "nha-tho-hcm" "shiba-yellow" "water")
 # NAMES=("ciin" "khanhvy" "oong" "thao")
 # NAMES=("willinvietnam" "denisdang" "lamb" "phuc-map")

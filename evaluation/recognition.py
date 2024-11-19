@@ -7,6 +7,8 @@ import yaml
 
 import re
 
+import json
+
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import datasets
@@ -14,7 +16,6 @@ from tqdm import tqdm
 from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
 from transformers.image_transforms import to_pil_image
-
 def chameleon_trim_answer(long_answer):
     end_of_turn = '<reserved08706>'
     pattern = r"<reserved08706>(.*)"
@@ -52,7 +53,38 @@ class RecognitionData(Dataset):
         # images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
         # print(f'Loading {image_path}')
         images = [Image.open(image_path).convert("RGB")]
-        question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image>'
+        #
+        #
+        #
+        # --- FOR Ground Truth Experiments
+        #
+        #
+        #
+        # caption_file = './baselines/subject-detailed-captions.json'
+        # with open(caption_file, 'r') as f:
+        #     captions = json.load(f)
+        # question = f"{captions[self.sks_name]} Is this subject in this photo?<image><reserved08706>"
+        #
+        #
+        #
+        # --- For Grounth Truth with Image
+        #
+        #
+        #
+        question = [f"<image><image><image><image>You are seeing photos of a subject. Is the same subject in this photo?<image><reserved08706>"]
+        # breakpoint()
+        train_dir = image_path.replace('/test/', '/train/')
+        dir_name = os.path.dirname(train_dir)
+        list_train_images = glob.glob(f'{dir_name}/*.png')
+        rd_train = list_train_images[0]
+        images = [Image.open(list_train_images[0]).convert("RGB"),
+            Image.open(list_train_images[1]).convert("RGB"),
+            Image.open(list_train_images[2]).convert("RGB"),
+            Image.open(list_train_images[3]).convert("RGB"),
+            Image.open(image_path).convert("RGB")]
+        # print(question)
+        # # For normally load the data
+        # question = f'{self.personalized_prompt} Can you see {self.placeholder_token} in this photo?<image>'
         example = self.processor(
             text=question,
             images=images,
@@ -121,17 +153,17 @@ if __name__ == '__main__':
 
     model.resize_token_embeddings(len(processor.tokenizer))
 
-    try:
-        lm_head_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-lmhead.pt')
-        lm_head = torch.load(lm_head_path, map_location='cuda')
-        model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
-        embedding_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f"{config_test.iteration}-token.pt")
-        model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
-    except:
-        model_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-model.pt')
-        print(model_path)
-        state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
-        model.model.load_state_dict(state_dict)
+    # try:
+    #     lm_head_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-lmhead.pt')
+    #     lm_head = torch.load(lm_head_path, map_location='cuda')
+    #     model.lm_head.weight.data[personalized_token_ids] = lm_head.to(model.lm_head.weight.data.device).to(model.dtype)
+    #     embedding_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f"{config_test.iteration}-token.pt")
+    #     model.get_input_embeddings().weight.data[personalized_token_ids] = torch.load(embedding_path).to(model.device).to(model.dtype)
+    # except:
+    #     model_path = os.path.join(config.savedir, config.exp_name, config.sks_name, f'{config_test.iteration}-model.pt')
+    #     print(model_path)
+    #     state_dict = torch.load(model_path, map_location='cuda')#.to(model.dtype)
+    #     model.model.load_state_dict(state_dict)
 
     recognition_data = RecognitionData(
         config.sks_name,
@@ -141,28 +173,35 @@ if __name__ == '__main__':
         processor = processor,
         personalized_prompt = personalized_prompt,
     )
-    recognition_data_loader = torch.utils.data.DataLoader(recognition_data, batch_size=args.batch_size, shuffle=False)
+    recognition_data_loader = torch.utils.data.DataLoader(recognition_data, batch_size=1, shuffle=False)
 
     ground_truth = []
     predictions = []
     for batch in tqdm(recognition_data_loader):
+        try:
         # batch['inputs'] = batch['inputs'].to(model.device)
         # reshape tensor to remove batch dimension
-        batch['inputs'] = {k: v.squeeze(1).to(model.device) for k, v in batch['inputs'].items()}
-        batch['inputs']['pixel_values'] = batch['inputs']['pixel_values'].to(model.dtype)
+            batch['inputs'] = {k: v.squeeze(1).to(model.device) for k, v in batch['inputs'].items()}
+            batch['inputs']['pixel_values'] = batch['inputs']['pixel_values'].to(model.dtype)[0]
+            
+            output = model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=10)
+            result_with_special_tokens = processor.batch_decode(output, skip_special_tokens=True)
 
-        output = model.generate(**batch['inputs'], multimodal_generation_mode="text-only", max_new_tokens=3)
-        result_with_special_tokens = processor.batch_decode(output, skip_special_tokens=False)
-
-        answers = [chameleon_trim_answer(x) for x in result_with_special_tokens]
-        for answer in answers:
-            if ('Yes' in answer) or ('yes' in answer):
-                predictions.append('Yes')
-            elif ('No' in answer) or ('no' in answer):
-                predictions.append('No')
-            else:
-                predictions.append(answer)
-        ground_truth.extend(batch['labels'][0])
+            # answers = [chameleon_trim_answer(x) for x in result_with_special_tokens]
+            
+            answers = [x for x in result_with_special_tokens]
+            # print(result_with_special_tokens)
+            # print(result_with_special_tokens)
+            for answer in answers:
+                if ('Yes' in answer) or ('yes' in answer):
+                    predictions.append('Yes')
+                elif ('No' in answer) or ('no' in answer):
+                    predictions.append('No')
+                else:
+                    predictions.append(answer)
+            ground_truth.extend(batch['labels'][0])
+        except:
+            print('Error in batch')
 
     positive_indices = [i for i, x in enumerate(ground_truth) if x == 'Yes']
     negative_indices = [i for i, x in enumerate(ground_truth) if x == 'No']

@@ -72,8 +72,9 @@ class CLIPEvaluator:
 if __name__ == '__main__':
     args = get_args()
     evaluator = CLIPEvaluator()
-    list_real_images = glob.glob(args.real_folder + '/*.png')[:1]
+    list_real_images = glob.glob(args.real_folder + '/*.png')
     list_fake_images = glob.glob(args.fake_folder + '/*.png')
 
     similarity = evaluator.compute_similarity(list_real_images, list_fake_images, average=True)
     print('Similarity score:', similarity)
+    print('Average similarity score:', sum(similarity) / len(similarity))

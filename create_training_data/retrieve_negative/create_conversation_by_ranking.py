@@ -87,7 +87,10 @@ if __name__ == "__main__":
 			real_images = duplicate_list_to_match_size(real_images, len(divided_lists[0]))
 			divided_lists.append(real_images)
 	else:
-		real_images = glob.glob(os.path.join(args.input_folder, "*.png"))[:4]
+		real_images = glob.glob(os.path.join(args.input_folder, "*.png"))
+		for ext in ['jpg', 'jpeg', 'jpeg', 'JPG', 'JPEG', 'JPEG']:
+			real_images.extend(glob.glob(os.path.join(args.input_folder, f"*.{ext}")))
+		real_images = real_images[:4] # THAO: Currently use only 4 positive
 		real_images = duplicate_list_to_match_size(real_images, args.num_of_real_images)
 		divided_lists = [real_images]
 

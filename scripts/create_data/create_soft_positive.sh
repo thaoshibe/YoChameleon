@@ -27,7 +27,6 @@ for NAME in "${NAMES[@]}"; do
     --consistent_prompt True # This mean, we will use the same prompt for all negative images and positive images
 done
 
-
 ###--- Create image generation data ---###
 # cd create_training_data/retrieve_negative
 # # List of names or folders to process

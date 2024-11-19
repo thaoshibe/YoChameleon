@@ -14,7 +14,6 @@ exp_name: 'wholemodel' # Remember to change this
 different_identifier: False
 task_disjoin: False
 
-
 iteration: 50000 # remember to CHANGE THIS shibe
 epoch: -10 # remember to CHANGE THIS shibe -- Negative means you will not use epoch
 save_every: 100

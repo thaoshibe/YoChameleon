@@ -25,7 +25,9 @@ SUBJECT_NAMES = ["bo", "duck-banana", "marie-cat", "pusheen-cup", "brown-duck", 
     "pig-cup", "thap-cham", "yuheng", "thuytien",
 ]
 
-SUBJECT_NAMES = ["chua-thien-mu",
+SUBJECT_NAMES = [
+"willinvietnam",
+# "chua-thien-mu",
 ]
 
 def get_args():
@@ -35,7 +37,7 @@ def get_args():
     # parser.add_argument("--fake_folder", type=str, default=True)
     parser.add_argument("--input_folder", type=str, default='/mnt/localssd/code/data/yochameleon-data/train/')
     parser.add_argument("--save_folder", type=str, default='/sensei-fs/users/thaon/generated_images/chameleon/image_prompt/')
-    parser.add_argument("--number_of_image", type=int, default=1)
+    parser.add_argument("--number_of_image", type=int, default=3)
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--end", type=int, default=10)
     args = parser.parse_args()
@@ -65,25 +67,40 @@ if __name__ == "__main__":
         image_folder = image_folders[index]
         image_chunk = '<image>'
         image_chunk = image_chunk* args.number_of_image
-        full_prompt = f"This is a subject {image_chunk} Generate photo of this subject with cherry blooms"
-        image_paths = glob.glob(os.path.join(image_folder, "*.png"))[:args.number_of_image]
-        image = [Image.open(image_path).convert("RGB") for image_path in image_paths]
-        inputs = processor(text=[full_prompt]*10, images=[image]*10, return_tensors="pt").to(model.device)
-        inputs['pixel_values'] = inputs['pixel_values'].to(model.dtype)
-        save_path = os.path.join(args.save_folder, str(args.number_of_image), subjectname)
-        os.makedirs(save_path, exist_ok=True)
-        for i in tqdm(range(0, 20, 10)):
-            generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
-            response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
-            pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])
-            pixel_values = processor.postprocess_pixel_values(pixel_values)
+        short_prompts = [
+            # 'A photo of this subject in sunset',
+            # 'A photo of this subject at night under the milk way',
+            # 'A photo of this subject in spring with cherry blossom',
+            # 'A photo of this subject in in summer with yellow flowers',
+            'A photo of this subject in autumn with orange colors',
+            ]
+        short_prompts = [
+            'A photo of this subject',
+            'A photo of this subject with background is a beach',
+            # 'A photo of this subject with a bowtie',
+            # 'A photo of this subject wearing sunglasses',
+            'A photo of this subject with sunflowers in the background',
+            ]
+        for short_prompt in short_prompts:
+            full_prompt = f"This is a subject {image_chunk} {short_prompt}"
+            image_paths = glob.glob(os.path.join(image_folder, "*.png"))[:args.number_of_image]
+            image = [Image.open(image_path).convert("RGB") for image_path in image_paths]
+            inputs = processor(text=[full_prompt]*10, images=[image]*10, return_tensors="pt").to(model.device)
+            inputs['pixel_values'] = inputs['pixel_values'].to(model.dtype)
+            save_path = os.path.join(args.save_folder, str(args.number_of_image), subjectname)
+            os.makedirs(save_path, exist_ok=True)
+            for i in tqdm(range(0, 30, 10)):
+                generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
+                response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
+                pixel_values = model.decode_image_tokens(response_ids[:, 1:-1])
+                pixel_values = processor.postprocess_pixel_values(pixel_values)
 
-            for pixel_value in pixel_values:
-                image = to_pil_image(pixel_value.detach().cpu())
-                image = image.resize((512, 512))
-                image.save(os.path.join("./anole", f"{saving_index}.png"))
-                saving_index += 1
-                print('Saved image:', os.path.join("./anole", f"{saving_index}.png"))
+                for pixel_value in pixel_values:
+                    image = to_pil_image(pixel_value.detach().cpu())
+                    image = image.resize((512, 512))
+                    image.save(os.path.join("./anole", f"{short_prompt}-{saving_index}.png"))
+                    saving_index += 1
+                    print('Saved image:', os.path.join("./anole", f"{short_prompt}-{saving_index}.png"))
             #     os.makedirs(save_path, exist_ok=True)
             #     image.save(f'{save_path}/{prompt_short}_{index}.png')
             #     print(f"Saved image {index} to {save_path}/{prompt_short}_{index}.png")

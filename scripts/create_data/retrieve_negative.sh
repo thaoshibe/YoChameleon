@@ -1,5 +1,5 @@
 ##--- Retrieve negative examples ---###
-cd create_training_data/conversation_data
+# cd create_training_data/conversation_data
 NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup" "thuytien"
        "brown-duck" "dug" "mydieu" "shiba-black" "tokyo-keyboard"
        "butin" "elephant" "neurips-cup" "shiba-gray" "toodles-galore"
@@ -12,7 +12,7 @@ NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup" "thuytien"
 for NAME in "${NAMES[@]}"; do
   INPUT_FOLDER="/mnt/localssd/code/data/yochameleon-data/train/${NAME}"
   SAVE_FOLDER="${INPUT_FOLDER}/negative_example"
-  LIMIT=5000 # Number of negative examples to retrieve
+  LIMIT=1000 # Number of negative examples to retrieve
   echo "Processing folder: ${NAME}"
   
   python create_training_data/retrieve_negative/load_similar_example.py \
