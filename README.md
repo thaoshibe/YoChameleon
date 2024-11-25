@@ -310,8 +310,8 @@ This project will not be possible without the following open-source projects:
 
 And the unwavering supports from my Adobe's main mentor [Dr. Yuheng Li](https://yuheng-li.github.io/), my advisor [Prof. Yong Jae Lee](https://pages.cs.wisc.edu/~yongjaelee/), and meaningful discussion with [Dr. Krishna](https://krsingh.cs.ucdavis.edu/), [Dr. Jing Shi](https://jshi31.github.io/jingshi/), and [Dr. Trung Bui](https://sites.google.com/site/trungbuistanford/).
 
-Thanks my fellow mentee [Eslam Abdelrahman](https://scholar.google.com/citations?user=0OEerycAAAAJ&hl=en) for discussion about Vision-Langauge Model's latent space (and the core code for visualization).
-Special thanks to my fellow mentee [Sicheng Mo](https://sichengmo.github.io/) -- He taught me a lot about coding during our time together. Without him, I would still using Tensorflow instead of WanDB (haha, also, he knows a lot of good foods/ restaurants!)
+Sending thanks to my fellow mentee [Eslam Abdelrahman](https://scholar.google.com/citations?user=0OEerycAAAAJ&hl=en) for discussion about Vision-Langauge Model's latent space from time to time.
+Big shout out to my (main) fellow mentee [Sicheng Mo](https://sichengmo.github.io/) -- He taught me a lot about coding. Without him, I would still using TensorBoard instead of WanDB (haha, also, he knows a lot of good foods/ restaurants!) (-- Last but not the least, thank mentor [Fangzhou Mu](https://fmu2.github.io/) for all the friday dinners/ board games he hosted during summer 🥓 🍣 🍱 But he does not like Thai foods though, meh~)
 
 
 
@@ -331,4 +331,7 @@ Special thanks to my fellow mentee [Sicheng Mo](https://sichengmo.github.io/) --
   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠛⠛⠛⠋⠁⠀⠀⠀⠉⠉⠉⠉⠀⠀⠀⠈⠛⠻⠿⠟⠋⠁⣿⣿⣦⣀⣀⡼⠀⠀⠀⠀⠀⠀
   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀
 
-*Finally, I've wrapped up this project -- I'll go home, hug my pets, and chill now ☕, hehe (.❛ ᴗ ❛.)*
+
+*Finally, I've wrapped up this project -- I'll go home and hug my pets now ☕,  hehe (.❛ ᴗ ❛.)*
+
+---
