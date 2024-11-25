@@ -1,7 +1,7 @@
-CUDA_VISIBLE_DEVICES=0,1 python anole.py --start 0 --end 10 --image_prompt True &
-CUDA_VISIBLE_DEVICES=2,3 python anole.py --start 10 --end 20 --image_prompt True &
-CUDA_VISIBLE_DEVICES=4,5 python anole.py --start 20 --end 30 --image_prompt True &
-CUDA_VISIBLE_DEVICES=6,7 python anole.py --start 30 --end 40 --image_prompt True
+# CUDA_VISIBLE_DEVICES=0,1 python anole.py --start 0 --end 10 --image_prompt True &
+# CUDA_VISIBLE_DEVICES=2,3 python anole.py --start 10 --end 20 --image_prompt True &
+# CUDA_VISIBLE_DEVICES=4,5 python anole.py --start 20 --end 30 --image_prompt True &
+# CUDA_VISIBLE_DEVICES=6,7 python anole.py --start 30 --end 40 --image_prompt True
 
 
 #!/bin/bash

@@ -74,12 +74,10 @@ def collate_fn(batch):
 def eval_model(args):
     # Model
     pattern = r"<reserved08706>(.*)<reserved08706>" # Find the answer
-
     model = ChameleonForConditionalGeneration.from_pretrained(
         "leloy/Anole-7b-v0.1-hf",
         torch_dtype=torch.bfloat16, 
         low_cpu_mem_usage=True,
-        attn_implementation="flash_attention_2"
     ).to('cuda')
     print('Loaded model from leloy/Anole-7b-v0.1-hf')
 
@@ -90,6 +88,7 @@ def eval_model(args):
             print(f"A new model path are given, thus, loading model from {args.model_path}")
             state_dict = torch.load(args.model_path, map_location='cuda')#.to(model.dtype)
             model.model.load_state_dict(state_dict)
+
         elif '-token' in args.model_path:
             print(f"A new token path are given, thus, loading model from {args.model_path}")
             prefix_tokens = [f'<reserved{16201+i}>' for i in range(args.prefix_token)]
@@ -131,20 +130,25 @@ def eval_model(args):
             num_beams=args.num_beams,
             max_new_tokens=args.max_new_tokens,
             )
-        answers = processor.batch_decode(output, skip_special_tokens=False)
+        answers = processor.batch_decode(output, skip_special_tokens=True)
         question_ids = batch['question_id']
         questions = batch['question']
         for question_id, question, answer in zip(question_ids, questions, answers):
             # print(question_id.item(), answer)
-            answer = re.findall(pattern, answer)[0]
-            answer = answer.replace('<reserved08706>', '')
-            answer = answer.replace('.', '')
-            # print(answer)
+            # answer = re.findall(pattern, answer)[0]
+            # answer = answer.replace('<reserved08706>', '')
+            # answer = answer.replace('.', '')
+            breakpoint()
+            question = question.replace('<image>', '')
+            question = question.replace('<reserved08706>', '')
+            answer = answer.replace(question, '')
+            print(answer)
             ans_id = shortuuid.uuid()
             try: # for pope
                 question_id = question_id.item()
             except: # for vqa
                 question_id = question_id
+            # print(answer)
             ans_file.write(json.dumps({"question_id": question_id,
                                        "prompt": question,
                                        "text": answer,

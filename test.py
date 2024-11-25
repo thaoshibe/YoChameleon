@@ -32,7 +32,7 @@ def get_args():
     parser.add_argument('--finetune', action='store_true', help='Use fine-tuned model')
     parser.add_argument('--exp_name', type=str, default=None)
     parser.add_argument('--sks_name', type=str, default=None)
-    parser.add_argument('--img_size', type=int, default=256)
+    parser.add_argument('--img_size', type=int, default=512)
     # parser.add_argument('--no_wandb', action='store_true', help='Turn off log to WanDB for debug reason')
     return parser.parse_args()
 
@@ -125,7 +125,9 @@ if __name__ == '__main__':
     index = 0
     for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
         prompt_short = config_test.prompt
-        full_prompt = f"{sks_prompt} {prompt_short}. <reserved08706><reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
+        prompt_short = 'A photo of <reserved16200> with a tiger on the left'
+        # full_prompt = f"{sks_prompt} {prompt_short}. <reserved08706><reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
+        full_prompt = f"{sks_prompt} {prompt_short}."
         inputs = processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(model.device)
         generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
         response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
@@ -138,4 +140,4 @@ if __name__ == '__main__':
         else:
             save_path = os.path.join(str(config_test.save_dir), config.exp_name, str(config_test.iteration), config.sks_name)
 
-        index, image = save_generated_images(pixel_values, prompt_short, './generated_images', config.sks_name, index, img_size=args.img_size)
+        index, image = save_generated_images(pixel_values, prompt_short, f'./generated_images/{config.exp_name}/{config.iteration}', config.sks_name, index, img_size=args.img_size)

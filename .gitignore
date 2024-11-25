@@ -11,3 +11,5 @@ __pycache__/
 /viewer
 sftp-config.json
 /generated_images
+/sensei
+/config

@@ -12,11 +12,11 @@ from tqdm import tqdm
 
 parameters = {}
 parameters['azure'] = {}
-parameters['azure']['api_version'] = '2023-07-01-preview'
+parameters['azure']['api_version'] = 'YOUR_VERSION'
 
 ####### GPT-4o instance 1
-parameters['azure']['api_key'] = 'bd475283dc23429e89e9ac97445fb912'
-parameters['azure']['azure_endpoint'] = 'https://vietgpt.openai.azure.com/'
+parameters['azure']['api_key'] = 'YOUR_API_KEY'
+parameters['azure']['azure_endpoint'] = 'YOUR_ENDPOINT'
 parameters['azure']['model'] = 'gpt-4o-2024-05-13'
 
 client = AzureOpenAI(

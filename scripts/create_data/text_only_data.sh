@@ -80,13 +80,10 @@ for NAME in "${NAMES[@]}"; do
 done
 
 # List of names or folders to process -- For object
-NAMES=("bo" "duck-banana" "marie-cat" "pusheen-cup"
-       "brown-duck" "dug" "mydieu" "shiba-black" "tokyo-keyboard"
-       "butin" "elephant" "neurips-cup" "shiba-gray" "toodles-galore"
-       "cat-cup" "fire" "nha-tho-hanoi" "shiba-sleep"
-       "chua-thien-mu" "henry" "nha-tho-hcm" "shiba-yellow" "water"
-       "lamb" "thap-but" "yellow-duck"
-       "dragon" "mam" "pig-cup" "thap-cham")
+NAMES=("bo" "butin" "neurips-cup"
+       "nha-tho-hanoi"
+       "chua-thien-mu" "henry" "nha-tho-hcm" "thap-but"
+       "mam" "thap-cham")
 
 # Loop through each folder
 for NAME in "${NAMES[@]}"; do

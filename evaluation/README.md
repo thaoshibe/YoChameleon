@@ -118,32 +118,6 @@ Then, you can run the following command:
 bash scripts/eval/eval_pope.sh
 ```
 
-### TextVQA
-
-This is done, and it has the same function as the original llava (number can be directly put in the paper)
-
-```
-# This script will download the train images and extract it into ./evaluation/textvqa/train_images (around 6.6GB)
-
-bash scripts/eval/eval_textvqa.sh
-```
-
-- `llava_textvqa_val_v051_ocr.jsonl` (this is question file)
-- `TextVQA_0.5.1_val.json` (answer file, you can download from `download_anno_and_images.sh`)
-- an image folder which can be downloaded from `download_anno_and_images.sh`
-
-
-### VQAV2 --- Thao -- TODO
-
-
-You will have to download [eval.zip](https://drive.google.com/file/d/1atZSBBrAX54yYpxtVVW33zFvcnaHeFPy/view), unzip it.
-After extract, you should find `textvqa/llava_textvqa_val_v051_ocr.jsonl`.
-
-For data, you need to have:
-- an image folder which can be donwloaded from `download_images.sh`
-
-Note that, this dataset needs 8 gpus to eval
-
 ### MMBench
 
 This is also almost done, but this requires external online evaluator, but i haven't figure out how to submit. 
