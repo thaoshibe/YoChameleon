@@ -413,12 +413,6 @@ _import_structure = {
         "ElectraConfig",
         "ElectraTokenizer",
     ],
-    "models.emu3": [
-        "Emu3Config",
-        "Emu3Processor",
-        "Emu3TextConfig",
-        "Emu3VQVAEConfig",
-    ],
     "models.encodec": [
         "EncodecConfig",
         "EncodecFeatureExtractor",
@@ -626,7 +620,6 @@ _import_structure = {
     "models.nougat": ["NougatProcessor"],
     "models.nystromformer": ["NystromformerConfig"],
     "models.olmo": ["OlmoConfig"],
-    "models.olmo_1124": ["Olmo1124Config"],
     "models.olmoe": ["OlmoeConfig"],
     "models.omdet_turbo": [
         "OmDetTurboConfig",
@@ -875,7 +868,6 @@ _import_structure = {
         "ImageClassificationPipeline",
         "ImageFeatureExtractionPipeline",
         "ImageSegmentationPipeline",
-        "ImageTextToTextPipeline",
         "ImageToImagePipeline",
         "ImageToTextPipeline",
         "JsonPipelineDataFormat",
@@ -1192,7 +1184,7 @@ else:
     )
     _import_structure["models.convnext"].extend(["ConvNextFeatureExtractor", "ConvNextImageProcessor"])
     _import_structure["models.deformable_detr"].extend(
-        ["DeformableDetrFeatureExtractor", "DeformableDetrImageProcessor", "DeformableDetrImageProcessorFast"]
+        ["DeformableDetrFeatureExtractor", "DeformableDetrImageProcessor"]
     )
     _import_structure["models.deit"].extend(["DeiTFeatureExtractor", "DeiTImageProcessor"])
     _import_structure["models.deprecated.deta"].append("DetaImageProcessor")
@@ -1203,7 +1195,6 @@ else:
     _import_structure["models.donut"].extend(["DonutFeatureExtractor", "DonutImageProcessor"])
     _import_structure["models.dpt"].extend(["DPTFeatureExtractor", "DPTImageProcessor"])
     _import_structure["models.efficientnet"].append("EfficientNetImageProcessor")
-    _import_structure["models.emu3"].append("Emu3ImageProcessor")
     _import_structure["models.flava"].extend(["FlavaFeatureExtractor", "FlavaImageProcessor", "FlavaProcessor"])
     _import_structure["models.fuyu"].extend(["FuyuImageProcessor", "FuyuProcessor"])
     _import_structure["models.glpn"].extend(["GLPNFeatureExtractor", "GLPNImageProcessor"])
@@ -1237,7 +1228,7 @@ else:
     _import_structure["models.poolformer"].extend(["PoolFormerFeatureExtractor", "PoolFormerImageProcessor"])
     _import_structure["models.pvt"].extend(["PvtImageProcessor"])
     _import_structure["models.qwen2_vl"].extend(["Qwen2VLImageProcessor"])
-    _import_structure["models.rt_detr"].extend(["RTDetrImageProcessor", "RTDetrImageProcessorFast"])
+    _import_structure["models.rt_detr"].extend(["RTDetrImageProcessor"])
     _import_structure["models.sam"].extend(["SamImageProcessor"])
     _import_structure["models.segformer"].extend(["SegformerFeatureExtractor", "SegformerImageProcessor"])
     _import_structure["models.seggpt"].extend(["SegGptImageProcessor"])
@@ -2165,15 +2156,6 @@ else:
             "load_tf_weights_in_electra",
         ]
     )
-    _import_structure["models.emu3"].extend(
-        [
-            "Emu3ForCausalLM",
-            "Emu3ForConditionalGeneration",
-            "Emu3PreTrainedModel",
-            "Emu3TextModel",
-            "Emu3VQVAE",
-        ]
-    )
     _import_structure["models.encodec"].extend(
         [
             "EncodecModel",
@@ -2934,13 +2916,6 @@ else:
             "OlmoForCausalLM",
             "OlmoModel",
             "OlmoPreTrainedModel",
-        ]
-    )
-    _import_structure["models.olmo_1124"].extend(
-        [
-            "Olmo1124ForCausalLM",
-            "Olmo1124Model",
-            "Olmo1124PreTrainedModel",
         ]
     )
     _import_structure["models.olmoe"].extend(
@@ -5303,12 +5278,6 @@ if TYPE_CHECKING:
         ElectraConfig,
         ElectraTokenizer,
     )
-    from .models.emu3 import (
-        Emu3Config,
-        Emu3Processor,
-        Emu3TextConfig,
-        Emu3VQVAEConfig,
-    )
     from .models.encodec import (
         EncodecConfig,
         EncodecFeatureExtractor,
@@ -5536,7 +5505,6 @@ if TYPE_CHECKING:
         NystromformerConfig,
     )
     from .models.olmo import OlmoConfig
-    from .models.olmo_1124 import Olmo1124Config
     from .models.olmoe import OlmoeConfig
     from .models.omdet_turbo import (
         OmDetTurboConfig,
@@ -5826,7 +5794,6 @@ if TYPE_CHECKING:
         ImageClassificationPipeline,
         ImageFeatureExtractionPipeline,
         ImageSegmentationPipeline,
-        ImageTextToTextPipeline,
         ImageToImagePipeline,
         ImageToTextPipeline,
         JsonPipelineDataFormat,
@@ -6122,7 +6089,6 @@ if TYPE_CHECKING:
         from .models.deformable_detr import (
             DeformableDetrFeatureExtractor,
             DeformableDetrImageProcessor,
-            DeformableDetrImageProcessorFast,
         )
         from .models.deit import DeiTFeatureExtractor, DeiTImageProcessor
         from .models.deprecated.deta import DetaImageProcessor
@@ -6133,7 +6099,6 @@ if TYPE_CHECKING:
         from .models.donut import DonutFeatureExtractor, DonutImageProcessor
         from .models.dpt import DPTFeatureExtractor, DPTImageProcessor
         from .models.efficientnet import EfficientNetImageProcessor
-        from .models.emu3 import Emu3ImageProcessor
         from .models.flava import (
             FlavaFeatureExtractor,
             FlavaImageProcessor,
@@ -6187,7 +6152,7 @@ if TYPE_CHECKING:
         )
         from .models.pvt import PvtImageProcessor
         from .models.qwen2_vl import Qwen2VLImageProcessor
-        from .models.rt_detr import RTDetrImageProcessor, RTDetrImageProcessorFast
+        from .models.rt_detr import RTDetrImageProcessor
         from .models.sam import SamImageProcessor
         from .models.segformer import SegformerFeatureExtractor, SegformerImageProcessor
         from .models.seggpt import SegGptImageProcessor
@@ -6957,13 +6922,6 @@ if TYPE_CHECKING:
             ElectraPreTrainedModel,
             load_tf_weights_in_electra,
         )
-        from .models.emu3 import (
-            Emu3ForCausalLM,
-            Emu3ForConditionalGeneration,
-            Emu3PreTrainedModel,
-            Emu3TextModel,
-            Emu3VQVAE,
-        )
         from .models.encodec import (
             EncodecModel,
             EncodecPreTrainedModel,
@@ -7562,11 +7520,6 @@ if TYPE_CHECKING:
             OlmoForCausalLM,
             OlmoModel,
             OlmoPreTrainedModel,
-        )
-        from .models.olmo_1124 import (
-            Olmo1124ForCausalLM,
-            Olmo1124Model,
-            Olmo1124PreTrainedModel,
         )
         from .models.olmoe import (
             OlmoeForCausalLM,

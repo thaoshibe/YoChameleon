@@ -11,5 +11,7 @@ __pycache__/
 /viewer
 sftp-config.json
 /generated_images
-/sensei
+# scripts/sensei
 /config
+scripts/create_data/retrieve
+create_training_data/retrieve_negative/download_random_images.py

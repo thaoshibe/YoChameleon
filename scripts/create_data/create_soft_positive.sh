@@ -24,7 +24,7 @@ for NAME in "${NAMES[@]}"; do
     --spacing 1 \
     --negative_image True \
     --limit_negative 1000 \
-    --consistent_prompt True # This mean, we will use the same prompt for all negative images and positive images
+    # --consistent_prompt True # This mean, we will use the same prompt for all negative images and positive images
 done
 
 ###--- Create image generation data ---###

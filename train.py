@@ -10,6 +10,8 @@ import warnings
 from utils import get_dataloader_iter
 from utils import get_eval_dataloader
 from yochameleon import YoChameleonTrainer
+from yoemu3 import YoEmu3Trainer
+
 warnings.filterwarnings("ignore")
 
 def get_args():
@@ -33,7 +35,13 @@ if __name__ == '__main__':
         config.json_file = [x.replace('SKS_NAME', config.sks_name) for x in config.json_file]
 
     # call training loop
-    trainer = YoChameleonTrainer(config)
+    if config.model_id == 'leloy/Anole-7b-v0.1-hf':
+        trainer = YoChameleonTrainer(config)
+    elif config.model_id == 'Emu3-community/Emu3-Gen-hf':
+        trainer = YoEmu3Trainer(config)
+    else:
+        raise ValueError(f"Model ID {config.model_id} is not supported yet~")
+
     personalized_prompt = trainer.get_personalized_prompt()
     print(f"Personalized prompt: {personalized_prompt}")
     

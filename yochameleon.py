@@ -508,5 +508,4 @@ class YoChameleonTrainer:
 			"Text/Describe": wandb.Html(f'<p>{escaped_string}</p>')
 			}
 		return visual_dict
-			# self.wandb.log({"Text/Prediction": wandb.Html(f'<p>{escaped_string}</p>')})
 

@@ -4,6 +4,21 @@
 
 ⭑.ᐟ *Hello, this is [Yo'LLaVA](https://thaoshibe.github.io/YoLLaVA/) meets [Chameleon](https://arxiv.org/abs/2405.09818)!* ⭑.ᐟ
 ㅤ
+---
+
+##### Table of Contents
+
+1. [Getting Started](#-getting-started)
+1. [Creating Dataset](#-creating-dataset)
+1. [Train](#-train)
+1. [Test](#-test)
+1. [Evaluation](#-evaluation)
+  - [Detailed Caption](#detailed-caption)
+  - [Facial Similarity Scores](#facial-similarity-scores)
+  - [CLIP Image-to-Image Similarity](#clip-image-to-image-similarity)
+  - [Recognition Accuracy](#recognition-accuracy)
+1. [Acknowledgements](#-acknowledgements)
+
 ### 🚀 Getting Started
 
 ```
@@ -17,6 +32,10 @@ pip install -r requirements.txt
 # Or run the bash script
 bash install.sh
 ```
+
+### Quick Start
+
+This provide a quick start to train the model with the provided dataset.
 
 ### 🛠️ Creating dataset
 
@@ -299,7 +318,116 @@ python test_flexible.py --config config/basic.yaml --prompt "A photo of a cat"..
 
 ### 📊 Evaluation
 
-Please reference the README.md in the `evaluation` folder for more details.
+#### Detailed Captions
+
+Detailed captions for each subject in [Yo'LLaVA datasets](https://github.com/WisconsinAIVision/YoLLaVA) are given in [baselines/subject-detailed-captions.json](./baselines/subject-detailed-captions.json).
+
+For example, the detailed caption for `bo` is given as follows:
+
+```
+"bo": "<sks> is a charming cinnamon-colored Shiba Inu with cream accents and a cheerful personality, appears in various indoor and outdoor settings—posing on rugs, floors, and sidewalks. Often seen with a playful expression or tongue out, this Shiba enjoys relaxing, smiling for the camera, and is sometimes accompanied by a plush toy or sitting attentively in anticipation of a walk."
+```
+<img src="https://thaoshibe.github.io/visii/images/1_0.png" alt="Bo" width="300">
+
+#### Facial similarity scores
+
+Edit the file `bash scripts/eval/eval_facial_sim.sh`.
+
+<details>
+<summary> facial similarity compute between fake/ real folders</summary>
+
+```
+#!/bin/bash
+cd ../evaluation/
+
+EXP_FOLDER="64-5000"
+FAKE_FOLDER_BASE="/sensei-fs/users/thaon/code/generated_images"
+
+# Define the real folder
+REAL_FOLDER="/mnt/localssd/code/data/yollava-data/train/thao"
+
+# Define an array of fake folders
+FAKE_FOLDERS=(
+    # Local and aligned folders
+    # "/mnt/localssd/code/data/dathao_algined"
+    # "/mnt/localssd/code/data/yollava-data/train/khanhvy"
+    # "/mnt/localssd/code/data/yollava-data/train/thao/negative_example"
+    # Generated image sets using FAKE_FOLDER_BASE
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/2000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/3000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4050"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4100"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4150"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4200"
+)
+
+# Loop through each fake folder and run the Python evaluation script
+for FAKE_FOLDER in "${FAKE_FOLDERS[@]}"
+do
+    echo "Running evaluation with fake folder: $FAKE_FOLDER"
+    python insightface_verify.py --real_folder "$REAL_FOLDER" --fake_folder "$FAKE_FOLDER"
+done
+
+echo "All evaluations completed!"
+
+```
+</details>
+
+#### CLIP Image-to-Image Similarity
+
+```
+python clip_image_similarity.py --real_folder --fake_folder
+```
+
+<details>
+<summary> clip similarity score between fake/ real folders</summary>
+
+```
+#!/bin/bash
+cd ../evaluation/
+
+EXP_FOLDER="64-5000"
+FAKE_FOLDER_BASE="/sensei-fs/users/thaon/code/generated_images"
+
+# Define the real folder
+REAL_FOLDER="/mnt/localssd/code/data/yollava-data/train/thao"
+
+# Define an array of fake folders
+FAKE_FOLDERS=(
+    # Local and aligned folders
+    # "/mnt/localssd/code/data/dathao_algined"
+    # "/mnt/localssd/code/data/yollava-data/train/khanhvy"
+    # "/mnt/localssd/code/data/yollava-data/train/thao/negative_example"
+    # Generated image sets using FAKE_FOLDER_BASE
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/1000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/2000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/3000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4000"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4050"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4100"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4150"
+    "${FAKE_FOLDER_BASE}/${EXP_FOLDER}/4200"
+)
+
+# Loop through each fake folder and run the Python evaluation script
+for FAKE_FOLDER in "${FAKE_FOLDERS[@]}"
+do
+    echo "Running evaluation with fake folder: $FAKE_FOLDER"
+    python clip_image_similarity.py --real_folder "$REAL_FOLDER" --fake_folder "$FAKE_FOLDER"
+done
+
+echo "All evaluations completed!"
+
+```
+</details>
+
+#### Recognition Accuracy
+
+```
+python evaluation/recognition.py --config ./config/recog.yaml --sks_name "thao" --iteration 6
+```
 
 ### 🤗 Acknowledgements
 
