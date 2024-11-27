@@ -21,48 +21,6 @@ from itertools import cycle
 from tqdm import tqdm
 from transformers.image_transforms import to_pil_image
 from utils import Config
-
-# inputs = processor(
-#     text=["a portrait of young girl. masterpiece, film grained, best quality.", "a dog running under the rain"],
-#     padding=True,
-#     return_tensors="pt",
-#     return_for_image_generation=True,
-# )
-# inputs = inputs.to(device=model.device, dtype=torch.bfloat16)
-
-# neg_prompt = "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry."
-# neg_inputs = processor(text=[neg_prompt] * 2, return_tensors="pt").to(device="cuda:0")
-
-# image_sizes = inputs.pop("image_sizes")
-# HEIGHT, WIDTH = image_sizes[0]
-# VISUAL_TOKENS = model.vocabulary_mapping.image_tokens
-
-def prefix_allowed_tokens_fn(batch_id, input_ids):
-    height, width = HEIGHT, WIDTH
-    visual_tokens = VISUAL_TOKENS
-    image_wrapper_token_id = processor.tokenizer.encode("<|image token|>", return_tensors="pt")[0].to(model.device)
-    eoi_token_id = processor.tokenizer.encode("<|image end|>", return_tensors="pt")[0]
-    eos_token_id = processor.tokenizer.encode("<|extra_204|>", return_tensors="pt")[0]
-    pad_token_id = processor.tokenizer.encode("<|endoftext|>", return_tensors="pt")[0]
-    eol_token_id = processor.tokenizer.encode("<|extra_200|>", return_tensors="pt")[0]
-    eof_token_id = processor.tokenizer.encode("<|extra_201|>", return_tensors="pt")[0]
-
-    position = torch.nonzero(input_ids == image_wrapper_token_id, as_tuple=True)[0][0]
-    offset = input_ids.shape[0] - position
-    if offset % (width + 1) == 0:
-        return (eol_token_id, )
-    elif offset == (width + 1) * height + 1:
-        return (eof_token_id, )
-    elif offset == (width + 1) * height + 2:
-        return (eoi_token_id, )
-    elif offset == (width + 1) * height + 3:
-        return (eos_token_id, )
-    elif offset > (width + 1) * height + 3:
-        return (pad_token_id, )
-    else:
-        return visual_tokens
-
-
 # out = model.generate(
 #     **inputs,
 #     max_new_tokens=50000, # make sure to have enough tokens for one image
@@ -104,6 +62,7 @@ class YoEmu3Trainer:
         self.weighted_acc = 0.0
         self.mean_clip = 0.0
         self.avg_metric = 0.0
+        self.VISUAL_TOKENS = self.model.vocabulary_mapping.image_tokens
 
     def get_personalized_prompt(self):
         return self.sks_prompt
@@ -216,7 +175,7 @@ class YoEmu3Trainer:
             )
         else:
             # train embedding weights and lm only
-            # trainable_params = [self.model.get_input_embeddings().weight, self.model.lm_head.weight]
+            # trainable_params = [self.model.get_input_embeddings().weight, self.model.text_model.lm_head.weight]
             trainable_params = [self.model.get_input_embeddings().weight, self.model.text_model.lm_head.weight]
             optimizer = torch.optim.AdamW(
                 trainable_params,
@@ -249,7 +208,7 @@ class YoEmu3Trainer:
             torch.save(self.model.text_model.state_dict(), os.path.join(self.save_location, f'{iteration}-model.pt'))
             print('Saved whole model at: ', os.path.join(self.save_location, f'{iteration}-model.pt'))
         else:
-            torch.save(self.model.lm_head.weight.data[self.personalized_token_ids], save_path_lmhead)
+            torch.save(self.model.text_model.lm_head.weight.data[self.personalized_token_ids], save_path_lmhead)
             print('Saved lm_head at: ', save_path_lmhead)
 
 
@@ -257,9 +216,9 @@ class YoEmu3Trainer:
         lm_head_path = os.path.join(config_resume.savedir, exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-lmhead.pt")
         embedding_path = os.path.join(config_resume.savedir, exp_name, self.config.sks_name, f"{config_resume.resume_iteration}-token.pt")
         # Load language model head
-        lm_head = torch.load(lm_head_path, map_location='cuda').to(self.model.lm_head.weight.data.device)
+        lm_head = torch.load(lm_head_path, map_location='cuda').to(self.model.text_model.lm_head.weight.data.device)
         lm_head = lm_head.to(self.model.dtype)
-        self.model.lm_head.weight.data[resume_token_ids] = lm_head
+        self.model.text_model.lm_head.weight.data[resume_token_ids] = lm_head
 
         # Load input embeddings
         embeddings = torch.load(embedding_path).to(self.model.device).to(self.model.dtype)
@@ -297,13 +256,13 @@ class YoEmu3Trainer:
     def configure_model(self):
         if self.config.whole_model:
             self.model.text_model.requires_grad_(True)
-            self.model.text_model.embed_tokens.weight.requires_grad_(True)
+            self.model.text_model.model.embed_tokens.weight.requires_grad_(True)
             self.model.text_model.vqmodel.requires_grad_(False)
             self.index_no_updates = torch.zeros((len(self.processor.tokenizer),), dtype=torch.bool)
         else:
 
             self.model.text_model.requires_grad_(False)
-            self.model.text_model.embed_tokens.weight.requires_grad_(True)
+            self.model.text_model.model.embed_tokens.weight.requires_grad_(True)
             self.index_no_updates = torch.ones((len(self.processor.tokenizer),), dtype=torch.bool)
             self.index_no_updates[self.personalized_token_ids] = False
 
@@ -312,6 +271,9 @@ class YoEmu3Trainer:
             self.wandb.log({"Dataset/Train_dataset_length": len(dataloader.dataset)})
             self.mean_clip_at_best = 0.0
             self.weighted_acc_at_best = 0.0
+            self.weighted_acc = 0.0
+            self.mean_clip = 0.0
+
         if self.config.eval['clip_sim']:
             real_images_path = [x for x in sorted(recognition_data_loader_train.image_paths) if self.sks_name in x]
             real_images = [Image.open(x).convert("RGB") for x in real_images_path]
@@ -322,37 +284,8 @@ class YoEmu3Trainer:
                 self.save_checkpoint(iteration)
                 if self.config.eval_visualization:
                     visual_dict = self.visualize_evaluation()
-                    eval_list.append(visual_dict)
-                if self.config.eval['recognition']:
-                    train_recog = self.eval_recognition(recognition_data_loader_train, split='train')
-                    test_recog = self.eval_recognition(recognition_data_loader_test, split='test')
-                    eval_list.append(train_recog)
-                    eval_list.append(test_recog)
-                if self.config.eval['clip_sim']:
-                    clip_sim = self.eval_clip_similarity(real_images, number_fake_images=self.config.eval['number_fake_images'])
-                    eval_list.append(clip_sim)
-                if self.config.eval['recognition']:
-                    avg_score = clip_sim['Metrics/CLIP'] + train_recog['Metrics/train_weighted_accuracy']
-                else:
-                    avg_score = clip_sim['Metrics/CLIP']
-                if self.avg_metric <= avg_score:
-                    self.avg_metric = avg_score
-                    self.save_checkpoint('best')
-                    self.mean_clip_at_best = clip_sim['Metrics/CLIP']
-                    if self.config.eval['recognition']:
-                        self.weighted_acc_at_best = train_recog['Metrics/train_weighted_accuracy']
-
-                if not self.config.no_wandb:
-                    log_dict = {"eval": iteration,
-                    "Metrics/Best-avg_metric": avg_score/2,
-                    "Metrics/Best-clip": self.mean_clip,
-                    "Metrics/Best-recognition": self.weighted_acc,
-                    "Metrics/Best-clip-at-best": self.mean_clip_at_best,
-                    "Metrics/Best-recognition-at-best": self.weighted_acc_at_best
-                    }
-                    for item in eval_list:
-                        log_dict.update(item)
-                    self.wandb.log(log_dict)
+                    if not self.config.no_wandb:
+                        self.wandb.log(visual_dict)
             for batch in tqdm(dataloader):
                 self.optimizer.zero_grad()
                 batch['pixel_values'] = batch['pixel_values'].to(self.model.dtype)
@@ -394,13 +327,38 @@ class YoEmu3Trainer:
                 if not self.config.whole_model:
                     with torch.no_grad():
                         self.model.get_input_embeddings().weight[self.index_no_updates] = self.orig_embeds_params[self.index_no_updates]
-                        self.model.lm_head.weight[self.index_no_updates] = self.orig_lm_params[self.index_no_updates]
+                        self.model.text_model.lm_head.weight[self.index_no_updates] = self.orig_lm_params[self.index_no_updates]
 
                 # Log loss to W&B
                 if not self.config.no_wandb:
                     self.wandb.log({"loss": loss.item()})
             torch.cuda.empty_cache()
             self.iteration = iteration
+    @torch.no_grad()
+    def prefix_allowed_tokens_fn(self, batch_id, input_ids):
+        height, width = self.HEIGHT, self.WIDTH
+        visual_tokens = self.VISUAL_TOKENS
+        image_wrapper_token_id = self.processor.tokenizer.encode("<|image token|>", return_tensors="pt")[0].to(self.model.device)
+        eoi_token_id = self.processor.tokenizer.encode("<|image end|>", return_tensors="pt")[0]
+        eos_token_id = self.processor.tokenizer.encode("<|extra_204|>", return_tensors="pt")[0]
+        pad_token_id = self.processor.tokenizer.encode("<|endoftext|>", return_tensors="pt")[0]
+        eol_token_id = self.processor.tokenizer.encode("<|extra_200|>", return_tensors="pt")[0]
+        eof_token_id = self.processor.tokenizer.encode("<|extra_201|>", return_tensors="pt")[0]
+
+        position = torch.nonzero(input_ids == image_wrapper_token_id, as_tuple=True)[0][0]
+        offset = input_ids.shape[0] - position
+        if offset % (width + 1) == 0:
+            return (eol_token_id, )
+        elif offset == (width + 1) * height + 1:
+            return (eof_token_id, )
+        elif offset == (width + 1) * height + 2:
+            return (eoi_token_id, )
+        elif offset == (width + 1) * height + 3:
+            return (eos_token_id, )
+        elif offset > (width + 1) * height + 3:
+            return (pad_token_id, )
+        else:
+            return visual_tokens
 
     @torch.no_grad()
     def visualize_evaluation(self):
@@ -410,23 +368,32 @@ class YoEmu3Trainer:
         else:
             prompt = self.sks_prompt + f' A photo of {self.identifier}.'
         print(prompt)
-        inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
-        generate_ids = self.model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)
-        response_ids = generate_ids[:, inputs["input_ids"].shape[-1]:]
-        pixel_values = self.model.decode_image_tokens(response_ids[:, 1:-1])
-        pixel_values = self.processor.postprocess_pixel_values(pixel_values)
-        image = to_pil_image(pixel_values[0].detach().cpu())
 
-        print('Generate the text response...')
-        prompt = self.sks_prompt + f' Can you describe {self.identifier} in details?'
-        inputs = self.processor(prompt, return_tensors="pt").to(self.model.device)
-        output = self.model.generate(**inputs, max_new_tokens=200)
-        result_with_special_tokens = self.processor.decode(output[0], skip_special_tokens=False)
-        answer = chameleon_trim_answer(result_with_special_tokens)
-        escaped_string = html.escape(result_with_special_tokens)
-        print(answer)
+        # inputs = self.processor(text=prompt, return_tensors="pt").to(self.model.device)
+        inputs = self.processor(text=prompt, return_tensors="pt", return_for_image_generation=True).to(self.model.device)
+        
+        neg_prompt = "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry."
+        NEGATIVE_PROMPT = self.processor(text=neg_prompt, return_tensors="pt").to(device=self.model.device)
+
+        image_sizes = inputs.pop("image_sizes")
+        self.HEIGHT, self.WIDTH = image_sizes[0]
+
+        out = self.model.generate(
+            **inputs,
+            max_new_tokens=50_000, # make sure to have enough tokens for one image
+            prefix_allowed_tokens_fn=self.prefix_allowed_tokens_fn,
+            return_dict_in_generate=True,
+            negative_prompt_ids=NEGATIVE_PROMPT.input_ids, # indicate for Classifier-Free Guidance
+            negative_prompt_attention_mask=NEGATIVE_PROMPT.attention_mask,
+        )
+        image = self.model.decode_image_tokens(out.sequences[:, inputs.input_ids.shape[1]: ], height=self.HEIGHT, width=self.WIDTH)
+        images = self.processor.postprocess(list(image.float()), return_tensors="PIL.Image.Image") # internally we convert to np but it's not supported in bf16 precision
+        for i, image in enumerate(images['pixel_values']):
+            image.save(f"result{i}.png")
+            print(f"Saved result{i}.png")
+        image = image.resize((256, 256))
         visual_dict = {
             "Image": wandb.Image(image),
-            "Text/Describe": wandb.Html(f'<p>{escaped_string}</p>')
+            # "Text/Describe": wandb.Html(f'<p>{escaped_string}</p>')
             }
         return visual_dict

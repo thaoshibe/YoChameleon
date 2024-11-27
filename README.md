@@ -5,19 +5,27 @@
 ⭑.ᐟ *Hello, this is [Yo'LLaVA](https://thaoshibe.github.io/YoLLaVA/) meets [Chameleon](https://arxiv.org/abs/2405.09818)!* ⭑.ᐟ
 ㅤ
 ---
+**🦎 Yo’Chameleon: Personalized Vision and Language Generation**<br>
+Thao Nguyen<sup>1, 2</sup>, Krishna Kumar Singh<sup>2</sup>, Jing Shi<sup>2</sup>, Trung Bui<sup>2</sup>, Yong Jae Lee<sup>1, ¶</sup>, Yuheng Li<sup>2, ¶</sup><br>
+*<sup>1</sup>University of Wisconsin-Madison, <sup>2</sup>Adobe Research*<br>
+
+> Large Multimodal Models (e.g., GPT-4, Gemini, Chameleon) have evolved into powerful tools with millions of users. However, they remain generic models and lack personalized knowledge of specific user concepts.
+Previous work has explored personalization for text generation, yet it remains unclear how these methods can be adapted to new modalities, such as image generation. In this paper, we introduce Yo'Chameleon, the first attempt to study personalization for large multimodal models.
+Given 3-5 images of a particular concept, Yo'Chameleon leverages soft-prompt tuning to embed subject-specific information to (i) answer questions about the subject and (ii) recreate pixel-level details to produce images of the subject in new contexts. Yo'Chameleon is trained with (i) a self-prompting optimization mechanism to balance performance across multiple modalities, and (ii) a ``soft-positive" image generation approach to enhance image quality in a few-shot setting.
+Our qualitative and quantitative analyses reveal that Yo'Chameleon can learn concepts more efficiently using fewer tokens and effectively encode visual attributes, outperforming prompting baselines.
+
+*(¶: equal advising)*
+
+---
 
 ##### Table of Contents
 
-1. [Getting Started](#-getting-started)
-1. [Creating Dataset](#-creating-dataset)
-1. [Train](#-train)
-1. [Test](#-test)
-1. [Evaluation](#-evaluation)
-  - [Detailed Caption](#detailed-caption)
-  - [Facial Similarity Scores](#facial-similarity-scores)
-  - [CLIP Image-to-Image Similarity](#clip-image-to-image-similarity)
-  - [Recognition Accuracy](#recognition-accuracy)
-1. [Acknowledgements](#-acknowledgements)
+1. [**Getting Started**](#-getting-started)
+1. [**Creating Dataset**](#-creating-dataset)
+1. [**Train**](#-train)
+1. [**Test**](#-test)
+1. [**Evaluation**](#-evaluation): [Detailed Caption](#detailed-caption), [Facial Similarity Scores](#facial-similarity-scores), [CLIP Image-to-Image Similarity](#clip-image-to-image-similarity), [Recognition Accuracy](#recognition-accuracy)
+1. [**Acknowledgements**](#-acknowledgements)
 
 ### 🚀 Getting Started
 
@@ -235,7 +243,7 @@ done
 </details>
 
 <details>
-<summary> Soft negative ideas data </summary>
+<summary> Soft positive data </summary>
 
 ```
 cd create_training_data/retrieve_negative
@@ -275,6 +283,7 @@ for NAME in "${NAMES[@]}"; do
 done
 ```
 </details>
+<img src="./images/soft-positive.png" alt="YoChameleon" width="500">
 
 ### 🧑‍🏫 Train
 
@@ -434,12 +443,15 @@ python evaluation/recognition.py --config ./config/recog.yaml --sks_name "thao" 
 This project will not be possible without the following open-source projects:
 - [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://github.com/facebookresearch/chameleon)
 - [Anole: An Open, Autoregressive and Native Multimodal Models for Interleaved Image-Text Generation](https://gair-nlp.github.io/anole/)
-- and amazing HuggingFace's community: [Chamleon on HuggingFace](https://huggingface.co/docs/transformers/en/model_doc/chameleon), [Anole on HuggingFace](https://github.com/huggingface/transformers/pull/32013)
+- [Emu3: Next-Token Prediction is All You Need](https://github.com/baaivision/Emu3/tree/main)
+- and amazing HuggingFace's community: [Chamleon on HuggingFace](https://huggingface.co/docs/transformers/en/model_doc/chameleon), [Anole on HuggingFace](https://github.com/huggingface/transformers/pull/32013), [Emu3 on HuggingFace](https://github.com/huggingface/transformers/pull/33770)
 
-And the unwavering supports from my Adobe's main mentor [Dr. Yuheng Li](https://yuheng-li.github.io/), my advisor [Prof. Yong Jae Lee](https://pages.cs.wisc.edu/~yongjaelee/), and meaningful discussion with [Dr. Krishna](https://krsingh.cs.ucdavis.edu/), [Dr. Jing Shi](https://jshi31.github.io/jingshi/), and [Dr. Trung Bui](https://sites.google.com/site/trungbuistanford/).
+I would like to express my gratitude to my Adobe Research's mentors: [Dr. Krishna](https://krsingh.cs.ucdavis.edu/), [Dr. Jing Shi](https://jshi31.github.io/jingshi/), and [Dr. Trung Bui](https://sites.google.com/site/trungbuistanford/) for their discussions. Special thanks to my advisor, [Prof. Yong Jae Lee](https://pages.cs.wisc.edu/~yongjaelee/), who provided endless insights and guidance for this project (as always).
 
-Sending thanks to my fellow mentee [Eslam Abdelrahman](https://scholar.google.com/citations?user=0OEerycAAAAJ&hl=en) for discussion about Vision-Langauge Model's latent space from time to time.
-Big shout out to my (main) fellow mentee [Sicheng Mo](https://sichengmo.github.io/) -- He taught me a lot about coding. Without him, I would still using TensorBoard instead of WanDB (haha, also, he knows a lot of good foods/ restaurants!) (-- Last but not the least, thank mentor [Fangzhou Mu](https://fmu2.github.io/) for all the friday dinners/ board games he hosted during summer 🥓 🍣 🍱 But he does not like Thai foods though, meh~)
+A big shout-out to my primary fellow mentee [Sicheng Mo](https://sichengmo.github.io/)—he taught me so much about coding. Without him, I’d still be using TensorBoard instead of WanDB! (Also, he has wonderful taste in food and restaurants.) <br>
+Additionally, thanks to (technically-not) mentor [Fangzhou Mu](https://fmu2.github.io/) for hosting many Friday dinners and board game nights during the summer 🥓🍣🍱 (though, he’s not a fan of Thai foods —meh~).  
+
+And finally, saving the best for last: I couldn’t have completed this project without the unwavering support (and pushes) of my main Adobe `juan` mentor, [Dr. Yuheng Li](https://yuheng-li.github.io/) :xixi:. Thank you so much!
 
 
 
