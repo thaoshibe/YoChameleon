@@ -60,7 +60,8 @@ def get_dataloader_iter(config, processor, only_positive=False, personalized_pro
                     tokenizer_max_length=config.tokenizer_max_length,
                     END_OF_TURN=config.special_tokens["END_OF_TURN"],
                     personalized_prompt=personalized_prompt,
-                    task_disjoin=config.task_disjoin
+                    task_disjoin=config.task_disjoin,
+                    model_id=config.model_id
                 )
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=1,

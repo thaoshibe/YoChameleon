@@ -285,6 +285,8 @@ done
 </details>
 <img src="./images/soft-positive.png" alt="YoChameleon" width="500">
 
+---
+
 ### 🧑‍🏫 Train
 
 ```
@@ -340,7 +342,12 @@ For example, the detailed caption for `bo` is given as follows:
 
 #### Facial similarity scores
 
-Edit the file `bash scripts/eval/eval_facial_sim.sh`.
+```
+python insightface_verify.py --real_folder /path/to/real/folder --fake_folder /path/to/fake/folder
+```
+
+
+Or edit the file `bash scripts/eval/eval_facial_sim.sh`.
 
 <details>
 <summary> facial similarity compute between fake/ real folders</summary>
@@ -387,7 +394,7 @@ echo "All evaluations completed!"
 #### CLIP Image-to-Image Similarity
 
 ```
-python clip_image_similarity.py --real_folder --fake_folder
+python clip_image_similarity.py --real_folder /path/to/real/folder --fake_folder /path/to/fake/folder
 ```
 
 <details>
@@ -435,8 +442,14 @@ echo "All evaluations completed!"
 #### Recognition Accuracy
 
 ```
-python evaluation/recognition.py --config ./config/recog.yaml --sks_name "thao" --iteration 6
+python evaluation/recognition.py --config ./config/recog.yaml --sks_name "thao" --iteration 15
 ```
+---
+
+##### TODO
+
+- [ ] Emu3-Gen related
+  - [ ] Now only support train for image generation (dataloader support image only, not self-prompting)
 
 ### 🤗 Acknowledgements
 
@@ -473,5 +486,3 @@ And finally, saving the best for last: I couldn’t have completed this project 
 
 
 *Finally, I've wrapped up this project -- I'll go home and hug my pets now ☕,  hehe (.❛ ᴗ ❛.)*
-
----

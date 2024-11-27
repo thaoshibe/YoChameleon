@@ -1874,6 +1874,7 @@ class Emu3ForCausalLM(Emu3PreTrainedModel, GenerationMixin):
 
         loss = None
         if labels is not None:
+
             loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
 
         if not return_dict:
@@ -2000,6 +2001,7 @@ class Emu3ForConditionalGeneration(Emu3PreTrainedModel, GenerationMixin):
             image_sizes (`torch.LongTensor` of shape `(batch_size, 2)`):
                 The sizes of the images in the batch, being (height, width) for each image.
         """
+
         image_tokens_list = self.vqmodel.encode(pixel_values, image_sizes)
         bpe_tokens_list = [self.vocabulary_mapping.convert_img2bpe(tokens).flatten() for tokens in image_tokens_list]
         bpe_tokens = torch.cat(bpe_tokens_list)
@@ -2019,7 +2021,11 @@ class Emu3ForConditionalGeneration(Emu3PreTrainedModel, GenerationMixin):
             width (`int`):
                 Width of the generated image before upsampling.
         """
-        sequences = image_tokens[:, :-3].view(-1, height, width + 1)
+        try:
+            sequences = image_tokens[:, :-3].view(-1, height, width + 1)
+        except:
+            # --- Thao; this is temporal for the image_tokens only (size 64x64+1, last row are end-of-line)
+            sequences = image_tokens.view(-1, height, width + 1)
         image_tokens = self.vocabulary_mapping.convert_bpe2img(sequences)
         image = self.vqmodel.decode(image_tokens)
         return image
@@ -2126,6 +2132,7 @@ class Emu3ForConditionalGeneration(Emu3PreTrainedModel, GenerationMixin):
             return_dict=return_dict,
             cache_position=cache_position,
             num_logits_to_keep=num_logits_to_keep,
+            labels=labels
         )
 
         return outputs

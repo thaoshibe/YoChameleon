@@ -5,10 +5,12 @@ import glob
 
 import numpy as np
 
+import re
 import torch
 import yaml
 
 from PIL import Image
+from PIL import ImageOps
 
 from torch.utils.data import Dataset
 from torchvision import datasets
@@ -17,14 +19,24 @@ from transformers import ChameleonForConditionalGeneration
 from transformers import ChameleonProcessor
 from transformers import ChameleonVQVAE
 from transformers import ChameleonVQVAEConfig
+from transformers import Emu3Processor
 from transformers.image_transforms import to_pil_image
-
 # END-OF-TURN token: <reserved08706>
 
 class Config:
     def __init__(self, config_dict):
         for key, value in config_dict.items():
             setattr(self, key, value)
+
+### --- THAO: THIS IS QUICK ADAPTION --- NOT RELIABLE
+def chameleon_to_emu3(input_string):
+    def replacer(match):
+        num = int(match.group(1))
+        return f"<|extra_{num - 16200}|>"
+    
+    # Replace all occurrences of <reserved####> with <|extra_###|>
+    updated_string = re.sub(r"<reserved(\d+)>", replacer, input_string)
+    return updated_string
 
 class PersonalizedDataset(Dataset):
     def __init__(
@@ -39,13 +51,20 @@ class PersonalizedDataset(Dataset):
         only_positive: bool = False,
         personalized_prompt: str = None,
         task_disjoin: bool = False,
+        model_id: str = 'leloy/Anole-7b-v0.1-hf',
     ):
         self.processor = processor
+        self.model_id = model_id
         self.placeholder_token = placeholder_token
         self.max_length = tokenizer_max_length
         self.personalized_prompt = personalized_prompt
         self.END_OF_TURN = END_OF_TURN
-        self.chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
+        if model_id == 'Emu3-community/Emu3-Gen-hf':
+            self.chat_template = "{% for message in messages %}{% if message['from'] == 'human' %}HUMAN: {{ message['value'] }} {% elif message['from'] == 'bot' %}ASSISTANT: {% generation %}{{ message['value']}}{% endgeneration %} {% endif %}{% endfor %}"
+        elif model_id == 'leloy/Anole-7b-v0.1-hf':
+            self.chat_template = "{% for message in messages %}{% if not (loop.first and message['from'] != 'human') %}{{ message['value'] }}{% if not loop.last %}<reserved08706>{% endif %}{% endif %}{% endfor %}"
+        else:
+            raise ValueError(f"Dataloader for {model_id} is not supported yet~")
         self.task_disjoin = task_disjoin
         data = []
         try:
@@ -69,58 +88,86 @@ class PersonalizedDataset(Dataset):
     def __getitem__(self, i):
         image_paths = self.data[i]['image']
         images = [Image.open(image_path).convert("RGB") for image_path in image_paths]
+        images = [ImageOps.fit(image, (512, 512), method=Image.Resampling.LANCZOS) for image in images]
         images = [self.flip_transform(image) for image in images]
-
         conv = self.data[i]['conversations']
 
         # Manually added personalized prompt for text-only generation and image understanding
         if conv[-1]['value'] != "<image>":
             conv[0]['value'] = f'{self.personalized_prompt} {conv[0]["value"]}'
-
         conversations = self.processor.apply_chat_template(conv, chat_template=self.chat_template)
         # For recogtion and text response, we need to replace <sks> with <reserved16200>
         full_text = conversations.replace("<sks>", self.placeholder_token)
-        example = self.processor(
-            text=full_text,
-            images=images,
-            padding="max_length",
-            max_length=self.max_length,
-            )
-
+        if self.model_id == 'leloy/Anole-7b-v0.1-hf':
+            example = self.processor(
+                text=full_text,
+                images=images,
+                padding="max_length",
+                max_length=self.max_length,
+                )
+            
+        elif self.model_id == 'Emu3-community/Emu3-Gen-hf':
+            # ---------------------------------------------------------------
+            #     TODO: This is for image generation only -- Not yet support VQA
+            # ---------------------------------------------------------------
+            # full_text = full_text.replace(' <image> ', '')
+            full_text = chameleon_to_emu3(full_text)
+            example = self.processor(
+                text=full_text,
+                images=images,
+                padding="max_length",
+                max_length=5000, # This is hardfix... Thao, please fix this
+                # return_for_image_generation=True,
+                return_tensors='pt'
+                )
+            # print(full_text)
+            # example['pixel_values'] = self.processor(text='<image>', images=images, padding="max_length", max_length=self.max_length, return_tensors='pt')['pixel_values']
+        else:
+            raise ValueError(f"Dataloader for {self.model_id} is not supported yet~")
         example['input_ids'] = example['input_ids'][0]
         example['attention_mask'] = example['attention_mask'][0]
         example['pixel_values'] = example['pixel_values'][0]
+        example['image_sizes'] = torch.Tensor([512, 512])
 
         clone_inputs = example['input_ids'].clone()
-        eot_indices = (clone_inputs == self.END_OF_TURN).nonzero()[:]
         
-        # Initialize a mask with the same shape as the tensor, filled with -100 (mask out question)
-        labels = torch.full(clone_inputs.shape, -100)
-        for start_idx, end_idx in zip(eot_indices[0::2]+1, eot_indices[1::2]):
-            cur_labels = clone_inputs[start_idx:end_idx+1]
-            # ---------------------------------------------------------------
-            #     TODO: This part trying to append image_tokens
-            #     But I haven't figured out how to append image tokens in the dataloader
-            #     So right now, the code for "replace <image> to real vq-vae tokens" are on-the-fly with training
-            # ---------------------------------------------------------------
+        if self.model_id == 'leloy/Anole-7b-v0.1-hf':
+            eot_indices = (clone_inputs == self.END_OF_TURN).nonzero()[:]
+            # Initialize a mask with the same shape as the tensor, filled with -100 (mask out question)
+            labels = torch.full(clone_inputs.shape, -100)
+            for start_idx, end_idx in zip(eot_indices[0::2]+1, eot_indices[1::2]):
+                cur_labels = clone_inputs[start_idx:end_idx+1]
+                # ---------------------------------------------------------------
+                #     TODO: This part trying to append image_tokens
+                #     But I haven't figured out how to append image tokens in the dataloader
+                #     So right now, the code for "replace <image> to real vq-vae tokens" are on-the-fly with training
+                # ---------------------------------------------------------------
 
-            # check if there is any image token in the current conversation
-            # check = torch.nonzero(cur_labels==START_OF_IMAGE_INDEX).shape[0]
-            # if check > 0:
-            #     soi_index = torch.nonzero(cur_labels==START_OF_IMAGE_INDEX).item()+1
-            #     eot_index = torch.nonzero(cur_labels==END_OF_IMAGE_INDEX).item()
-            #     #----
-            #     image_tokens = self.vqvae.get_image_tokens(pixel_values=example['pixel_values'][None])[0]
-            #     breakpoint()
-            #     pixel_values = self.vqvae.decode(image_tokens[None])
-            #     images = self.processor.postprocess_pixel_values(pixel_values)
-            #     image = to_pil_image(images[0].detach().cpu())
-            #     image.save("test.png")
+                # check if there is any image token in the current conversation
+                # check = torch.nonzero(cur_labels==START_OF_IMAGE_INDEX).shape[0]
+                # if check > 0:
+                #     soi_index = torch.nonzero(cur_labels==START_OF_IMAGE_INDEX).item()+1
+                #     eot_index = torch.nonzero(cur_labels==END_OF_IMAGE_INDEX).item()
+                #     #----
+                #     image_tokens = self.vqvae.get_image_tokens(pixel_values=example['pixel_values'][None])[0]
+                #     breakpoint()
+                #     pixel_values = self.vqvae.decode(image_tokens[None])
+                #     images = self.processor.postprocess_pixel_values(pixel_values)
+                #     image = to_pil_image(images[0].detach().cpu())
+                #     image.save("test.png")
 
-            #     cur_labels[soi_index:eot_index] = image_tokens
-            # replace <image> to real vq-vae tokens
-            # breakpoint()
-            labels[start_idx:end_idx+1] = cur_labels
+                #     cur_labels[soi_index:eot_index] = image_tokens
+                # replace <image> to real vq-vae tokens
+                labels[start_idx:end_idx+1] = cur_labels
+        elif self.model_id == 'Emu3-community/Emu3-Gen-hf':
+            eot_indices = (clone_inputs == self.END_OF_TURN).nonzero()[:]
+            labels = torch.full(clone_inputs.shape, -100)
+            # ---------------------------------------------------------------
+            #     TODO: This is for single turn conversation only -- Not yet support multi-turn
+            # ---------------------------------------------------------------
+            labels[eot_indices+2:] = clone_inputs[eot_indices+2:]
+        else:
+            raise ValueError(f"Dataloader for {self.model_id} is not supported yet~")
         example['labels'] = labels
         return example
 
@@ -405,16 +452,16 @@ class RecognitionData_SelfPrompting(Dataset):
             example['labels'] = ['No']
         return example
 
-
 if __name__ == "__main__":
-
-    model_id = 'leloy/Anole-7b-v0.1-hf'
-    processor = ChameleonProcessor.from_pretrained(model_id)
-    #--- This is for debug purpose
-    config_file = './config/selfprompting.yaml'
-
+    #-- This is for debugging purpose
+    config_file = './config/emu3-gen.yaml'
     config_dict = yaml.safe_load(open(config_file, 'r'))
     config = Config(config_dict)
+    if config.model_id == 'leloy/Anole-7b-v0.1-hf':
+        processor = ChameleonProcessor.from_pretrained(config.model_id)
+    elif config.model_id == 'Emu3-community/Emu3-Gen-hf':
+        processor = Emu3Processor.from_pretrained(config.model_id)
+
     config.json_file = [x.replace('SKS_NAME', config.sks_name) for x in config.json_file]
     config.sks_name = 'bo'
     prefix_tokens = [f'<reserved{16201+i}>' for i in range(config.prefix_token)]
@@ -443,6 +490,8 @@ if __name__ == "__main__":
                 END_OF_TURN=config.special_tokens["END_OF_TURN"],
                 personalized_prompt=personalized_prompt,
                 task_disjoin=config.task_disjoin,
+                model_id=config.model_id
                 )
     for i in range(len(train_dataset)):
-        train_dataset.__getitem__(i)
+        print(train_dataset.__getitem__(i)['input_ids'].shape, train_dataset.__getitem__(i)['pixel_values'].shape)
+        # train_dataset.__getitem__(i)

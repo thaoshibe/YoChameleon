@@ -95,9 +95,9 @@ class YoEmu3Trainer:
             self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
 
             # generation tokens
-            gen_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
+            gen_prefix_tokens = [f'<|extra_{self.latent_tokens_start_index+i}|>' for i in range(self.config.prefix_token)]
             # understanding tokens
-            understand_prefix_tokens = [f'<reserved{self.latent_tokens_start_index+self.config.prefix_token+i}>' for i in range(self.config.prefix_token)]
+            understand_prefix_tokens = [f'<|extra_{self.latent_tokens_start_index+self.config.prefix_token+i}|>' for i in range(self.config.prefix_token)]
             personalized_tokens = [self.identifier]
             
             personalized_tokens.extend(gen_prefix_tokens)
@@ -117,7 +117,7 @@ class YoEmu3Trainer:
             self.latent_tokens_start_index = self.config.special_tokens["LATENT_TOKEN_START"]
             self.identifier = self.config.special_tokens["SKS_TOKEN"]
 
-            prefix_tokens = [f'<reserved{self.latent_tokens_start_index+i}>' for i in range(self.config.prefix_token)]
+            prefix_tokens = [f'<|extra_{self.latent_tokens_start_index+i}|>' for i in range(self.config.prefix_token)]
             personalized_tokens = [self.identifier]
             personalized_tokens.extend(prefix_tokens)
 
@@ -292,18 +292,20 @@ class YoEmu3Trainer:
 
                 # Process labels with image tokens
                 for i, item in enumerate(batch['labels']):
-                    if len(torch.nonzero(batch['labels'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
-                        soi_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
-                        eot_index = torch.nonzero(batch['labels'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
-                        image_tokens = self.model.text_model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
-                        batch['labels'][i, soi_index:eot_index] = image_tokens
-                for i, item in enumerate(batch['input_ids']):
-                    if len(torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
-                        soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
-                        eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
-                        image_tokens = self.model.text_model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
-                        batch['input_ids'][i, soi_index:eot_index] = image_tokens
-                        # print('image tokens added to input_ids')
+                    soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+                    eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+                    image_tokens = self.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i], image_sizes=batch['image_sizes'][None, i])
+                    batch['labels'][i, soi_index:eot_index] = image_tokens
+                    batch['input_ids'][i, soi_index:eot_index] = image_tokens
+                # breakpoint()
+                # for i, item in enumerate(batch['input_ids']):
+                #     if len(torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"])) != 0:
+                #         soi_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["START_OF_IMAGE_INDEX"]).item() + 1
+                #         eot_index = torch.nonzero(batch['input_ids'][i] == self.config.special_tokens["END_OF_IMAGE_INDEX"]).item()
+                #         image_tokens = self.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i])[0]
+                #         batch['input_ids'][i, soi_index:eot_index] = image_tokens
+                #         # print('image tokens added to input_ids')
+                # self.model.get_image_tokens(pixel_values=batch['pixel_values'][None, i], image_sizes=batch['image_sizes'])
                 batch = {k: v.to(self.model.device) for k, v in batch.items()}
 
                 # Forward pass
