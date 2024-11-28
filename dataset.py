@@ -32,7 +32,7 @@ class Config:
 def chameleon_to_emu3(input_string):
     def replacer(match):
         num = int(match.group(1))
-        return f"<|extra_{num - 16200}|>"
+        return f"<|extra_{num - 16100}|>"
     
     # Replace all occurrences of <reserved####> with <|extra_###|>
     updated_string = re.sub(r"<reserved(\d+)>", replacer, input_string)
