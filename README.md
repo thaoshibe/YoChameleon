@@ -1,13 +1,18 @@
 # Yo'Chameleon
 
-<img src="./images/yochameleon.png" alt="YoChameleon" width="300">
+###  [Project Page](https://thaoshibe.github.io/YoChameleon) | [arXiv]() | [HF Datasets](https://huggingface.co/datasets/thaoshibe/YoLLaVA)
 
-⭑.ᐟ *Hello, this is [Yo'LLaVA](https://thaoshibe.github.io/YoLLaVA/) meets [Chameleon](https://arxiv.org/abs/2405.09818)!* ⭑.ᐟ
-ㅤ
+
+<img src="./images/yochameleon-bo.png" alt="YoChameleon" width="1000">
+
 ---
 **🦎 Yo’Chameleon: Personalized Vision and Language Generation**<br>
 Thao Nguyen<sup>1, 2</sup>, Krishna Kumar Singh<sup>2</sup>, Jing Shi<sup>2</sup>, Trung Bui<sup>2</sup>, Yong Jae Lee<sup>1, ¶</sup>, Yuheng Li<sup>2, ¶</sup><br>
 *<sup>1</sup>University of Wisconsin-Madison, <sup>2</sup>Adobe Research*<br>
+
+(⭑.ᐟ *This is [Yo'LLaVA](https://thaoshibe.github.io/YoLLaVA/) meets [Chameleon](https://arxiv.org/abs/2405.09818)!* ⭑.ᐟ)
+
+<img src="./images/yochameleon.png" alt="YoChameleon" width="200">
 
 > Large Multimodal Models (e.g., GPT-4, Gemini, Chameleon) have evolved into powerful tools with millions of users. However, they remain generic models and lack personalized knowledge of specific user concepts.
 Previous work has explored personalization for text generation, yet it remains unclear how these methods can be adapted to new modalities, such as image generation. In this paper, we introduce Yo'Chameleon, the first attempt to study personalization for large multimodal models.
@@ -35,6 +40,10 @@ git clone https://github.com/thaoshibe/YoChameleon.git
 cd YoChameleon
 
 # Install via pip
+conda create -n yochameleon
+conda acitvate yochameleon
+conda install pytorch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 -c pytorch
+
 pip install -r requirements.txt
 
 # Or run the bash script
@@ -44,6 +53,27 @@ bash install.sh
 ### Quick Start
 
 This provide a quick start to train the model with the provided dataset.
+
+***1. Download Mini-YoChameleon Data***
+
+Here we provide a quick start with a mini-version of the YoChameleon training dataset. Please download it via HuggingFace Datasets.
+
+```
+git lfs install
+git clone git@hf.com:datasets/thaoshibe/Mini-YoChameleon-Data
+
+# optional, if you also want to see Yo'LLaVA data
+git clone git@hf.com:datasets/thaoshibe/Mini-YoChameleon-Data
+
+```
+
+***2. Train***
+
+Run this script to quick train -- You should be able to monitor the training with visualization via WanDB.
+
+```
+python train.py --config config/basic.yaml
+```
 
 ### 🛠️ Creating dataset
 
@@ -314,16 +344,14 @@ bash train.sh
 ### 🧪 Test
 
 ```
-# This test will generated "A photo of <sks>" and saved to some directory
-python test.py --config config/basic.yaml 
-# A bash script is also provided
-bash scripts/test.sh
+# This test will generated "A photo of <sks>" and saved to `./generated_images`
 
-# Or you can test in a flexible mode
-#
-#       THAO: THIS IS TODO
-#
-python test_flexible.py --config config/basic.yaml --prompt "A photo of a cat"... 
+python test.py --config config/basic.yaml 
+# (Or optionally, you can also provide override arguments: e.g., python test.py --config config/basic.yaml --exp_name 1000 --savedir ../ckpt --sks_name "mam")
+
+# Bash script for test
+
+bash scripts/test.sh
 ```
 
 
@@ -446,10 +474,31 @@ python evaluation/recognition.py --config ./config/recog.yaml --sks_name "thao" 
 ```
 ---
 
-##### TODO
+<!-- ##### TODO
 
 - [ ] Emu3-Gen related
-  - [ ] Now only support train for image generation (dataloader support image only, not self-prompting)
+  - [ ] Now only support train for image generation (dataloader support image only, not self-prompting) -->
+
+
+### 🖊️ Citation
+
+
+```
+@inproceedings{yochameleon,
+  author = {Thao Nguyen and Krishna Kumar Singh and Jing Shi and Trung Bui and Yong Jae Lee and Yuheng Li},
+  title = {Yo\textquotesingle Chameleon: Personalized Vision and Language Generation},
+  year = {2025},
+  booktitle = {Proceedings of the {IEEE} Conference on Computer Vision and Pattern Recognition (CVPR)}
+}
+
+@inproceedings{yollava,
+ author = {Nguyen, Thao and Liu, Haotian and Li, Yuheng and Cai, Mu and Ojha, Utkarsh and Lee, Yong Jae},
+ booktitle = {Advances in Neural Information Processing Systems},
+ title = {Yo\textquotesingle LLaVA: Your Personalized Language and Vision Assistant},
+ year = {2024}
+}
+```
+
 
 ### 🤗 Acknowledgements
 
@@ -459,12 +508,13 @@ This project will not be possible without the following open-source projects:
 - [Emu3: Next-Token Prediction is All You Need](https://github.com/baaivision/Emu3/tree/main)
 - and amazing HuggingFace's community: [Chamleon on HuggingFace](https://huggingface.co/docs/transformers/en/model_doc/chameleon), [Anole on HuggingFace](https://github.com/huggingface/transformers/pull/32013), [Emu3 on HuggingFace](https://github.com/huggingface/transformers/pull/33770)
 
+<!-- 
 I would like to express my gratitude to my Adobe Research's mentors: [Dr. Krishna](https://krsingh.cs.ucdavis.edu/), [Dr. Jing Shi](https://jshi31.github.io/jingshi/), and [Dr. Trung Bui](https://sites.google.com/site/trungbuistanford/) for their discussions. Special thanks to my advisor, [Prof. Yong Jae Lee](https://pages.cs.wisc.edu/~yongjaelee/), who provided endless insights and guidance for this project (as always).
 
 A big shout-out to my primary fellow mentee [Sicheng Mo](https://sichengmo.github.io/)—he taught me so much about coding. Without him, I’d still be using TensorBoard instead of WanDB! (Also, he has wonderful taste in food and restaurants.) <br>
 Additionally, thanks to (technically-not) mentor [Fangzhou Mu](https://fmu2.github.io/) for hosting many Friday dinners and board game nights during the summer 🥓🍣🍱 (though, he’s not a fan of Thai foods —meh~).  
 
-And finally, saving the best for last: I couldn’t have completed this project without the unwavering support (and pushes) of my main Adobe `juan` mentor, [Dr. Yuheng Li](https://yuheng-li.github.io/) :xixi:. Thank you so much!
+And finally, saving the best for last: I couldn’t have completed this project without the unwavering support (and pushes) of my main Adobe `juan` mentor, [Dr. Yuheng Li](https://yuheng-li.github.io/) :xixi:. Thank you so much! -->
 
 
 
@@ -485,4 +535,4 @@ And finally, saving the best for last: I couldn’t have completed this project 
   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀
 
 
-*Finally, I've wrapped up this project -- I'll go home and hug my pets now ☕,  hehe (.❛ ᴗ ❛.)*
+<!-- *Finally, I've wrapped up this project -- I'll go home and hug my pets now ☕,  hehe (.❛ ᴗ ❛.)* -->

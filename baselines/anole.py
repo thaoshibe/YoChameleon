@@ -1,17 +1,14 @@
 import argparse
 import glob
 import os
-import torch
-
-import wandb
-import yaml
-
 import random
 
+import torch
+import wandb
+import yaml
 from PIL import Image
 from tqdm import tqdm
-from transformers import ChameleonForConditionalGeneration
-from transformers import ChameleonProcessor
+from transformers import ChameleonForConditionalGeneration, ChameleonProcessor
 from transformers.image_transforms import to_pil_image
 
 SUBJECT_NAMES = ["bo", "duck-banana", "marie-cat", "pusheen-cup", "brown-duck", "dug", "mydieu", "shiba-black",
@@ -25,8 +22,8 @@ SUBJECT_NAMES = ["bo", "duck-banana", "marie-cat", "pusheen-cup", "brown-duck", 
     "pig-cup", "thap-cham", "yuheng", "thuytien",
 ]
 
-SUBJECT_NAMES = ["chua-thien-mu",
-]
+# SUBJECT_NAMES = ["chua-thien-mu",
+# ]
 
 def get_args():
     parser = argparse.ArgumentParser()

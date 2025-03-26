@@ -1,3 +1,5 @@
+Cython==3.0.1
+numpy==1.26.4
 absl-py==1.4.0
 accelerate==1.0.1
 aiobotocore==2.7.0
@@ -38,9 +40,7 @@ coloredlogs==15.0.1
 comm==0.2.2
 contourpy==1.1.0
 coverage==7.3.0
-cupy-cuda12x==12.2.0
 cycler==0.11.0
-Cython==3.0.1
 debugpy==1.6.7.post1
 decorator==4.4.2
 deepspeed==0.10.1
@@ -75,7 +75,6 @@ fvcore==0.1.5.post20221221
 g5nie==0.1.1
 gast==0.5.4
 gdown==4.4.0
-genie @ file:///opt/genie/genie-1.0.0%2Bfd4ffef-py3-none-any.whl#sha256=981149deb6e52ac706c4f2a0d724fcd28f7e8316bb1187555919f68fe02fa486
 gitdb==4.0.10
 GitPython==3.1.32
 google-auth==2.22.0
@@ -152,7 +151,6 @@ nest-asyncio==1.6.0
 networkx==3.1
 ninja==1.11.1.1
 notebook_shim==0.2.4
-numpy==1.26.4
 nvidia-cublas-cu12==12.2.5.6
 nvidia-cuda-cupti-cu12==12.2.142
 nvidia-cuda-nvrtc-cu12==12.2.140
@@ -202,7 +200,6 @@ py-spy==0.3.14
 pyarrow==13.0.0
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
-pycocotools @ git+https://github.com/philferriere/cocoapi.git@2929bd2ef6b451054755dfd7ceb09278f935f7ad#subdirectory=PythonAPI
 pycodestyle==2.11.0
 pycparser==2.21
 pydantic==1.10.13
@@ -275,12 +272,6 @@ tinycss2==1.2.1
 tokenizers==0.20.1
 tomli==2.0.1
 tomlkit==0.12.1
-torch @ file:///opt/pytorch/dist/torch-2.1.0-cp310-cp310-linux_x86_64.whl
-torch-tb-profiler==0.4.1
-torchaudio @ file:///opt/audio/dist/torchaudio-2.2.0a0%2B2994ce2-cp310-cp310-linux_x86_64.whl#sha256=866f32c9f0b75c8573847fdb48c4f4d6312f1b911f9108f6b9be96b78a355726
-torchdata==0.6.1
-torchmetrics==1.1.0
-torchvision @ file:///opt/vision/dist/torchvision-0.16.0a0%2B224cbc8-cp310-cp310-linux_x86_64.whl
 tornado==6.4
 tqdm==4.66.1
 traitlets==5.14.2

@@ -1,5 +1,5 @@
 project_name: "YoChameleon9"
-entity: "thaoshibe-university-of-wisconsin-madison"
+# entity: "thaoshibe-university-of-wisconsin-madison"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
 data_root: '/mnt/localssd/code/data/minithao/'

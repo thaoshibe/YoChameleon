@@ -1,26 +1,19 @@
+import glob
 import json
 import os
-
-import glob
+import re
 
 import numpy as np
-
-import re
 import torch
 import yaml
-
-from PIL import Image
-from PIL import ImageOps
-
+from PIL import Image, ImageOps
 from torch.utils.data import Dataset
-from torchvision import datasets
-from torchvision import transforms
-from transformers import ChameleonForConditionalGeneration
-from transformers import ChameleonProcessor
-from transformers import ChameleonVQVAE
-from transformers import ChameleonVQVAEConfig
-from transformers import Emu3Processor
+from torchvision import datasets, transforms
+from transformers import (ChameleonForConditionalGeneration,
+                          ChameleonProcessor, ChameleonVQVAE,
+                          ChameleonVQVAEConfig, Emu3Processor)
 from transformers.image_transforms import to_pil_image
+
 # END-OF-TURN token: <reserved08706>
 
 class Config:

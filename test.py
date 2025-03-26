@@ -1,16 +1,15 @@
 import argparse
 import os
-import torch
 
+import torch
 import wandb
 import yaml
-
 from PIL import Image
 from tqdm import tqdm
-from transformers import ChameleonForConditionalGeneration
-from transformers import ChameleonProcessor
+from transformers import ChameleonForConditionalGeneration, ChameleonProcessor
 from transformers.image_transforms import to_pil_image
 from utils import Config
+
 
 def save_generated_images(pixel_values, prompt_short, save_path, sks_name, index, img_size=256):
     """Save generated images to a specified directory."""
@@ -30,6 +29,7 @@ def get_args():
     parser.add_argument('--config', type=str, default='./config/basic.yml')
     parser.add_argument('--iteration', type=str, default='10')
     parser.add_argument('--finetune', action='store_true', help='Use fine-tuned model')
+    parser.add_argument('--savedir', type=str, default=None)
     parser.add_argument('--exp_name', type=str, default=None)
     parser.add_argument('--sks_name', type=str, default=None)
     parser.add_argument('--img_size', type=int, default=512)
@@ -47,6 +47,8 @@ if __name__ == '__main__':
         config.exp_name = args.exp_name
     if args.sks_name is not None:
         config.sks_name = args.sks_name
+    if args.savedir is not None:
+        config.savedir = args.savedir
 
     # Initialize processor and model
     processor = ChameleonProcessor.from_pretrained(config.model_id)
@@ -125,8 +127,8 @@ if __name__ == '__main__':
     index = 0
     for i in tqdm(range(0, config_test.num_images, config_test.batch_size)):  # Step through by batch size
         prompt_short = config_test.prompt
-        prompt_short = 'A photo of <reserved16200> with a tiger on the left'
-        # full_prompt = f"{sks_prompt} {prompt_short}. <reserved08706><reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
+        # breakpoint()
+        full_prompt = f"{sks_prompt} {prompt_short}. <reserved08706><reserved16201><reserved16202><reserved16203><reserved16204><reserved16205><reserved16206><reserved16207><reserved16208><reserved16209><reserved16210><reserved16211><reserved16212><reserved16213><reserved16214><reserved16215><reserved16216>."
         full_prompt = f"{sks_prompt} {prompt_short}."
         inputs = processor([full_prompt] * config_test.batch_size, return_tensors="pt").to(model.device)
         generate_ids = model.generate(**inputs, multimodal_generation_mode="image-only", max_new_tokens=1026, do_sample=True)

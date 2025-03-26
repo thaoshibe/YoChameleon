@@ -1,14 +1,10 @@
 import argparse
-import yaml
-
-from PIL import Image
-from tqdm import tqdm
-from utils import Config
-
 import warnings
 
-from utils import get_dataloader_iter
-from utils import get_eval_dataloader
+import yaml
+from PIL import Image
+from tqdm import tqdm
+from utils import Config, get_dataloader_iter, get_eval_dataloader
 from yochameleon import YoChameleonTrainer
 from yoemu3 import YoEmu3Trainer
 

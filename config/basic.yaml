@@ -1,17 +1,17 @@
 project_name: "YoChameleon"
-entity: "thaoshibe-university-of-wisconsin-madison"
+entity: "YOUR-ENTITY"
 
 model_id: 'leloy/Anole-7b-v0.1-hf'
-data_root: '/mnt/localssd/code/data/minithao/'
+data_root: './data/mini-yochameleon-data'
 
-json_file: # Remember to change this
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/recognition.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/text_conversation.json'
-  - '/mnt/localssd/code/data/yochameleon-data/train/SKS_NAME/json/1000.json'
+json_file: # Remember to change this -- THIS IS PATH TO YOUR DATA
+  - './mini-yochameleon-data/train/SKS_NAME/json/recognition.json'
+  - './mini-yochameleon-data/train/SKS_NAME/json/text_conversation.json'
+  - './mini-yochameleon-data/train/SKS_NAME/json/1000.json'
 
-sks_name: 'thao'
-prefix_token: 16 # Remember to change this
-exp_name: 'sf' # Remember to change this
+sks_name: 'bo'
+prefix_token: 8 # Remember to change this if needed
+exp_name: 'YoChameleon' # Remember to change this
 different_identifier: False
 task_disjoin: False
 self_prompting: True
@@ -23,7 +23,7 @@ epoch: 16000 # remember to CHANGE THIS shibe; Currently it will use epochs for t
 save_every: 200
 
 batch_size: 4
-savedir: '/sensei-fs/users/thaon/ckpt/'
+savedir: '../ckpt/'
 # savedir: '/sensei-fs/users/thaon/ckpt-04112024/'
 whole_model: False
 tokenizer_max_length: 1500
@@ -54,7 +54,7 @@ special_tokens:
 resume: 
   resume: No
   resume_iteration: 15
-  savedir: '/sensei-fs/users/thaon/ckpt/'
+  savedir: './ckpt/'
   exp_name: '1000disjoin'
 
 finetune:
@@ -94,6 +94,6 @@ eval:
 test:
   prompt: "A photo of <reserved16200>."
   iteration: 200 # this will not affect the train code -- generated images are always with lastest checkpoints
-  save_dir: '/sensei-fs/users/thaon/code/generated_images/'
-  batch_size: 16
+  save_dir: './ckpt/generated_images/'
+  batch_size: 1
   num_images: 100
